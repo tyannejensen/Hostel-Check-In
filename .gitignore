@@ -1,0 +1,12 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Node modules
+/node_modules/
+/client/node_modules/
+/server/node_modules/
+
+# UNCOMMENT WHEN DEPLOYING WITH SENSITIVE DATA
+# Environment variables 
+# .env
+# /client/.env
+# /server/.env
