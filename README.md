@@ -7,7 +7,7 @@
 [Sky](https://github.com/skylark-shae)
 [Chris](https://github.com/cjsquared-dev)
 
-[Repo](https://github.com/skylark-shae/Hostel_checkin)
+[Repo](https://github.com/tyannejensen/Hostel-Check-In)
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
