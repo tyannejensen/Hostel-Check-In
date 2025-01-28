@@ -1,5 +1,7 @@
 import { User } from "./User"
 import { Booking } from "./Booking"
 import { Payment } from "./Payment"
+import { Room } from "./Room"
 
-export { User, Booking, Payment }
+// Export all models
+export { User, Booking, Payment, Room }
