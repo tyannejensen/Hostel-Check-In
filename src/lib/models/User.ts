@@ -1,9 +1,10 @@
 import { Schema, model, ObjectId, Document, models } from "mongoose"
+import { IPayment } from "./Payment"
 import bcrypt from "bcrypt"
 import { v4 as uuidv4 } from "uuid"
 
 // Custom types for User Schema
-type IPaymenMethod =
+export type IPaymentType =
 	| "cash"
 	| "credit"
 	| "debit"
@@ -20,9 +21,8 @@ export interface IPhoneNumber {
 	isPrimary: boolean
 }
 
-export interface IPaymentMethod {
-	isPrimary: boolean
-	method: IPaymenMethod
+export interface IPaymentDetails {
+	method: IPaymentType
 	cardHolderName?: string
 	cardNumber?: string
 	expirationDate?: Date
@@ -30,6 +30,11 @@ export interface IPaymentMethod {
 	routingNumber?: string
 	accountNumber?: string
 	bankName?: string
+}
+
+export interface IPaymentMethod extends IPaymentDetails {
+	isPrimary: boolean
+	paymentName?: string
 }
 
 export interface IUser extends Document {
@@ -105,7 +110,7 @@ const userSchema = new Schema<IUser>(
 					},
 				},
 				isMobile: {
-					type: boolean,
+					type: Boolean,
 					required: [true, "Phone type is required"],
 					default: true,
 				},
