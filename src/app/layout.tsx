@@ -1,16 +1,16 @@
-import React from "react"
+import React from "react";
 
 // These styles apply to every route in the application
-import "@/styles/globals.css"
+import "@/styles/global.css";
 
 export default function RootLayout({
-	children,
+  children,
 }: {
-	children: React.ReactNode
+  children: React.ReactNode;
 }) {
-	return (
-		<html lang="en">
-			<body>{children}</body>
-		</html>
-	)
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
 }
