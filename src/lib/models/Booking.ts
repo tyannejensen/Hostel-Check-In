@@ -27,64 +27,62 @@ export interface IBooking extends Document {
 
 // TODO: Complete the Booking Schema - add validation, default values, and required fields
 
-const bookingSchema = new Schema<IBooking>({
-	bookedBy: {
-		type: String, // reference to the user (tenant) who made the booking - uses uuid v4
-		required: [true, "Tenant ID is required"],
-		ref: "User",
-	},
-	createdBy: {
-		type: String, // reference to the user (employee) who created the booking - uses uuid v4
-		required: [true, "Employee ID is required"],
-		ref: "User",
-	},
-	roomId: {
-		// reference to the Room Schema
-		type: Schema.Types.ObjectId, // Note: dot notation needed instead of alias due to mongoDB ObjectId import
-		ref: "Room",
-		required: [true, "Room ID is required"],
-	},
-	checkIn: {
-		type: Date,
-		required: [true, "Check-in date is required"],
-	},
-	checkOut: {
-		type: Date,
-		required: [true, "Check-out date is required"],
-	},
-	status: {
-		type: String,
-		enum: ["paid", "pending", "due"],
-		default: "pending",
-	},
-	DepositAmount: {
-		type: Number,
-		required: [true, "Deposit amount is required"],
-	},
-	depositReturned: {
-		type: Boolean,
-		default: false,
-	},
-	depositReturnDate: {
-		type: Date,
-	},
-	depositReturnAmount: {
-		type: Number,
-	},
-	payments: [
-		{
-			type: Schema.Types.ObjectId,
-			ref: "Payment",
+const bookingSchema = new Schema<IBooking>(
+	{
+		bookedBy: {
+			type: String, // reference to the user (tenant) who made the booking - uses uuid v4
+			required: [true, "Tenant ID is required"],
+			ref: "User",
 		},
-	],
-	Notes: [noteSchema],
-	history: [changeLogSchema],
-})
-
-// TODO: Check if virtual fields are necessary on this Booking Schema
-// Ensure virtual fields are serialized in JSON and object representations
-// bookingSchema.set("toJSON", { virtuals: true })
-// bookingSchema.set("toObject", { virtuals: true })
+		createdBy: {
+			type: String, // reference to the user (employee) who created the booking - uses uuid v4
+			required: [true, "Employee ID is required"],
+			ref: "User",
+		},
+		roomId: {
+			// reference to the Room Schema
+			type: Schema.Types.ObjectId,
+			ref: "Room",
+			required: [true, "Room ID is required"],
+		},
+		checkIn: {
+			type: Date,
+			required: [true, "Check-in date is required"],
+		},
+		checkOut: {
+			type: Date,
+			required: [true, "Check-out date is required"],
+		},
+		status: {
+			type: String,
+			enum: ["paid", "pending", "due"],
+			default: "pending",
+		},
+		DepositAmount: {
+			type: Number,
+			required: [true, "Deposit amount is required"],
+		},
+		depositReturned: {
+			type: Boolean,
+			default: false,
+		},
+		depositReturnDate: {
+			type: Date,
+		},
+		depositReturnAmount: {
+			type: Number,
+		},
+		payments: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "Payment",
+			},
+		],
+		Notes: [noteSchema],
+		history: [changeLogSchema],
+	},
+	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+)
 
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
 bookingSchema.pre("findOneAndUpdate", async function (next) {
