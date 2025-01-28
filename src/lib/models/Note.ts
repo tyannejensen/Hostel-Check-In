@@ -26,7 +26,7 @@ export const noteSchema = new Schema<INote>(
 			required: [true, "Employee ID is required"],
 		},
 	},
-	{ versionKey: false } // Disable versioning (__v) field to prevent notes from being updated
+	{ versionKey: false, timestamps: true } // Disable versioning (__v) field to prevent notes from being updated
 )
 
 // Notes Pre Save Hook -> Middleware to enforce immutability of notes

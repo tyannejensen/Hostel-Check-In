@@ -194,7 +194,7 @@ const userSchema = new Schema<IUser>(
 		],
 	},
 	{
-		timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" },
+		timestamps: true, // Add createdAt and updatedAt fields
 		toJSON: { getters: true },
 		toObject: { getters: true },
 	}

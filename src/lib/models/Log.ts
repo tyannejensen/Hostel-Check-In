@@ -35,7 +35,7 @@ export const changeLogSchema = new Schema<IChangeLog>(
 			required: [true, "Employee ID is required"],
 		},
 	},
-	{ versionKey: false } // Disable versioning (__v) field to prevent Booking Updates from being updated
+	{ versionKey: false, timestamps: true } // Disable versioning (__v) field to prevent Booking Updates from being updated
 )
 
 // Booking Update Pre Save Hook -> Middleware to enforce immutability of notes

@@ -33,8 +33,31 @@ export interface IPayment extends IPaymentDetails, Document {
 
 // Payment Schema - subdocument of Booking Schema
 const paymentSchema = new Schema<IPayment>(
-	{},
-	{ versionKey: false } // Disable versioning (__v) field to prevent Payment from being updated
+	{
+		bookingId: {
+			type: Schema.Types.ObjectId,
+			ref: "Booking",
+			required: [true, "Booking ID is required"],
+		},
+		amount: {
+			type: Number,
+			required: [true, "Payment amount is required"],
+		},
+		paidBy: {
+			type: String,
+			required: [true, "Payer ID is required"],
+			ref: "User",
+		},
+		createdBy: {
+			type: String,
+			required: [true, "Employee ID is required"],
+			ref: "User",
+		},
+	},
+	{
+		versionKey: false, // Disable versioning (__v) field to prevent Payment from being updated
+		timestamps: true, // Add createdAt and updatedAt fields
+	}
 )
 
 // Notes Pre Save Hook -> Middleware to enforce immutability of notes
