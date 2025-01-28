@@ -98,10 +98,15 @@ bookingSchema.post(
 	async function (result: IBooking & Document) {
 		if (!result || !this.get("_oldDoc")) return // Exit if no result or old doc
 
-		const oldDoc = this.get("_oldDoc") as IBooking // Retrieve the old document
-		const update = this.getUpdate() as Record<string, any> // Retrieve the update object
-		if (!update) return // Exit if no updates
-		const updatedFields = update.$set // Retrieve updated fields
+		// Retrieve the old and new document fields
+		const oldDoc = this.get("_oldDoc") // Retrieve the old document
+		const update = this.getUpdate() as { $set?: Record<string, any> } // Refined typing for update object
+
+		if (!update) return // Exit if no update object
+
+		const updatedFields = update.$set || {} // Safely access $set, defaulting to an empty object if undefined
+
+		if (Object.keys(updatedFields).length === 0) return // Exit if no updated fields
 
 		const changeLogs: IChangeLog[] = Object.keys(updatedFields)
 			.map((field) => {
