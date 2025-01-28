@@ -15,6 +15,7 @@ type IPaymentType =
 
 // Interfaces for Schemas
 export interface IPhoneNumber extends Document {
+	_id: ObjectId
 	countryCode: string
 	number: string
 	isMobile: boolean
@@ -67,15 +68,15 @@ export interface IUser extends Document {
 	lastName: string
 	fullname?: string
 	email: string
-	phoneNumber: IPhoneNumber[]
+	phoneNumber: IPhoneNumber[] // reference to PhoneNumber Subdocument
 	password: string
 	role: IRole
 	transactions: ObjectId[] // reference to Transaction Schema
-	paymentMethod: IPaymentMethod[]
+	paymentMethod: IPaymentMethod[] // reference to PaymentMethod Subdocument
 	createdAt?: Date
 	updatedAt?: Date
 	tags: string[]
-	history: IChangeLog[]
+	history: IChangeLog[] // reference to ChangeLog Subdocument
 	createdBy?: string // reference to the user (employee) who created the user - uses uuid v4
 	updatedBy?: string // reference to the user (employee) who updated the user - uses uuid v4
 }

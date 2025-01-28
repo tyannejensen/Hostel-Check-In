@@ -2,6 +2,7 @@ import { Schema, model, ObjectId, Document, models } from "mongoose"
 import bcrypt from "bcrypt"
 import { v4 as uuidv4 } from "uuid"
 import { changeLogSchema } from "@/lib/models/Log"
+import { phoneNumberSchema } from "@/lib/models/PhoneNumber"
 import { IChangeLog, IUser } from "@/lib/types"
 
 // User Schema
@@ -44,34 +45,7 @@ const userSchema = new Schema<IUser>(
 				"Email is invalid",
 			],
 		},
-		phoneNumber: [
-			{
-				countryCode: {
-					type: String,
-					required: [true, "Country code is required"],
-					default: "+1",
-				},
-				number: {
-					type: String,
-					required: [true, "Phone number is required"],
-					unique: [true, "Phone number already exists"],
-					validate: {
-						// custom validator requiring number to be in the format 123-456-7890
-						validator: (v: string) => /\d{3}-\d{3}-\d{4}/.test(v),
-						message: (props) => `${props.value} is not a valid phone number`,
-					},
-				},
-				isMobile: {
-					type: Boolean,
-					required: [true, "Phone type is required"],
-					default: true,
-				},
-				isPrimary: {
-					type: Boolean,
-					required: [true, "Primary phone indicator is required"],
-				},
-			},
-		],
+		phoneNumber: [phoneNumberSchema],
 		password: {
 			type: String,
 			required: [true, "Password is required"],
