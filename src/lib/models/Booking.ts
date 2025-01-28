@@ -1,21 +1,16 @@
 import { Schema, model, ObjectId, Document, models } from "mongoose"
-import { IPaymentType } from "./User"
-import { v4 as uuidv4 } from "uuid"
+import { IPayment } from "./Payment"
+import { changeLogSchema, IChangeLog } from "./Log"
 
+// Custom types for Booking Schema
 type IBookingStatus = "paid" | "pending" | "due"
+
+// Interfaces for Booking Schema
 
 export interface INote {
 	content: string
 	createdAt: Date
 	createdBy: string // reference to the user (employee) who created the note - uses uuid v4
-}
-
-export interface IPayment {
-	_id: ObjectId
-	amount: number
-	paymentMethod: IPaymentType
-	createdAt: Date
-	createdBy: string // reference to the user (employee) who created the payment - uses uuid v4
 }
 
 export interface IBooking extends Document {
@@ -32,7 +27,7 @@ export interface IBooking extends Document {
 	payments: IPayment[]
 	totalPayment?: number
 	Notes?: INote[]
-	history: ObjectId[] // reference to BookingHistory Schema
+	history?: IChangeLog[]
 }
 
 // Note Schema - subdocument of Booking Schema
@@ -69,7 +64,6 @@ noteSchema.pre("save", function (next) {
 	next(new Error("Notes are immutable once created"))
 })
 
-// TODO: Define BookingHistory Schema
 // TODO: Complete the Booking Schema - add validation, default values, and required fields
 
 const bookingSchema = new Schema<IBooking>({
@@ -115,17 +109,53 @@ const bookingSchema = new Schema<IBooking>({
 	},
 	payments: [
 		{
-			_id: {
-				type: String,
-				default: uuidv4,
-			},
+			type: Schema.Types.ObjectId,
+			ref: "Payment",
 		},
 	],
 	Notes: [noteSchema],
-	history: [
-		{
-			type: Schema.Types.ObjectId,
-			ref: "BookingHistory",
-		},
-	],
+	history: [changeLogSchema],
 })
+
+// Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
+bookingSchema.pre("findOneAndUpdate", async function (next) {
+	const query = this // Reference to the query
+	const docToUpdate = await this.model.findOne(this.getQuery()) // Fetch the old document
+	query.set("_oldDoc", docToUpdate) // Store the old document in a query property
+	next()
+})
+
+// Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
+bookingSchema.post("findOneAndUpdate", async function (result) {
+	if (!result || !this.get("_oldDoc")) return // Exit if no result or old doc
+
+	const oldDoc = this.get("_oldDoc") // Retrieve the old document
+	const update = this.getUpdate() // Retrieve the update object
+	if (!update) return // Exit if no updates
+	const updatedFields = (update as any).$set // Retrieve updated fields
+
+	const changeLogs = Object.keys(updatedFields)
+		.map((field) => {
+			const oldValue = oldDoc[field]
+			const newValue = updatedFields[field]
+
+			// Log the changes only if the value is different
+			if (oldValue !== newValue) {
+				return {
+					field,
+					oldValue,
+					newValue,
+				}
+			}
+		})
+		.filter(Boolean) // Remove undefined logs
+
+	// Append the changes to the history field
+	if (changeLogs.length > 0) {
+		result.history.push(...changeLogs)
+		await result.save() // Save the document with the new history
+	}
+})
+
+export const Booking =
+	models.Booking || model<IBooking>("Booking", bookingSchema)
