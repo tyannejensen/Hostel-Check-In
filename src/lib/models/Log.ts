@@ -1,8 +1,7 @@
-import { Schema, ObjectId } from "mongoose"
+import { Schema, Document } from "mongoose"
 import { IBooking } from "./Booking"
 
-export interface IChangeLog {
-	_id: ObjectId
+export interface IChangeLog extends Document {
 	field: string
 	oldValue: any
 	newValue: any

@@ -1,35 +1,17 @@
 import { Schema, model, ObjectId, Document, models } from "mongoose"
-import { IPayment } from "./Payment"
+import { IPaymentDetails } from "@/lib/models/Payment"
 import bcrypt from "bcrypt"
 import { v4 as uuidv4 } from "uuid"
 
 // Custom types for User Schema
-export type IPaymentType =
-	| "cash"
-	| "credit"
-	| "debit"
-	| "bank"
-	| "money order"
-	| "check"
 type IRole = "admin" | "employee" | "tenant"
 
 // Interfaces for User Schema
-export interface IPhoneNumber {
+export interface IPhoneNumber extends Document {
 	countryCode: string
 	number: string
 	isMobile: boolean
 	isPrimary: boolean
-}
-
-export interface IPaymentDetails {
-	method: IPaymentType
-	cardHolderName?: string
-	cardNumber?: string
-	expirationDate?: Date
-	cvv?: string
-	routingNumber?: string
-	accountNumber?: string
-	bankName?: string
 }
 
 export interface IPaymentMethod extends IPaymentDetails {
@@ -103,6 +85,7 @@ const userSchema = new Schema<IUser>(
 				number: {
 					type: String,
 					required: [true, "Phone number is required"],
+					unique: [true, "Phone number already exists"],
 					validate: {
 						// custom validator requiring number to be in the format 123-456-7890
 						validator: (v: string) => /\d{3}-\d{3}-\d{4}/.test(v),

@@ -1,19 +1,12 @@
-import { Schema, model, Document, models } from "mongoose"
-import { ObjectId } from "mongodb"
-import { IPayment } from "./Payment"
-import { changeLogSchema, IChangeLog } from "./Log"
+import { Schema, model, Document, models, ObjectId } from "mongoose"
+import { IPayment } from "@/lib/models/Payment"
+import { changeLogSchema, IChangeLog } from "@/lib/models/Log"
+import { noteSchema, INote } from "@/lib/models/Note"
 
 // Custom types for Booking Schema
 type IBookingStatus = "paid" | "pending" | "due"
 
-// Interfaces for Booking Schema
-
-export interface INote {
-	content: string
-	createdAt: Date
-	createdBy: string // reference to the user (employee) who created the note - uses uuid v4
-}
-
+// Interface for Booking Schema
 export interface IBooking extends Document {
 	bookedBy: string // reference to the user (tenant) who made the booking - uses uuid v4
 	createdBy: string // reference to the user (employee) who created the booking - uses uuid v4
@@ -31,54 +24,22 @@ export interface IBooking extends Document {
 	history?: IChangeLog[]
 }
 
-// Note Schema - subdocument of Booking Schema
-const noteSchema = new Schema<INote>(
-	{
-		content: {
-			type: String,
-			required: [true, "Note is required"],
-			minLength: [5, "Note must be at least 5 characters long"],
-			maxLength: [1000, "Note must not exceed 1000 characters"],
-		},
-		createdAt: {
-			type: Date,
-			default: Date.now,
-		},
-		createdBy: {
-			ref: "User",
-			type: String, // reference to the user (employee) who created the note - uses uuid v4
-			required: [true, "Employee ID is required"],
-		},
-	},
-	{ versionKey: false } // Disable versioning (__v) field to prevent notes from being updated
-)
-
-// Notes Pre Save Hook -> Middleware to enforce immutability of notes
-noteSchema.pre("save", function (next) {
-	if (this.isNew) {
-		// If the note is new, allow it to save
-		return next()
-	}
-
-	// Prevent updating the note if it already exists
-	this.invalidate("content", "Notes cannot be modified after creation")
-	next(new Error("Notes are immutable once created"))
-})
-
 // TODO: Complete the Booking Schema - add validation, default values, and required fields
 
 const bookingSchema = new Schema<IBooking>({
 	bookedBy: {
 		type: String, // reference to the user (tenant) who made the booking - uses uuid v4
 		required: [true, "Tenant ID is required"],
+		ref: "User",
 	},
 	createdBy: {
 		type: String, // reference to the user (employee) who created the booking - uses uuid v4
 		required: [true, "Employee ID is required"],
+		ref: "User",
 	},
 	roomId: {
 		// reference to the Room Schema
-		type: Schema.Types.ObjectId,
+		type: Schema.Types.ObjectId, // Note: dot notation needed instead of alias due to mongoDB ObjectId import
 		ref: "Room",
 		required: [true, "Room ID is required"],
 	},
@@ -118,6 +79,11 @@ const bookingSchema = new Schema<IBooking>({
 	Notes: [noteSchema],
 	history: [changeLogSchema],
 })
+
+// TODO: Check if virtual fields are necessary on this Booking Schema
+// Ensure virtual fields are serialized in JSON and object representations
+// bookingSchema.set("toJSON", { virtuals: true })
+// bookingSchema.set("toObject", { virtuals: true })
 
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
 bookingSchema.pre("findOneAndUpdate", async function (next) {
