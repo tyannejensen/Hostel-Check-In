@@ -7,7 +7,8 @@
 			"@/lib/*": ["lib/*"],
 			"@/app/*": ["app/*"],
 			"@/utils/*": ["utils/*"],
-			"@/ui/*": ["ui/*"]
+			"@/ui/*": ["ui/*"],
+			"@/auth/*": ["auth/*"]
 		},
 		"target": "ES2017",
 		"lib": ["dom", "dom.iterable", "esnext"],

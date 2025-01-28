@@ -1,19 +1,12 @@
+import Login from '@/app/ui/login'
+import { Suspense } from 'react';
+
 export default async function Page() {
 	return (
 		<div>
-			<h1>Login</h1>
-			<form>
-				<label>
-					Email
-					<input type="email" />
-				</label>
-				<label>
-					Password
-					<input type="password" />
-				</label>
-				<button type="submit">Login</button>
-			</form>
-			// TODO: add forgot password link
+			<Suspense>
+				<Login/>
+			</Suspense>
 		</div>
 	)
 }
