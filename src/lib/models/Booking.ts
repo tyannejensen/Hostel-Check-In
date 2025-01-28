@@ -1,4 +1,5 @@
-import { Schema, model, ObjectId, Document, models } from "mongoose"
+import { Schema, model, Document, models } from "mongoose"
+import { ObjectId } from "mongodb"
 import { IPayment } from "./Payment"
 import { changeLogSchema, IChangeLog } from "./Log"
 
@@ -68,14 +69,15 @@ noteSchema.pre("save", function (next) {
 
 const bookingSchema = new Schema<IBooking>({
 	bookedBy: {
-		type: String,
+		type: String, // reference to the user (tenant) who made the booking - uses uuid v4
 		required: [true, "Tenant ID is required"],
 	},
 	createdBy: {
-		type: String,
+		type: String, // reference to the user (employee) who created the booking - uses uuid v4
 		required: [true, "Employee ID is required"],
 	},
 	roomId: {
+		// reference to the Room Schema
 		type: Schema.Types.ObjectId,
 		ref: "Room",
 		required: [true, "Room ID is required"],
@@ -126,36 +128,42 @@ bookingSchema.pre("findOneAndUpdate", async function (next) {
 })
 
 // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-bookingSchema.post("findOneAndUpdate", async function (result) {
-	if (!result || !this.get("_oldDoc")) return // Exit if no result or old doc
+bookingSchema.post(
+	"findOneAndUpdate",
+	async function (result: IBooking & Document) {
+		if (!result || !this.get("_oldDoc")) return // Exit if no result or old doc
 
-	const oldDoc = this.get("_oldDoc") // Retrieve the old document
-	const update = this.getUpdate() // Retrieve the update object
-	if (!update) return // Exit if no updates
-	const updatedFields = (update as any).$set // Retrieve updated fields
+		const oldDoc = this.get("_oldDoc") as IBooking // Retrieve the old document
+		const update = this.getUpdate() as Record<string, any> // Retrieve the update object
+		if (!update) return // Exit if no updates
+		const updatedFields = update.$set // Retrieve updated fields
 
-	const changeLogs = Object.keys(updatedFields)
-		.map((field) => {
-			const oldValue = oldDoc[field]
-			const newValue = updatedFields[field]
+		const changeLogs: IChangeLog[] = Object.keys(updatedFields)
+			.map((field) => {
+				const oldValue = (oldDoc as any)[field]
+				const newValue = updatedFields[field]
 
-			// Log the changes only if the value is different
-			if (oldValue !== newValue) {
-				return {
-					field,
-					oldValue,
-					newValue,
+				// Log the changes only if the value is different
+				if (oldValue !== newValue) {
+					return {
+						field,
+						oldValue,
+						newValue,
+						updatedAt: new Date(),
+						updatedBy: result.createdBy, // Assuming the updater is the creator
+					} as IChangeLog
 				}
-			}
-		})
-		.filter(Boolean) // Remove undefined logs
+			})
+			.filter(Boolean) as IChangeLog[] // Remove undefined logs
 
-	// Append the changes to the history field
-	if (changeLogs.length > 0) {
-		result.history.push(...changeLogs)
-		await result.save() // Save the document with the new history
+		// Append the changes to the history field
+		if (changeLogs.length > 0) {
+			result.history = result.history || []
+			result.history.push(...changeLogs)
+			await result.save() // Save the document with the new history
+		}
 	}
-})
+)
 
 export const Booking =
 	models.Booking || model<IBooking>("Booking", bookingSchema)

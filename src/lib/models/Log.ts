@@ -1,4 +1,5 @@
 import { Schema, ObjectId } from "mongoose"
+import { IBooking } from "./Booking"
 
 export interface IChangeLog {
 	_id: ObjectId
@@ -38,7 +39,7 @@ export const changeLogSchema = new Schema<IChangeLog>(
 )
 
 // Booking Update Pre Save Hook -> Middleware to enforce immutability of notes
-changeLogSchema.pre("save", function (next) {
+changeLogSchema.pre<IBooking>("save", function (next) {
 	if (this.isNew) {
 		// If the Log is new, allow it to save
 		return next()
