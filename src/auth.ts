@@ -2,12 +2,12 @@ import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
-import { db } from 'mongoosedb';
+import { dbConnect } from '@/utils/db';
 import type { User } from '@/lib/definitions';
 import bcrypt from 'bcrypt';
 
 async function getUserbyEmail(email: string): Promise<User | undefined> {
-    const client = await db.connect();
+    const client = await dbConnect.connect();
     try {
         const user = await client.sql<User>`SELECT * FROM users WHERE email = ${email}`;
         return user.rows[0];

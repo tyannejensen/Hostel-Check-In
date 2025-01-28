@@ -1,6 +1,6 @@
 // TODO: add all mutation functions to this file.
 
-'user server';
+'use server';
 
 import { signIn } from '../auth';
 import { AuthError } from 'next-auth';
