@@ -1,43 +1,8 @@
 import { Schema, model, ObjectId, Document, models } from "mongoose"
-import { IPaymentDetails } from "@/lib/models/Payment"
-import { changeLogSchema, IChangeLog } from "@/lib/models/Log"
 import bcrypt from "bcrypt"
 import { v4 as uuidv4 } from "uuid"
-
-// Custom types for User Schema
-type IRole = "admin" | "employee" | "tenant"
-
-// Interfaces for User Schema
-export interface IPhoneNumber extends Document {
-	countryCode: string
-	number: string
-	isMobile: boolean
-	isPrimary: boolean
-}
-
-export interface IPaymentMethod extends IPaymentDetails {
-	isPrimary: boolean
-	paymentName?: string
-}
-
-export interface IUser extends Document {
-	_id: string // string in UUID v4 format - example: 123e4567-e89b-12d3-a456-426614174000
-	firstName: string
-	lastName: string
-	fullname?: string
-	email: string
-	phoneNumber: IPhoneNumber[]
-	password: string
-	role: IRole
-	transactions: ObjectId[] // reference to Transaction Schema
-	paymentMethod: IPaymentMethod[]
-	createdAt?: Date
-	updatedAt?: Date
-	tags: string[]
-	history: IChangeLog[]
-	createdBy?: string // reference to the user (employee) who created the user - uses uuid v4
-	updatedBy?: string // reference to the user (employee) who updated the user - uses uuid v4
-}
+import { changeLogSchema } from "@/lib/models/Log"
+import { IChangeLog, IUser } from "@/lib/types"
 
 // User Schema
 const userSchema = new Schema<IUser>(

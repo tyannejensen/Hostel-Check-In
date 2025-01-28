@@ -1,19 +1,5 @@
 import { Schema, model, ObjectId, Document, models } from "mongoose"
-
-// Custom types and interfaces for Room Schema
-export type IRoomType = "shared" | "single" | "double" | "suite"
-export type IRoomStatus = "available" | "occupied" | "maintenance" | "cleaning"
-
-// Interface for Room Schema
-export interface IRoom extends Document {
-	_id: ObjectId
-	type: IRoomType
-	roomNumber: number | string
-	status: IRoomStatus
-	bookedBy: string // reference to the user (tenant) who made the booking - uses uuid v4
-	name?: string
-	occupants?: number
-}
+import { IRoom } from "@/lib/types"
 
 // Room Schema
 export const roomSchema = new Schema<IRoom>(

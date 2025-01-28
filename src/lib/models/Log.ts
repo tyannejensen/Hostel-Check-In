@@ -1,14 +1,5 @@
-import { Schema, Document, ObjectId } from "mongoose"
-import { IBooking } from "./Booking"
-
-export interface IChangeLog extends Document {
-	_id: ObjectId
-	field: string
-	oldValue: any
-	newValue: any
-	updatedAt: Date
-	updatedBy: string // reference to the user (employee) who updated the booking - uses uuid v4
-}
+import { Schema } from "mongoose"
+import { IChangeLog, IBooking } from "@/lib/types"
 
 // Change Log Schema - subdocument of Booking Schema
 export const changeLogSchema = new Schema<IChangeLog>(

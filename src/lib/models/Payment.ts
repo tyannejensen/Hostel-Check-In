@@ -1,35 +1,5 @@
-import { Schema, model, ObjectId, Document, models } from "mongoose"
-
-// Custom types and interfaces for Payment Schema
-export type IPaymentType =
-	| "cash"
-	| "credit"
-	| "debit"
-	| "bank"
-	| "money order"
-	| "check"
-
-export interface IPaymentDetails {
-	method: IPaymentType
-	cardHolderName?: string
-	cardNumber?: string
-	expirationDate?: Date
-	cvv?: string
-	routingNumber?: string
-	accountNumber?: string
-	bankName?: string
-}
-
-export interface IPayment extends IPaymentDetails, Document {
-	_id: ObjectId
-	bookingId: ObjectId // reference to the booking the payment is associated with
-	amount: number
-	paidBy: string // reference to the user (tenant) who made the payment - uses uuid v4
-	createdAt: Date
-	createdBy: string // reference to the user (employee) who created the payment - uses uuid v4
-}
-
-// TODO: Add validation, error messages, and hooks to the Payment Schema
+import { Schema, model, models } from "mongoose"
+import { IPayment } from "@/lib/types"
 
 // Payment Schema - subdocument of Booking Schema
 const paymentSchema = new Schema<IPayment>(

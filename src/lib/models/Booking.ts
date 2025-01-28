@@ -1,31 +1,7 @@
-import { Schema, model, Document, models, ObjectId } from "mongoose"
-import { IPayment } from "@/lib/models/Payment"
-import { changeLogSchema, IChangeLog } from "@/lib/models/Log"
-import { noteSchema, INote } from "@/lib/models/Note"
-
-// Custom types for Booking Schema
-type IBookingStatus = "paid" | "pending" | "due"
-
-// Interface for Booking Schema
-export interface IBooking extends Document {
-	_id: ObjectId
-	bookedBy: string // reference to the user (tenant) who made the booking - uses uuid v4
-	createdBy: string // reference to the user (employee) who created the booking - uses uuid v4
-	roomId: ObjectId
-	checkIn: Date
-	checkOut: Date
-	status: IBookingStatus
-	DepositAmount: number
-	depositReturned: boolean
-	depositReturnDate?: Date
-	depositReturnAmount?: number
-	payments: IPayment[]
-	totalPayment?: number
-	Notes?: INote[]
-	history?: IChangeLog[]
-}
-
-// TODO: Complete the Booking Schema - add validation, default values, and required fields
+import { Schema, model, Document, models } from "mongoose"
+import { IChangeLog, IBooking } from "@/lib/types"
+import { changeLogSchema } from "@/lib/models/Log"
+import { noteSchema } from "@/lib/models/Note"
 
 const bookingSchema = new Schema<IBooking>(
 	{
