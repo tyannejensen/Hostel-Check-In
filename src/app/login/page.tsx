@@ -1,11 +1,11 @@
-import Login from '@/app/ui/login'
+import LoginForm from '../../ui/login-form'
 import { Suspense } from 'react';
 
 export default async function Page() {
 	return (
 		<div>
 			<Suspense>
-				<Login/>
+				<LoginForm/>
 			</Suspense>
 		</div>
 	)
