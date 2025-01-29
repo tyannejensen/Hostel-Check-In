@@ -1,5 +1,5 @@
 import { Document, ObjectId } from "mongoose"
-import { IChangeLog } from "@/interfaces/changeLog.interface"
+import { IChangeLog } from "@/mytypes/interfaces/change-log.interface"
 import { IPayment } from "@/interfaces/payment.interface"
 import { IBookingStatus } from "@/mytypes/index"
 import { INote } from "@/interfaces/note.interface"
