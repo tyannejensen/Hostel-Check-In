@@ -18,7 +18,7 @@ import { authenticate } from "@/lib/actions"
 import { useSearchParams } from "next/navigation"
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
-export default async function Page() {
+export default function Page() {
 
   const searchParams = useSearchParams()
   const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard/";
