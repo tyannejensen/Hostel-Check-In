@@ -7,7 +7,7 @@ import type { User } from '@/lib/definitions';
 import bcrypt from 'bcrypt';
 
 async function getUserbyEmail(email: string): Promise<User | undefined> {
-    const client = await dbConnect.connect();
+    const client = await dbConnect();
     try {
         const user = await client.sql<User>`SELECT * FROM users WHERE email = ${email}`;
         return user.rows[0];
@@ -30,7 +30,7 @@ export const { auth, signIn, signOut } = NextAuth({
                     .safeParse(credentials);
 
 
-                if (!parsedCredentials.success) {
+                if (parsedCredentials.success) {
                     const { email, password } = parsedCredentials.data;
                     const user = await getUserbyEmail(email);
                     if (!user) return null;
