@@ -28,7 +28,7 @@ export default function Page() {
   );
 
 	return (
-    <form action={formAction}>
+<>
 			<div id="grad">
 				<div id="text" className=" flex items-center justify-center h-screen">
 					<Tabs defaultValue="register" id="text" className="w-[400px] text">
@@ -86,6 +86,7 @@ export default function Page() {
 								</CardFooter>
 							</Card>
 						</TabsContent>
+						<form action={formAction}>
 						<TabsContent value="login">
 							<Card>
 								<CardHeader>
@@ -132,9 +133,10 @@ export default function Page() {
                 </CardFooter>
               </Card>
             </TabsContent>
+			</form>
           </Tabs>
         </div>
       </div>
-    </form>
+    </>
   );
 }

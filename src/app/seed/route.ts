@@ -18,12 +18,11 @@ async function seedUsers() {
 
   const insertedUsers = await Promise.all(
     users.map(async (user) => {
-      const hashedPassword = await bcrypt.hash(user.password, 10);
       const newUser = new User({
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        password: hashedPassword,
+        password: user.password, // No manual hashing here
         role: user.role,
       });
       return newUser.save();

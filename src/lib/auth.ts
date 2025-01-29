@@ -32,7 +32,6 @@ export const { auth, signIn, signOut} = NextAuth({
                 password: { label: 'Password', type: 'password' },
             },
             async authorize(credentials) {
-                console.log('Authorize function called with credentials:', credentials);
 
                 if (!credentials) {
                     console.error('No credentials provided');
@@ -63,7 +62,10 @@ export const { auth, signIn, signOut} = NextAuth({
 
                 const passwordsMatch = await bcrypt.compare(password, user.password);
                 if (!passwordsMatch) {
-                    console.log(password, user.password);
+                    console.log('Plain text password:', password);
+                    console.log('Hashed password from database:', user.password);
+                    const passwordsMatch = await bcrypt.compare(password, user.password);
+                    console.log('Passwords match:', passwordsMatch);
                     console.error('Invalid password for user:', email);
                     return null;
                 }
