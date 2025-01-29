@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from "@/components/ui/button"
 import {
 	Card,
@@ -10,10 +12,23 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+//Adding auth to the page
+import { useActionState } from "react"
+import { authenticate } from "@/lib/actions"
+import { useSearchParams } from "next/navigation"
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
-export default async function Page() {
+export default function Page() {
+
+  const searchParams = useSearchParams()
+  const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard/";
+  const [errorMessage, formAction, isPending] = useActionState(
+    authenticate, 
+    undefined,
+  );
+
 	return (
-		<>
+<>
 			<div id="grad">
 				<div id="text" className=" flex items-center justify-center h-screen">
 					<Tabs defaultValue="register" id="text" className="w-[400px] text">
@@ -59,12 +74,19 @@ export default async function Page() {
 									</div>
 								</CardContent>
 								<CardFooter className="flex justify-end">
-									<Button id="contrast" className="drop-shadow-lg">
+									<Button id="contrast" className="drop-shadow-lg" aria-disabled={isPending}>
 										Submit
 									</Button>
+                  {errorMessage && (
+                    <>
+                      <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+                      <p className="text-sm text-red-500">{errorMessage}</p>
+                    </>
+                  )}
 								</CardFooter>
 							</Card>
 						</TabsContent>
+						<form action={formAction}>
 						<TabsContent value="login">
 							<Card>
 								<CardHeader>
@@ -78,7 +100,13 @@ export default async function Page() {
 								<CardContent id="text" className="space-y-2">
 									<div className="space-y-1">
 										<Label htmlFor="email">Email</Label>
-										<Input id="email" placeholder="Email" type="email" />
+										<Input 
+										id="email" 
+										placeholder="Email" 
+										type="email" 
+										name="email"
+										required
+										/>
 									</div>
 									<div className="space-y-1">
 										<Label htmlFor="password">Password</Label>
@@ -86,19 +114,29 @@ export default async function Page() {
 											id="password"
 											placeholder="Password"
 											type="password"
+											name="password"
+											required
 										/>
 									</div>
 								</CardContent>
-								<CardFooter className="flex justify-end">
-									<Button id="dark-button" className="drop-shadow-lg">
-										Login
-									</Button>
-								</CardFooter>
-							</Card>
-						</TabsContent>
-					</Tabs>
-				</div>
-			</div>
-		</>
-	)
+                <CardFooter className="flex justify-end">
+                <input type="hidden" name="redirectTo" value={callBackUrl} />
+                  <Button id="dark-button" className="drop-shadow-lg">
+                    Login
+                  </Button>
+                  {errorMessage && (
+                    <>
+                      <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+                      <p className="text-sm text-red-500">{errorMessage}</p>
+                    </>
+                  )}
+                </CardFooter>
+              </Card>
+            </TabsContent>
+			</form>
+          </Tabs>
+        </div>
+      </div>
+    </>
+  );
 }
