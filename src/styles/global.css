@@ -24,22 +24,14 @@
     --destructive-foreground: 210 40% 98%;
     --ring: 215 20.2% 65.1%;
     --radius: 0.5rem;
-    --secondary-glow: conic-gradient(
-      from 10deg at 50% 50%,
-      #eb7494 0deg,
-      #ae77b2 55deg,
-      #97b5da 120deg,
-      #0099ca 160deg,
-      transparent 360deg
-    );
-    --third-glow: conic-gradient(
-      from 90deg at 50% 50%,
-      #ff8b7e 0deg,
-      #e24e6b 160deg,
-      #7ed2da 120deg,
-      #8bdce0 55deg,
-      transparent 360deg
-    );
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
@@ -62,13 +54,68 @@
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
     --ring: 216 34% 17%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
-/* @theme {
-  --color-gaia-green: #00ff5b;
-  --color-venus-blue: #0014ff;
-} */
+/* LOGIN PAGE */
+:root {
+  --light: #d1fae5;
+  --highlight: #d1fae5;
+  --basic: #a7f3d0;
+  --contrast: #069668;
+  --text: #022c22;
+  --dark-button: #047857;
+  --glow: conic-gradient(
+    from 90deg at 50% 50%,
+    #022c22 170deg,
+    #a7f3d0 160deg,
+    #d1fae5 20deg,
+    transparent 360deg
+  );
+}
+
+#grad {
+  background-image: var(--glow);
+}
+
+#text {
+  color: var(--text);
+}
+
+#dark-button {
+  background-color: var(--dark-button);
+  color: var(--light);
+}
+#dark-button:hover {
+  background-color: #ebfdf5;
+  color: var(--contrast);
+  border: 1px solid var(--contrast);
+  transform: scale(1.1);
+}
+#contrast {
+  background-color: #ebfdf5;
+  color: var(--contrast);
+  border: 1px solid var(--contrast);
+}
+#contrast:hover {
+  background-color: var(--dark-button);
+  color: var(--light);
+  transform: scale(1.1);
+}
+
+.bg-muted {
+  background-color: var(--basic);
+}
+
+/* DASHBOARD */
 
 @layer base {
   * {
@@ -76,5 +123,14 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
