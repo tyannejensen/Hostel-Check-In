@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from "@/components/ui/button"
 import {
 	Card,
@@ -10,10 +12,23 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+//Adding auth to the page
+import { useActionState } from "react"
+import { authenticate } from "@/lib/actions"
+import { useSearchParams } from "next/navigation"
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 export default async function Page() {
+
+  const searchParams = useSearchParams()
+  const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard/";
+  const [errorMessage, formAction, isPending] = useActionState(
+    authenticate, 
+    undefined,
+  );
+
 	return (
-		<>
+    <form action={formAction}>
 			<div id="grad">
 				<div id="text" className=" flex items-center justify-center h-screen">
 					<Tabs defaultValue="register" id="text" className="w-[400px] text">
@@ -59,9 +74,15 @@ export default async function Page() {
 									</div>
 								</CardContent>
 								<CardFooter className="flex justify-end">
-									<Button id="contrast" className="drop-shadow-lg">
+									<Button id="contrast" className="drop-shadow-lg" aria-disabled={isPending}>
 										Submit
 									</Button>
+                  {errorMessage && (
+                    <>
+                      <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+                      <p className="text-sm text-red-500">{errorMessage}</p>
+                    </>
+                  )}
 								</CardFooter>
 							</Card>
 						</TabsContent>
@@ -89,16 +110,23 @@ export default async function Page() {
 										/>
 									</div>
 								</CardContent>
-								<CardFooter className="flex justify-end">
-									<Button id="dark-button" className="drop-shadow-lg">
-										Login
-									</Button>
-								</CardFooter>
-							</Card>
-						</TabsContent>
-					</Tabs>
-				</div>
-			</div>
-		</>
-	)
+                <CardFooter className="flex justify-end">
+                <input type="hidden" name="redirectTo" value={callBackUrl} />
+                  <Button id="dark-button" className="drop-shadow-lg">
+                    Login
+                  </Button>
+                  {errorMessage && (
+                    <>
+                      <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+                      <p className="text-sm text-red-500">{errorMessage}</p>
+                    </>
+                  )}
+                </CardFooter>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </form>
+  );
 }

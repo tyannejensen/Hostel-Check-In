@@ -1,9 +1,10 @@
 import { Schema, model, ObjectId, Document, models } from "mongoose"
 import bcrypt from "bcrypt"
 import { v4 as uuidv4 } from "uuid"
-import { changeLogSchema } from "@/lib/models/Log"
-import { phoneNumberSchema } from "@/lib/models/PhoneNumber"
-import { IChangeLog, IUser } from "types"
+import { changeLogSchema } from "@/models/Log.schema"
+import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
+import { IUser } from "@/mytypes/interfaces/user.interface"
+import { IChangeLog } from "@/mytypes/interfaces/change-log.interface"
 
 // User Schema
 const userSchema = new Schema<IUser>(
@@ -143,6 +144,7 @@ const userSchema = new Schema<IUser>(
     updatedBy: {
       type: String,
       ref: "User",
+		}
 	},
 	{
 		timestamps: true, // Add createdAt and updatedAt fields
