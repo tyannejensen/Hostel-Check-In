@@ -13,9 +13,7 @@ export async function dbConnect() {
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGO_URI, {
-      dbName: "your_database_name",
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      dbName: "hostel_db",
     } as mongoose.ConnectOptions);
   }
 
