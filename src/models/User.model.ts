@@ -3,7 +3,7 @@ import bcrypt from "bcrypt"
 import { v4 as uuidv4 } from "uuid"
 import { changeLogSchema } from "@/lib/models/Log"
 import { phoneNumberSchema } from "@/lib/models/PhoneNumber"
-import { IChangeLog, IUser } from "@/lib/types"
+import { IChangeLog, IUser } from "types"
 
 // User Schema
 const userSchema = new Schema<IUser>(

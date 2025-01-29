@@ -1,5 +1,5 @@
 import { Schema, model, models } from "mongoose"
-import { IPayment } from "@/lib/types"
+import { IPayment } from "types"
 
 // Payment Schema - subdocument of Booking Schema
 const paymentSchema = new Schema<IPayment>(

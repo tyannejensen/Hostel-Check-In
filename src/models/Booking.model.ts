@@ -1,5 +1,5 @@
 import { Schema, model, Document, models } from "mongoose"
-import { IChangeLog, IBooking } from "@/lib/types"
+import { IChangeLog, IBooking } from "types"
 import { changeLogSchema } from "@/lib/models/Log"
 import { noteSchema } from "@/lib/models/Note"
 

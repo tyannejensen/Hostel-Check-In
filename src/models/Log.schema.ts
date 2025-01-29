@@ -1,5 +1,5 @@
 import { Schema } from "mongoose"
-import { IChangeLog, IBooking } from "@/lib/types"
+import { IChangeLog, IBooking } from "types"
 
 // Change Log Schema - subdocument of Booking Schema
 export const changeLogSchema = new Schema<IChangeLog>(
