@@ -1,4 +1,13 @@
-import { Bed, Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import {
+  Bed,
+  Calendar,
+  Home,
+  Inbox,
+  LayoutDashboard,
+  Search,
+  Settings,
+  UsersRound,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -15,28 +24,18 @@ import {
 const items = [
   {
     title: "Dashboard",
-    url: "#",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Reservations",
+    url: "/dashboard/reservations",
     icon: Bed,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    title: "Tenants",
+    url: "/dashboard/tenants",
+    icon: UsersRound,
   },
 ];
 
