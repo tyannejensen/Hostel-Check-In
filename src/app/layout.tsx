@@ -7,9 +7,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html>
-      <body>
-        <section>{children}</section>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
