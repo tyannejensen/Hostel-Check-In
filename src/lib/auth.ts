@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
-import CredentialsProvider from 'next-auth/providers/credentials';
+import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import { dbConnect } from '@/lib/db'; // Ensure this path is correct
 import { User } from '@/models/User.model'; // Ensure this path is correct
@@ -17,15 +17,10 @@ async function getUserByEmail(email: string) {
     }
 }
 
-export default NextAuth({
+export const { auth, signIn, signOut } = NextAuth({
     ...authConfig,
     providers: [
-        CredentialsProvider({
-            name: 'Credentials',
-            credentials: {
-                email: { label: 'Email', type: 'email' },
-                password: { label: 'Password', type: 'password' },
-            },
+        Credentials({
             async authorize(credentials) {
                 const parsedCredentials = z.object({
                     email: z.string().email(),
