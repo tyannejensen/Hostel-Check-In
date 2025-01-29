@@ -9,7 +9,12 @@ import bcrypt from 'bcrypt';
 async function getUserByEmail(email: string) {
     await dbConnect();
     try {
-        const user = await User.findOne({ email }).exec();
+        // Ensure the password field is included in the query
+        const user = await User.findOne({ email }).select('+password').exec();
+        if (!user) {
+            console.error('User not found:', email);
+            return null;
+        }
         return user;
     } catch (error) {
         console.error('Failed to fetch user:', error);
@@ -28,7 +33,12 @@ export const { auth, signIn, signOut} = NextAuth({
             },
             async authorize(credentials) {
                 console.log('Authorize function called with credentials:', credentials);
-                
+
+                if (!credentials) {
+                    console.error('No credentials provided');
+                    return null;
+                }
+
                 const parsedCredentials = z.object({
                     email: z.string().email(),
                     password: z.string().min(8)
@@ -46,8 +56,14 @@ export const { auth, signIn, signOut} = NextAuth({
                     return null;
                 }
 
-                const isValid = await bcrypt.compare(password, user.password);
-                if (!isValid) {
+                if (!user.password) {
+                    console.error('User password not found:', email);
+                    return null;
+                }
+
+                const passwordsMatch = await bcrypt.compare(password, user.password);
+                if (!passwordsMatch) {
+                    console.log(password, user.password);
                     console.error('Invalid password for user:', email);
                     return null;
                 }

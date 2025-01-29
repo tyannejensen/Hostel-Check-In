@@ -99,7 +99,13 @@ export default function Page() {
 								<CardContent id="text" className="space-y-2">
 									<div className="space-y-1">
 										<Label htmlFor="email">Email</Label>
-										<Input id="email" placeholder="Email" type="email" />
+										<Input 
+										id="email" 
+										placeholder="Email" 
+										type="email" 
+										name="email"
+										required
+										/>
 									</div>
 									<div className="space-y-1">
 										<Label htmlFor="password">Password</Label>
@@ -107,6 +113,8 @@ export default function Page() {
 											id="password"
 											placeholder="Password"
 											type="password"
+											name="password"
+											required
 										/>
 									</div>
 								</CardContent>
