@@ -1,10 +1,10 @@
-import { Schema, model, ObjectId, Document, models } from "mongoose"
-import bcrypt from "bcrypt"
+import { Schema, model, models } from "mongoose"
+import { getOldDoc, logChanges } from "@/utils/helpers"
 import { v4 as uuidv4 } from "uuid"
+import { IUser } from "@/interfaces/user.interface"
 import { changeLogSchema } from "@/models/Log.schema"
 import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
-import { IUser } from "@/interfaces/user.interface"
-import { IChangeLog } from "@/interfaces/change-log.interface"
+import bcrypt from "bcrypt"
 
 // User Schema
 const userSchema = new Schema<IUser>(
@@ -154,62 +154,16 @@ const userSchema = new Schema<IUser>(
 )
 
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
-userSchema.pre("findOneAndUpdate", async function (next) {
-	const query = this // Reference to the query
-	const docToUpdate = await this.model.findOne(this.getQuery()) // Fetch the old document
-	query.set("_oldDoc", docToUpdate) // Store the old document in a query property
-	next()
-})
+userSchema.pre("findOneAndUpdate", getOldDoc) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
+userSchema.pre("updateOne", getOldDoc)
+userSchema.pre("replaceOne", getOldDoc)
+// DO NOT USE findByIdAndUpdate as it does not trigger the pre hook
 
 // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-userSchema.post("findOneAndUpdate", async function (result: IUser & Document) {
-	if (!result || !this.get("_oldDoc")) return // Exit if no result or old doc
-
-	// Retrieve the old and new document fields
-	const oldDoc = this.get("_oldDoc") // Retrieve the old document
-	const update = this.getUpdate() as { $set?: Record<string, any> } // Refined typing for update object
-
-	if (!update) return // Exit if no update object
-
-	const updatedFields = update.$set || {} // Safely access $set, defaulting to an empty object if undefined
-
-	if (Object.keys(updatedFields).length === 0) return // Exit if no updated fields
-
-	const changeLogs: IChangeLog[] = Object.keys(updatedFields)
-		.map((field) => {
-			const oldValue = oldDoc[field]
-			const newValue = updatedFields[field]
-
-			if (field === "password") {
-				return {
-					field,
-					oldValue: "Password updated", // Log that the password was updated
-					newValue: "Password updated", // Log that the password was updated
-					updatedAt: new Date(),
-					updatedBy: result.updatedBy,
-				} as IChangeLog
-			}
-
-			// Log the changes only if the value is different
-			if (oldValue !== newValue) {
-				return {
-					field,
-					oldValue,
-					newValue,
-					updatedAt: new Date(),
-					updatedBy: result.updatedBy,
-				} as IChangeLog
-			}
-		})
-		.filter(Boolean) as IChangeLog[] // Remove undefined logs
-
-	// Append the changes to the history field
-	if (changeLogs.length > 0) {
-		result.history = result.history || []
-		result.history.push(...changeLogs)
-		await result.save() // Save the document with the new history
-	}
-})
+userSchema.post("findOneAndUpdate", logChanges) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
+userSchema.post("updateOne", logChanges)
+userSchema.post("replaceOne", logChanges)
+// DO NOT USE findByIdAndUpdate as it does not trigger the post hook
 
 // Pre-save hook to hash password
 userSchema.pre<IUser>("save", async function (next) {
