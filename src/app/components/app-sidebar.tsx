@@ -1,20 +1,8 @@
-import {
-  Bed,
-  Calendar,
-  Home,
-  Inbox,
-  LayoutDashboard,
-  Search,
-  Settings,
-  UsersRound,
-} from "lucide-react";
+import Image from "next/image";
+import { Bed, LayoutDashboard, UsersRound } from "lucide-react";
 
 import {
   Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -41,26 +29,32 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel></SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+    <Sidebar className="sidebar">
+      <div>
+        <Image
+          className="p-4"
+          src="/assets/photos/devTech.png"
+          width={300}
+          height={300}
+          alt="devTech co logo"
+        />
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem
+              className="p-3 font-semibold
+"
+              key={item.title}
+            >
+              <SidebarMenuButton className="nav-item" asChild>
+                <a href={item.url}>
+                  <item.icon />
+                  <span>{item.title}</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </div>
     </Sidebar>
   );
 }
