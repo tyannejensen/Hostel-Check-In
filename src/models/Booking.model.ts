@@ -1,7 +1,8 @@
 import { Schema, model, Document, models } from "mongoose"
-import { IChangeLog, IBooking } from "types"
-import { changeLogSchema } from "@/lib/models/Log"
-import { noteSchema } from "@/lib/models/Note"
+import { IChangeLog } from "@/interfaces/change-log.interface"
+import { IBooking } from "@/interfaces/booking.interface"
+import { changeLogSchema } from "@/models/Log.schema"
+import { noteSchema } from "@/models/Note.schema"
 
 const bookingSchema = new Schema<IBooking>(
 	{
