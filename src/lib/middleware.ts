@@ -14,10 +14,10 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
   
-    // Redirect to login if the user is not authenticated
-    if (!token) {
-      return NextResponse.redirect(new URL('/login', req.url));
-    }
+  // Redirect to login if the user is not authenticated and trying to access dashboard routes
+  if (req.nextUrl.pathname.startsWith('/dashboard') && !token) {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
   
     return NextResponse.next();
   }
