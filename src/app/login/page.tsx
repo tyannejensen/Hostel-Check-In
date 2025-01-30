@@ -1,4 +1,4 @@
-'use client';
+"use client"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -18,7 +18,7 @@ import { authenticate } from "@/lib/actions"
 //Adding registerUser to the page
 import { registerUser } from "@/lib/actions"
 import { useSearchParams } from "next/navigation"
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline"
 
 export default function Page() {
 
