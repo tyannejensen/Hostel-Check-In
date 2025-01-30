@@ -3,8 +3,8 @@ import bcrypt from "bcrypt"
 import { v4 as uuidv4 } from "uuid"
 import { changeLogSchema } from "@/models/Log.schema"
 import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
-import { IUser } from "@/mytypes/interfaces/user.interface"
-import { IChangeLog } from "@/mytypes/interfaces/change-log.interface"
+import { IUser } from "@/interfaces/user.interface"
+import { IChangeLog } from "@/interfaces/change-log.interface"
 
 // User Schema
 const userSchema = new Schema<IUser>(
@@ -46,12 +46,12 @@ const userSchema = new Schema<IUser>(
 				"Email is invalid",
 			],
 		},
-		phoneNumber: [phoneNumberSchema],
 		password: {
 			type: String,
 			required: [true, "Password is required"],
 			select: false,
 		},
+		phoneNumbers: [phoneNumberSchema],
 		role: {
 			type: String,
 			required: [true, "Role is required"],
@@ -60,8 +60,8 @@ const userSchema = new Schema<IUser>(
 				message: "{VALUE} is not a valid role",
 			},
 		},
-		transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
-		paymentMethod: [
+		bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
+		paymentMethods: [
 			{
 				isPrimary: {
 					type: Boolean,
@@ -137,14 +137,14 @@ const userSchema = new Schema<IUser>(
 			},
 		],
 		history: [changeLogSchema],
-    createdBy: {
-      type: String,
-      ref: "User",
-    },
-    updatedBy: {
-      type: String,
-      ref: "User",
-		}
+		createdBy: {
+			type: String,
+			ref: "User",
+		},
+		updatedBy: {
+			type: String,
+			ref: "User",
+		},
 	},
 	{
 		timestamps: true, // Add createdAt and updatedAt fields
@@ -165,30 +165,30 @@ userSchema.pre("findOneAndUpdate", async function (next) {
 userSchema.post("findOneAndUpdate", async function (result: IUser & Document) {
 	if (!result || !this.get("_oldDoc")) return // Exit if no result or old doc
 
-  // Retrieve the old and new document fields
+	// Retrieve the old and new document fields
 	const oldDoc = this.get("_oldDoc") // Retrieve the old document
-	const update = this.getUpdate() as { $set?: Record<string, any> }; // Refined typing for update object
-  
-  if (!update) return; // Exit if no update object
-  
-  const updatedFields = update.$set || {}; // Safely access $set, defaulting to an empty object if undefined
+	const update = this.getUpdate() as { $set?: Record<string, any> } // Refined typing for update object
 
-  if (Object.keys(updatedFields).length === 0) return; // Exit if no updated fields
+	if (!update) return // Exit if no update object
+
+	const updatedFields = update.$set || {} // Safely access $set, defaulting to an empty object if undefined
+
+	if (Object.keys(updatedFields).length === 0) return // Exit if no updated fields
 
 	const changeLogs: IChangeLog[] = Object.keys(updatedFields)
 		.map((field) => {
 			const oldValue = oldDoc[field]
 			const newValue = updatedFields[field]
 
-      if (field === "password") {
-        return {
-          field,
-          oldValue: "Password updated", // Log that the password was updated
-          newValue: "Password updated", // Log that the password was updated
-          updatedAt: new Date(),
-          updatedBy: result.updatedBy,
-        } as IChangeLog
-      }
+			if (field === "password") {
+				return {
+					field,
+					oldValue: "Password updated", // Log that the password was updated
+					newValue: "Password updated", // Log that the password was updated
+					updatedAt: new Date(),
+					updatedBy: result.updatedBy,
+				} as IChangeLog
+			}
 
 			// Log the changes only if the value is different
 			if (oldValue !== newValue) {
