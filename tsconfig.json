@@ -20,6 +20,7 @@
 		],
 		"baseUrl": "src/",
 		"paths": {
+			"@/actions/*": ["actions/*"],
 			"@/components/*": ["app/components/*"],
 			"@/lib/*": ["lib/*"],
 			"@/fonts/*": ["styles/fonts"],
@@ -31,6 +32,12 @@
 			"@/interfaces/*": ["types/interfaces/*"]
 		}
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+	"include": [
+		"next-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		".next/types/**/*.ts",
+		"postcss.config.mjs"
+	],
 	"exclude": ["node_modules"]
 }
