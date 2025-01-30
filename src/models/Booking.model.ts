@@ -4,7 +4,7 @@ import { IBooking } from "@/interfaces/booking.interface"
 import { changeLogSchema } from "@/models/Log.schema"
 import { noteSchema } from "@/models/Note.schema"
 
-const bookingSchema = new Schema<IBooking>(
+const BookingSchema = new Schema<IBooking>(
 	{
 		bookedBy: {
 			type: String, // reference to the user (tenant) who made the booking - uses uuid v4
@@ -38,6 +38,8 @@ const bookingSchema = new Schema<IBooking>(
 		DepositAmount: {
 			type: Number,
 			required: [true, "Deposit amount is required"],
+			get: (v: number) => v * 100, // Convert deposit amount to cents
+			set: (v: number) => v / 100, // Convert deposit amount to dollars
 		},
 		depositReturned: {
 			type: Boolean,
@@ -48,6 +50,8 @@ const bookingSchema = new Schema<IBooking>(
 		},
 		depositReturnAmount: {
 			type: Number,
+			get: (v: number) => v * 100, // Convert deposit amount to cents
+			set: (v: number) => v / 100, // Convert deposit amount to dollars
 		},
 		payments: [
 			{
@@ -58,20 +62,31 @@ const bookingSchema = new Schema<IBooking>(
 		Notes: [noteSchema],
 		history: [changeLogSchema],
 	},
-	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+	{
+		timestamps: true,
+		toJSON: { getters: true, virtuals: true },
+		toObject: { getters: true, virtuals: true },
+	}
 )
 
+// VIRTUALS
+// Virtual to calculate the total payment made for a booking
+BookingSchema.virtual("totalPayment").get(function () {
+	return this.payments.reduce((acc, curr) => acc + curr.amount, 0)
+})
+
+// MIDDLEWARE
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
-bookingSchema.pre("findOneAndUpdate", getOldDoc) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
-bookingSchema.pre("updateOne", getOldDoc)
-bookingSchema.pre("replaceOne", getOldDoc)
+BookingSchema.pre("findOneAndUpdate", getOldDoc) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
+BookingSchema.pre("updateOne", getOldDoc)
+BookingSchema.pre("replaceOne", getOldDoc)
 // DO NOT USE findByIdAndUpdate as it does not trigger the pre hook
 
 // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-bookingSchema.post("findOneAndUpdate", logChanges) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
-bookingSchema.post("updateOne", logChanges)
-bookingSchema.post("replaceOne", logChanges)
+BookingSchema.post("findOneAndUpdate", logChanges) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
+BookingSchema.post("updateOne", logChanges)
+BookingSchema.post("replaceOne", logChanges)
 // DO NOT USE findByIdAndUpdate as it does not trigger the post hook
 
 export const Booking =
-	models.Booking || model<IBooking>("Booking", bookingSchema)
+	models.Booking || model<IBooking>("Booking", BookingSchema)
