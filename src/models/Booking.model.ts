@@ -122,12 +122,6 @@ bookingSchema.pre("replaceOne", getOldDoc)
 // DO NOT USE findByIdAndUpdate as it does not trigger the pre hook
 
 // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-bookingSchema.post(
-	"findOneAndUpdate",
-	async function (result: IBooking & Document) {}
-)
-
-// Apply the post hook to multiple update operations
 bookingSchema.post("findOneAndUpdate", logChanges) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
 bookingSchema.post("updateOne", logChanges)
 bookingSchema.post("replaceOne", logChanges)
