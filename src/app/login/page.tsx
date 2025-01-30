@@ -14,9 +14,9 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 //Adding auth to the page
 import { useActionState } from "react"
-import { authenticate } from "@/lib/actions"
+import { authenticate } from "@/actions/auth.actions"
 //Adding registerUser to the page
-import { registerUser } from "@/lib/actions"
+import { registerUser } from "@/actions/auth.actions"
 import { useSearchParams } from "next/navigation"
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline"
 
