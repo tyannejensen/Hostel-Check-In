@@ -1,16 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { ObjectId, Query } from "mongoose"
-import { twMerge } from "tailwind-merge"
-
 // For Mongoose Model Pre and Post Hook Functions
-import { Booking } from "@/models/Booking.model"
-import { IBooking } from "@/interfaces/booking.interface"
-import { IChangeLog } from "@/interfaces/change-log.interface"
-
-// Combine classnames with Tailwind CSS
-export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs))
-}
+import { ObjectId, Query } from "mongoose"
+import { Booking } from "@/lib/models/Booking.model"
+import { IBooking } from "@/lib/types/interfaces/booking.interface"
+import { IChangeLog } from "@/lib/types/interfaces/change-log.interface"
 
 // Functions to help with logging changes to documents
 

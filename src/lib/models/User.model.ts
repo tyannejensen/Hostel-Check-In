@@ -1,9 +1,9 @@
 import { Schema, model, models } from "mongoose"
-import { getOldDoc, logChanges } from "@/utils/helpers"
+import { getOldDoc, logChanges } from "@/lib/utils/helpers"
 import { v4 as uuidv4 } from "uuid"
-import { IUser } from "@/interfaces/user.interface"
-import { changeLogSchema } from "@/models/Log.schema"
-import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
+import { IUser } from "@/lib/types/interfaces/user.interface"
+import { changeLogSchema } from "@/lib/models/Log.schema"
+import { phoneNumberSchema } from "@/lib/models/PhoneNumber.schema"
 import bcrypt from "bcrypt"
 
 // User Schema

@@ -3,9 +3,9 @@ import { authConfig } from "./auth.config"
 import Credentials from "next-auth/providers/credentials"
 import { z } from "zod"
 import { dbConnect } from "@/lib/db" // Ensure this path is correct
-import type { IUser } from "@/mytypes/interfaces/user.interface" // Ensure this path is correct
-import { User } from "@/models/User.model" // Ensure this path is correct
-import bcrypt from "bcrypt" 
+import type { IUser } from "@/lib/types/interfaces/user.interface" // Ensure this path is correct
+import { User } from "@/lib/models/User.model" // Ensure this path is correct
+import bcrypt from "bcrypt"
 
 // Get a user using their email address
 async function getUserByEmail(email: string): Promise<IUser | undefined> {
@@ -27,26 +27,26 @@ async function getUserByEmail(email: string): Promise<IUser | undefined> {
 // Export the auth object and the signIn and signOut functions
 
 export const { auth, signIn, signOut } = NextAuth({
-    ...authConfig,
-    providers: [
-        Credentials({
-            async authorize(credentials) {
-                const parsedCredentials = z
-                    .object({ email: z.string().email(), password: z.string().min(6) })
-                    .safeParse(credentials);
+	...authConfig,
+	providers: [
+		Credentials({
+			async authorize(credentials) {
+				const parsedCredentials = z
+					.object({ email: z.string().email(), password: z.string().min(6) })
+					.safeParse(credentials)
 
-                if (parsedCredentials.success) {
-                    const { email, password } = parsedCredentials.data;
-                    const user = await getUserByEmail(email);
-                    if (!user) return null;
-                    const passwordsMatch = await bcrypt.compare(password, user.password);
+				if (parsedCredentials.success) {
+					const { email, password } = parsedCredentials.data
+					const user = await getUserByEmail(email)
+					if (!user) return null
+					const passwordsMatch = await bcrypt.compare(password, user.password)
 
-                    if (passwordsMatch) return user;
-                }
+					if (passwordsMatch) return user
+				}
 
-                console.log('Invalid credentials');
-                return null;
-            },
-        }),
-    ],
-});
+				console.log("Invalid credentials")
+				return null
+			},
+		}),
+	],
+})

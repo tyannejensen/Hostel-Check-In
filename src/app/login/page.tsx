@@ -1,34 +1,34 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 //Adding auth to the page
-import { useActionState } from "react";
-import { authenticate } from "@/actions/auth.actions";
+import { useActionState } from "react"
+import { authenticate } from "@/actions/auth.actions"
 //Adding registerUser to the page
 import { registerUser } from "@/actions/user.actions";
 import { useSearchParams } from "next/navigation";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
 export default function Page() {
-  const searchParams = useSearchParams();
-  const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard/";
-  const [errorMessage, formAction, isPending] = useActionState(
-    authenticate,
-    undefined
-  );
-  const [registerErrorMessage, registerFormAction, isRegisterPending] =
-    useActionState(registerUser, undefined);
+	const searchParams = useSearchParams()
+	const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard/"
+	const [errorMessage, formAction, isPending] = useActionState(
+		authenticate,
+		undefined
+	)
+	const [registerErrorMessage, registerFormAction, isRegisterPending] =
+		useActionState(registerUser, undefined)
 
   return (
     <>
