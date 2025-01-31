@@ -1,5 +1,5 @@
 import { Schema, model, models } from "mongoose"
-import { IPayment } from "types"
+import { IPayment } from "@/interfaces/payment.interface"
 
 // Payment Schema - subdocument of Booking Schema
 const paymentSchema = new Schema<IPayment>(
@@ -42,7 +42,7 @@ const paymentSchema = new Schema<IPayment>(
 			type: Date,
 			validate: {
 				validator: (v: Date) => v > new Date(),
-				message: (props) => `${props.value} is not a valid expiration date`,
+				message: "{VALUE} is not a valid expiration date",
 			},
 		},
 		cvv: {
@@ -64,6 +64,11 @@ const paymentSchema = new Schema<IPayment>(
 			type: String,
 			minlength: [2, "Bank Name must be at least 2 characters long"],
 			maxlength: [50, "Bank Name must be at most 50 characters long"],
+		},
+		checkNumber: {
+			type: String,
+			minlength: [5, "Check Number must be at least 5 characters long"],
+			maxlength: [5, "Check Number must be at most 5 characters long"],
 		},
 	},
 	{
