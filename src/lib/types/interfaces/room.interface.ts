@@ -1,5 +1,5 @@
 import { Document, ObjectId } from "mongoose"
-import { IRoomStatus, IRoomType } from "@/lib/types/index"
+import { IRoomStatus, IRoomType } from "@/mytypes/index"
 
 // Interfaces for Room Schema
 export interface IRoom extends Document {

@@ -1,8 +1,8 @@
 // For Mongoose Model Pre and Post Hook Functions
 import { ObjectId, Query } from "mongoose"
 import { Booking } from "@/models/Booking.model"
-import { IBooking } from "@/lib/types/interfaces/booking.interface"
-import { IChangeLog } from "@/lib/types/interfaces/change-log.interface"
+import { IBooking } from "@/interfaces/booking.interface"
+import { IChangeLog } from "@/interfaces/change-log.interface"
 
 // Functions to help with logging changes to documents
 

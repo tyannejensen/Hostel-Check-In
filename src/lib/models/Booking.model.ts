@@ -1,8 +1,8 @@
 import { Schema, model, models } from "mongoose"
-import { getOldDoc, logChanges } from "@/lib/utils/helpers"
-import { IBooking } from "@/lib/types/interfaces/booking.interface"
-import { changeLogSchema } from "@/lib/models/Log.schema"
-import { noteSchema } from "@/lib/models/Note.schema"
+import { getOldDoc, logChanges } from "@/server-utils/helpers"
+import { IBooking } from "@/interfaces/booking.interface"
+import { changeLogSchema } from "@/models/Log.schema"
+import { noteSchema } from "@/models/Note.schema"
 
 const BookingSchema = new Schema<IBooking>(
 	{

@@ -3,8 +3,8 @@ import { authConfig } from "./auth.config"
 import Credentials from "next-auth/providers/credentials"
 import { z } from "zod"
 import { dbConnect } from "@/lib/db" // Ensure this path is correct
-import type { IUser } from "@/lib/types/interfaces/user.interface" // Ensure this path is correct
-import { User } from "@/lib/models/User.model" // Ensure this path is correct
+import type { IUser } from "@/interfaces/user.interface" // Ensure this path is correct
+import { User } from "@/models/User.model" // Ensure this path is correct
 import bcrypt from "bcrypt"
 
 // Get a user using their email address

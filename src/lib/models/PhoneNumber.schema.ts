@@ -1,5 +1,5 @@
 import { Schema } from "mongoose"
-import { IPhoneNumber } from "@/lib/types/interfaces/phone-number.interface"
+import { IPhoneNumber } from "@/interfaces/phone-number.interface"
 
 export const phoneNumberSchema = new Schema<IPhoneNumber>(
 	{

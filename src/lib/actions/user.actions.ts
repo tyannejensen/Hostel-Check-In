@@ -1,7 +1,7 @@
 "use server"
 
 import { dbConnect } from "@/lib/db"
-import { User } from "@/lib/models/User.model"
+import { User } from "@/models/User.model"
 
 // register user function
 export async function registerUser(

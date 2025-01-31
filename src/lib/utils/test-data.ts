@@ -1,5 +1,4 @@
-import { IRoom } from "@/lib/types/interfaces/room.interface"
-
+// Users data
 const users = [
 	// 1 admin, 5 tenants, 6 total
 	{
@@ -189,6 +188,7 @@ const users = [
 	},
 ]
 
+// Rooms data for Bookings
 const rooms = [
 	{
 		type: "shared",
@@ -237,6 +237,7 @@ const rooms = [
 	},
 ]
 
+// Bookings data
 const bookings = [
 	{
 		roomId: "",
@@ -280,6 +281,7 @@ const bookings = [
 	},
 ]
 
+// Notes data for Bookings
 const notes = [
 	{
 		content: "Tenant is delinquent",
