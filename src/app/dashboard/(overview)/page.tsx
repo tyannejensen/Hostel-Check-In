@@ -13,6 +13,48 @@ import {
 import Image from "next/image";
 
 export default async function Page() {
+  const data = [
+    {
+      name: "John E Doe.",
+      room: "444",
+      duration: "14 Days",
+      checkInDate: "Jan 01, 2025",
+      checkOutDate: "Jan 15, 2025",
+      notes: "$250.00",
+    },
+    {
+      name: "John E Doe.",
+      room: "444",
+      duration: "14 Days",
+      checkInDate: "Jan 01, 2025",
+      checkOutDate: "Jan 15, 2025",
+      notes: "$250.00",
+    },
+    {
+      name: "John E Doe.",
+      room: "444",
+      duration: "14 Days",
+      checkInDate: "Jan 01, 2025",
+      checkOutDate: "Jan 15, 2025",
+      notes: "$250.00",
+    },
+    {
+      name: "John E Doe.",
+      room: "444",
+      duration: "14 Days",
+      checkInDate: "Jan 01, 2025",
+      checkOutDate: "Jan 15, 2025",
+      notes: "$250.00",
+    },
+    {
+      name: "John E Doe.",
+      room: "444",
+      duration: "14 Days",
+      checkInDate: "Jan 01, 2025",
+      checkOutDate: "Jan 15, 2025",
+      notes: "$250.00",
+    },
+  ];
   return (
     <div>
       <h1 className="pt-[10px] pl-[30px] pb-[40px] font-bold">DASHBOARD</h1>
@@ -83,15 +125,19 @@ export default async function Page() {
             <TableHead>Notes</TableHead>
             <TableHead>Actions</TableHead>
           </TableHeader>
-          <TableRow className="table-data-row">
-            <TableCell>John E Doe.</TableCell>
-            <TableCell>444</TableCell>
-            <TableCell>14 Days</TableCell>
-            <TableCell>Jan 01, 2025</TableCell>
-            <TableCell>Jan 15, 2025</TableCell>
-            <TableCell>$250.00</TableCell>
-            <TableCell>. . .</TableCell>
-          </TableRow>
+          {data.map((rowData: any) => {
+            return (
+              <TableRow className="table-data-row">
+                <TableCell>{rowData.name}</TableCell>
+                <TableCell>{rowData.room}</TableCell>
+                <TableCell>{rowData.duration}</TableCell>
+                <TableCell>{rowData.checkInDate}</TableCell>
+                <TableCell>{rowData.checkOutDate}</TableCell>
+                <TableCell>{rowData.notes}</TableCell>
+                <TableCell>. . .</TableCell>
+              </TableRow>
+            );
+          })}
           <TableCaption>A list of your recent customers.</TableCaption>
         </Table>
       </div>
