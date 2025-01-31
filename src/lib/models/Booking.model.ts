@@ -88,5 +88,5 @@ BookingSchema.post("updateOne", logChanges)
 BookingSchema.post("replaceOne", logChanges)
 // DO NOT USE findByIdAndUpdate as it does not trigger the post hook
 
-export const Booking =
-	models.Booking || model<IBooking>("Booking", BookingSchema)
+// export const Booking =
+//   models.Booking || model<IBooking>("Booking", BookingSchema);
