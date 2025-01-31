@@ -1,4 +1,4 @@
-import { IRoom } from "@/interfaces/room.interface"
+import { IRoom } from "@/lib/types/interfaces/room.interface"
 
 const users = [
 	// 1 admin, 5 tenants, 6 total

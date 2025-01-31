@@ -1,8 +1,8 @@
 import { Document, ObjectId } from "mongoose"
-import { IPhoneNumber } from "@/interfaces/phone-number.interface"
-import { IPaymentMethod } from "@/interfaces/payment-method.interface"
-import { IChangeLog } from "@/interfaces/change-log.interface"
-import { IRole } from "@/mytypes/index"
+import { IPhoneNumber } from "@/lib/types/interfaces/phone-number.interface"
+import { IPaymentMethod } from "@/lib/types/interfaces/payment-method.interface"
+import { IChangeLog } from "@/lib/types/interfaces/change-log.interface"
+import { IRole } from "@/lib/types/index"
 
 // Interfaces for User Schema
 export interface IUser extends Document {

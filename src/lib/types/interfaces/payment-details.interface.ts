@@ -1,4 +1,4 @@
-import { IPaymentType } from "@/mytypes/index"
+import { IPaymentType } from "@/lib/types/index"
 
 export interface IPaymentDetails {
 	method: IPaymentType

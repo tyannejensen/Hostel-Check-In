@@ -14,18 +14,21 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 //Adding auth to the page
 import { useActionState } from "react"
-import { authenticate } from "@/actions/auth.actions"
+import { authenticate } from "@/lib/actions/auth.actions"
 //Adding registerUser to the page
-import { registerUser } from "@/actions/auth.actions"
+import { registerUser } from "@/lib/actions/auth.actions"
 import { useSearchParams } from "next/navigation"
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline"
 
 export default function Page() {
-
 	const searchParams = useSearchParams()
-	const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard/";
-	const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
-	const [registerErrorMessage, registerFormAction, isRegisterPending] = useActionState(registerUser, undefined);
+	const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard/"
+	const [errorMessage, formAction, isPending] = useActionState(
+		authenticate,
+		undefined
+	)
+	const [registerErrorMessage, registerFormAction, isRegisterPending] =
+		useActionState(registerUser, undefined)
 
 	return (
 		<>
@@ -75,13 +78,19 @@ export default function Page() {
 										</div>
 									</CardContent>
 									<CardFooter className="flex justify-end">
-										<Button id="contrast" className="drop-shadow-lg" aria-disabled={isRegisterPending}>
+										<Button
+											id="contrast"
+											className="drop-shadow-lg"
+											aria-disabled={isRegisterPending}
+										>
 											Submit
 										</Button>
 										{registerErrorMessage && (
 											<>
 												<ExclamationCircleIcon className="h-5 w-5 text-red-500" />
-												<p className="text-sm text-red-500">{registerErrorMessage}</p>
+												<p className="text-sm text-red-500">
+													{registerErrorMessage}
+												</p>
 											</>
 										)}
 									</CardFooter>
@@ -122,7 +131,11 @@ export default function Page() {
 										</div>
 									</CardContent>
 									<CardFooter className="flex justify-end">
-										<input type="hidden" name="redirectTo" value={callBackUrl} />
+										<input
+											type="hidden"
+											name="redirectTo"
+											value={callBackUrl}
+										/>
 										<Button id="dark-button" className="drop-shadow-lg">
 											Login
 										</Button>
@@ -140,5 +153,5 @@ export default function Page() {
 				</div>
 			</div>
 		</>
-	);
+	)
 }
