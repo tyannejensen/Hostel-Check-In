@@ -1,8 +1,8 @@
 import { Document, ObjectId } from "mongoose"
-import { IChangeLog } from "@/mytypes/interfaces/change-log.interface"
-import { IPayment } from "@/interfaces/payment.interface"
-import { IBookingStatus } from "@/mytypes/index"
-import { INote } from "@/interfaces/note.interface"
+import { IChangeLog } from "@/lib/types/interfaces/change-log.interface"
+import { IPayment } from "@/lib/types/interfaces/payment.interface"
+import { IBookingStatus } from "@/lib/types/index"
+import { INote } from "@/lib/types/interfaces/note.interface"
 
 // Interfaces for Booking Schema
 export interface IBooking extends Document {
@@ -15,7 +15,7 @@ export interface IBooking extends Document {
 	status: IBookingStatus
 	depositAmount: number
 	depositReturned: boolean
-	depositReturnDate?: Date
+	depositReturnedDate?: Date
 	depositReturnAmount?: number
 	payments: IPayment[]
 	totalPayment?: number
