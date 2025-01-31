@@ -1,3 +1,9 @@
+/* @media screen and (max-width: 992px) {
+  body {
+    background-color: blue;
+  }
+} */
+
 @import url("https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap");
 @tailwind base;
 @tailwind components;
@@ -106,8 +112,8 @@ h3 {
   padding: 20px;
   border-radius: var(--radius);
   box-shadow: var(--text);
-  width: 250px;
-  height: 130px;
+  width: 20vw;
+  height: 18vh;
   box-shadow: 6px 6px 3.5px 0px rgba(2, 44, 34, 0.25);
 }
 .icon-light {
@@ -141,7 +147,11 @@ h3 {
   box-shadow: 6px 6px 3.5px 0px rgba(2, 44, 34, 0.25);
   padding: 30px;
   margin: 30px;
-  border: 1px solid var(--text);
+}
+
+.table-data-row:hover {
+  background-color: var(--dark-button) !important;
+  color: var(--light) !important;
 }
 
 /* --------------------------- ROOT --------------------------- */
@@ -155,7 +165,7 @@ h3 {
     --muted: 223 47% 11%;
     --muted-foreground: 215.4 16.3% 56.9%;
     --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
+    /* --accent-foreground: 210 40% 98%; */
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 47.4% 11.2%;
     --sidebar-background: var(--contrast);

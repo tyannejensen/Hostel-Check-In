@@ -69,21 +69,21 @@ export default async function Page() {
         </Card>
       </div>
 
-      <div className="table-container">
+      <div className="rounded-xl table-container border bg-card text-card-foreground shadow">
         <Table>
           <TableHeader>
             <h1 className="pt-[10px] pb-[40px]">Tenants</h1>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Room</TableHead>
-              <TableHead>Duration</TableHead>
-              <TableHead>Check-In Date</TableHead>
-              <TableHead>Check-Out Date</TableHead>
-              <TableHead>Notes</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
           </TableHeader>
-          <TableRow>
+          <TableHeader className="table-row">
+            <TableHead>Name</TableHead>
+            <TableHead>Room</TableHead>
+            <TableHead>Duration</TableHead>
+            <TableHead>Check-In Date</TableHead>
+            <TableHead>Check-Out Date</TableHead>
+            <TableHead>Notes</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableHeader>
+          <TableRow className="table-data-row">
             <TableCell>John E Doe.</TableCell>
             <TableCell>444</TableCell>
             <TableCell>14 Days</TableCell>

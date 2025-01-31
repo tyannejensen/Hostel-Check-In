@@ -35,7 +35,7 @@ const BookingSchema = new Schema<IBooking>(
       enum: ["paid", "pending", "due"],
       default: "pending",
     },
-    DepositAmount: {
+    depositAmount: {
       type: Number,
       required: [true, "Deposit amount is required"],
       get: (v: number) => v * 100, // Convert deposit amount to cents
