@@ -13,7 +13,7 @@ export interface IBooking extends Document {
 	checkIn: Date
 	checkOut: Date
 	status: IBookingStatus
-	DepositAmount: number
+	depositAmount: number
 	depositReturned: boolean
 	depositReturnDate?: Date
 	depositReturnAmount?: number

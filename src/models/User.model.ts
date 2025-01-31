@@ -7,7 +7,7 @@ import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
 import bcrypt from "bcrypt"
 
 // User Schema
-const userSchema = new Schema<IUser>(
+const UserSchema = new Schema<IUser>(
 	{
 		_id: {
 			type: String,
@@ -20,6 +20,7 @@ const userSchema = new Schema<IUser>(
 			maxlength: [50, "First name must be at most 50 characters long"],
 			trim: true,
 			lowercase: true,
+			get: (v: string) => v.charAt(0).toUpperCase() + v.slice(1), // Capitalize firstName
 			match: [
 				/^[A-Za-zÀ-ÖØ-öø-ÿ'\-]{2,50}$/,
 				"First name contains invalid characters",
@@ -32,6 +33,7 @@ const userSchema = new Schema<IUser>(
 			maxlength: [50, "Last name must be at most 50 characters long"],
 			trim: true,
 			lowercase: true,
+			get: (v: string) => v.charAt(0).toUpperCase() + v.slice(1), // Capitalize lastName
 			match: [
 				/^[A-Za-zÀ-ÖØ-öø-ÿ'\-]{2,50}$/,
 				"Last name contains invalid characters",
@@ -41,6 +43,7 @@ const userSchema = new Schema<IUser>(
 			type: String,
 			required: [true, "Email is required"],
 			unique: true,
+			lowercase: true,
 			match: [
 				/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
 				"Email is invalid",
@@ -125,6 +128,9 @@ const userSchema = new Schema<IUser>(
 			{
 				type: String,
 				lowercase: true,
+				min_length: [2, "Tag must be at least 2 characters long"],
+				max_length: [20, "Tag must be at most 20 characters"],
+				set: (v: string) => v.split(" ").join("-"), // Replace spaces with hyphens
 				trim: true,
 				validate: {
 					// Checks the input for only letters, hyphens, and underscores
@@ -148,25 +154,26 @@ const userSchema = new Schema<IUser>(
 	},
 	{
 		timestamps: true, // Add createdAt and updatedAt fields
-		toJSON: { getters: true },
-		toObject: { getters: true },
+		toJSON: { getters: true, virtuals: true },
+		toObject: { getters: true, virtuals: true },
 	}
 )
 
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
-userSchema.pre("findOneAndUpdate", getOldDoc) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
-userSchema.pre("updateOne", getOldDoc)
-userSchema.pre("replaceOne", getOldDoc)
+UserSchema.pre("findOneAndUpdate", getOldDoc) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
+UserSchema.pre("updateOne", getOldDoc)
+UserSchema.pre("replaceOne", getOldDoc)
 // DO NOT USE findByIdAndUpdate as it does not trigger the pre hook
 
 // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-userSchema.post("findOneAndUpdate", logChanges) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
-userSchema.post("updateOne", logChanges)
-userSchema.post("replaceOne", logChanges)
+UserSchema.post("findOneAndUpdate", logChanges) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
+UserSchema.post("updateOne", logChanges)
+UserSchema.post("replaceOne", logChanges)
 // DO NOT USE findByIdAndUpdate as it does not trigger the post hook
 
+// MIDDLEWARE
 // Pre-save hook to hash password
-userSchema.pre<IUser>("save", async function (next) {
+UserSchema.pre<IUser>("save", async function (next) {
 	if (this.isNew || this.isModified("password")) {
 		const saltRounds = 10
 		this.password = await bcrypt.hash(this.password, saltRounds)
@@ -174,20 +181,30 @@ userSchema.pre<IUser>("save", async function (next) {
 	next()
 })
 
-// Method to check if provided password is correct
-userSchema.methods.isCorrectPassword = async function (
+// METHODS
+// Check if the password is correct
+UserSchema.methods.isCorrectPassword = async function (
 	password: string
 ): Promise<boolean> {
 	return bcrypt.compare(password, this.password)
 }
 
-// Virtuals (fullname)
-userSchema.virtual("fullname").get(function (this: IUser) {
+// GETTERS
+// Return the First Name and Last Name with the first letter capitalized
+UserSchema.path("firstName").get(function (firstName: string) {
+	return firstName.charAt(0).toUpperCase() + firstName.slice(1) // Capitalize firstName
+})
+
+UserSchema.path("lastName").get(function (lastName: string) {
+	return lastName.toUpperCase() // Convert lastName to uppercase
+})
+
+// SETTERS
+// None
+
+// VIRTUALS
+UserSchema.virtual("fullname").get(function (this: IUser) {
 	return `${this.firstName} ${this.lastName}`
 })
 
-// Ensure virtual fields are serialized in JSON and object representations
-userSchema.set("toJSON", { virtuals: true })
-userSchema.set("toObject", { virtuals: true })
-
-export const User = models.User || model<IUser>("User", userSchema)
+export const User = models.User || model<IUser>("User", UserSchema)
