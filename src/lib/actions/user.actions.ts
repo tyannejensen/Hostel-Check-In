@@ -1,5 +1,7 @@
+"use server"
+
 import { dbConnect } from "@/lib/db"
-import { User } from "@/models/User.model"
+import { User } from "@/lib/models/User.model"
 
 // register user function
 export async function registerUser(
@@ -22,7 +24,7 @@ export async function registerUser(
 		lastName,
 		email,
 		password,
-		role: "user",
+		role: "admin",
 	})
 
 	await newUser.save()

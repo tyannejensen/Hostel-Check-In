@@ -2,8 +2,6 @@
 
 import { signIn } from "@/lib/auth"
 import { AuthError } from "next-auth"
-import { dbConnect } from "@/lib/db"
-import { User } from "@/lib/models/User.model"
 
 export async function authenticate(
 	prevState: string | undefined,
