@@ -11,9 +11,6 @@ if (!MONGO_URI) {
 	throw new Error(
 		"Please define the MONGO_URI environment variable inside .env.local"
 	)
-	throw new Error(
-		"Please define the MONGO_URI environment variable inside .env.local"
-	)
 }
 
 let cached = (global as any).mongoose || { conn: null, promise: null }
