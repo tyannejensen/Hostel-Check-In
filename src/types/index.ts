@@ -5,7 +5,7 @@ export type IRoomStatus = "available" | "occupied" | "maintenance" | "cleaning"
 
 export type IRole = "admin" | "employee" | "tenant"
 
-export type IBookingStatus = "paid" | "pending" | "due"
+export type IBookingStatus = "paid" | "pending" | "booked" | "due"
 
 export type IPaymentType =
 	| "cash"

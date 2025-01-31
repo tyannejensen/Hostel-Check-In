@@ -1,5 +1,5 @@
 import { Schema } from "mongoose"
-import { INote } from "types"
+import { INote } from "@/interfaces/note.interface"
 
 // Note Schema - subdocument of Booking Schema
 export const noteSchema = new Schema<INote>(
