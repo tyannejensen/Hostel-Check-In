@@ -5,7 +5,7 @@ import { z } from "zod"
 import { dbConnect } from "@/lib/db" // Ensure this path is correct
 import type { IUser } from "@/mytypes/interfaces/user.interface" // Ensure this path is correct
 import { User } from "@/models/User.model" // Ensure this path is correct
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt" 
 
 // Get a user using their email address
 async function getUserByEmail(email: string): Promise<IUser | undefined> {
