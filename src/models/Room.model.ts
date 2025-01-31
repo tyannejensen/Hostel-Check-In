@@ -17,7 +17,7 @@ export const roomSchema = new Schema<IRoom>(
 				validator: (v: number | string) => {
 					return /^[0-9]{3}$/.test(v.toString())
 				},
-				message: (props) => `${props.value} is not a valid room number!`,
+				message: (v: number) => `${v} is not a valid room number!`,
 			},
 			status: {
 				type: String,
