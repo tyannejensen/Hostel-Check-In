@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useActionState } from "react"
 import { authenticate } from "@/actions/auth.actions"
 //Adding registerUser to the page
-import { registerUser } from "@/actions/auth.actions"
+import { registerUser } from "@/actions/user.actions"
 import { useSearchParams } from "next/navigation"
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline"
 
@@ -58,15 +58,15 @@ export default function Page() {
 									<CardContent className="space-y-2">
 										<div id="text" className="space-y-1">
 											<Label htmlFor="first">First Name</Label>
-											<Input id="first" placeholder="John" type="input" />
+											<Input id="first" placeholder="John" type="input" name="firstName" />
 										</div>
 										<div id="text" className="space-y-1">
 											<Label htmlFor="last">Last Name</Label>
-											<Input id="last" placeholder="Doe" type="input" />
+											<Input id="last" placeholder="Doe" type="input" name="lastName" />
 										</div>
 										<div id="text" className="space-y-1">
 											<Label htmlFor="email">Email</Label>
-											<Input id="email" placeholder="Email" type="email" />
+											<Input id="email" placeholder="Email" type="email" name="email"/>
 										</div>
 										<div id="text" className="space-y-1">
 											<Label htmlFor="password">Password</Label>
@@ -74,6 +74,7 @@ export default function Page() {
 												id="password"
 												placeholder="Password"
 												type="password"
+												name="password"
 											/>
 										</div>
 									</CardContent>
