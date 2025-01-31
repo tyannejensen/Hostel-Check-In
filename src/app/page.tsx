@@ -31,13 +31,13 @@ export default function Page() {
             <Button onClick={handleUserLogin} className="text-lg px-5 py-2.5 font-medium w-full">
               User Login
             </Button>
-            <Button onClick={handleUserLogin} className="text-lg px-5 py-2.5 font-medium w-full">
+            <Button onClick={handleAdminLogin} className="text-lg px-5 py-2.5 font-medium w-full">
               Admin Login
             </Button>
           </div>
           <h2 className="text-xl font-medium">Register new user</h2>
           <div className="border border-gray-300 rounded-lg p-4 mt-4">
-            <Button onClick={handleUserLogin} className="text-lg px-5 py-2.5 font-medium w-full">
+            <Button onClick={handleRegister} className="text-lg px-5 py-2.5 font-medium w-full">
               Register
             </Button>
           </div>
