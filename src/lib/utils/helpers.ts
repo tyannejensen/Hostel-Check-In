@@ -1,6 +1,6 @@
 // For Mongoose Model Pre and Post Hook Functions
 import { ObjectId, Query } from "mongoose"
-import { Booking } from "@/lib/models/Booking.model"
+import { Booking } from "@/models/Booking.model"
 import { IBooking } from "@/lib/types/interfaces/booking.interface"
 import { IChangeLog } from "@/lib/types/interfaces/change-log.interface"
 

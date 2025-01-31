@@ -1,5 +1,5 @@
 import { Schema, model, models } from "mongoose"
-import { getOldDoc, logChanges } from "@/lib/utils/helpers"
+import { getOldDoc, logChanges } from "@/server-utils/helpers"
 import { v4 as uuidv4 } from "uuid"
 import { IUser } from "@/lib/types/interfaces/user.interface"
 import { changeLogSchema } from "@/lib/models/Log.schema"
