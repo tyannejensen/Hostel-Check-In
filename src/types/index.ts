@@ -1,5 +1,3 @@
-import { Document, ObjectId } from "mongoose"
-
 // Custom types for interfaces and schemas
 export type IRoomType = "shared" | "single" | "double" | "suite"
 

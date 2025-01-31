@@ -9,4 +9,5 @@ export interface IPaymentDetails {
 	routingNumber?: string
 	accountNumber?: string
 	bankName?: string
+	checkNumber?: string
 }

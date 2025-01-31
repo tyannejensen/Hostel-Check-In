@@ -1,5 +1,5 @@
-import { Schema, Document } from "mongoose"
-import { IPhoneNumber } from "../types"
+import { Schema } from "mongoose"
+import { IPhoneNumber } from "@/interfaces/phone-number.interface"
 
 export const phoneNumberSchema = new Schema<IPhoneNumber>(
 	{
@@ -15,7 +15,7 @@ export const phoneNumberSchema = new Schema<IPhoneNumber>(
 			validate: {
 				// custom validator requiring number to be in the format 123-456-7890
 				validator: (v: string) => /\d{3}-\d{3}-\d{4}/.test(v),
-				message: (props) => `${props.value} is not a valid phone number`,
+				message: "{VALUE} is not a valid phone number",
 			},
 		},
 		isMobile: {

@@ -39,9 +39,9 @@ main {
   background-image: var(--glow);
 }
 
-#text {
+/* #text {
   color: var(--text);
-}
+} */
 
 #text-light {
   color: var(--light);
