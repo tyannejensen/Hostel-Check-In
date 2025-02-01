@@ -1,8 +1,8 @@
 // For Mongoose Model Pre and Post Hook Functions
 import { ObjectId, Query } from "mongoose"
-import { Booking } from "@/lib/models/Booking.model"
-import { IBooking } from "@/lib/types/interfaces/booking.interface"
-import { IChangeLog } from "@/lib/types/interfaces/change-log.interface"
+import { Booking } from "@/models/Booking.model"
+import { IBooking } from "@/interfaces/booking.interface"
+import { IChangeLog } from "@/interfaces/change-log.interface"
 
 // Functions to help with logging changes to documents
 
@@ -70,4 +70,14 @@ export async function logChanges(
 		result.history.push(...changeLogs)
 		await result.save() // Save the document with the new history
 	}
+}
+
+// Setter function to format dates for createdAt and updatedAt fields
+export function formatDate(v: Date): string {
+	const date = new Date(v)
+	return date.toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "2-digit",
+	})
 }

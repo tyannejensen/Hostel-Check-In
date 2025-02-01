@@ -1,5 +1,5 @@
 import { Schema } from "mongoose"
-import { IPhoneNumber } from "@/lib/types/interfaces/phone-number.interface"
+import { IPhoneNumber } from "@/interfaces/phone-number.interface"
 
 export const phoneNumberSchema = new Schema<IPhoneNumber>(
 	{
@@ -11,7 +11,6 @@ export const phoneNumberSchema = new Schema<IPhoneNumber>(
 		number: {
 			type: String,
 			required: [true, "Phone number is required"],
-			unique: [true, "Phone number already exists"],
 			validate: {
 				// custom validator requiring number to be in the format 123-456-7890
 				validator: (v: string) => /\d{3}-\d{3}-\d{4}/.test(v),

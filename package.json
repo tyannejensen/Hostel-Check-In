@@ -1,9 +1,10 @@
 {
   "scripts": {
-    "dev": "next dev",
+    "dev": "pnpm run seed && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "ts-node --require tsconfig-paths/register --project tsconfig.ts-node.json ./src/lib/scripts/seed.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -21,22 +22,21 @@
     "@radix-ui/react-tooltip": "^1.1.7",
     "@shadcn/ui": "^0.0.4",
     "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
     "@tanstack/react-table": "^8.20.6",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cmdk": "1.0.0",
-    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
     "lucide-react": "^0.474.0",
     "mongoose": "^8.9.5",
     "next": "^15.1.6",
     "next-auth": "5.0.0-beta.25",
     "postcss-load-config": "^6.0.1",
     "react": "^19.0.0",
-    "react-circular-progressbar": "^2.1.0",
-    "react-day-picker": "8.10.1",
     "react-dom": "^19.0.0",
+    "react-day-picker": "8.10.1",
     "react-hook-form": "^7.54.2",
     "recharts": "^2.15.1",
     "tailwind-merge": "^2.6.0",
@@ -55,6 +55,8 @@
     "eslint-config-next": "15.1.6",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "5.7.3"
   }
 }

@@ -1,12 +1,15 @@
-import { IRoom } from "@/lib/types/interfaces/room.interface"
+function setDate(days: number): Date {
+	return new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+}
 
-const users = [
+// Users data
+const usersData = [
 	// 1 admin, 5 tenants, 6 total
 	{
 		// admin
 		firstName: "John",
 		lastName: "Doe",
-		phoneNumber: [
+		phoneNumbers: [
 			{
 				countryCode: "+1",
 				number: "555-555-5555",
@@ -17,9 +20,9 @@ const users = [
 		email: "john@test.com",
 		password: "password123",
 		role: "admin",
-		paymentMethod: [],
+		paymentMethods: [],
 		bookings: [],
-		tags: [],
+		tags: ["boss"],
 		history: [],
 		createdBy: "",
 	},
@@ -27,7 +30,7 @@ const users = [
 		// tenant #1
 		firstName: "Jane",
 		lastName: "Doe",
-		phoneNumber: [
+		phoneNumbers: [
 			{
 				countryCode: "+1",
 				number: "222-222-2222",
@@ -44,7 +47,7 @@ const users = [
 		email: "jane@test.com",
 		password: "password123",
 		role: "tenant",
-		paymentMethod: [
+		paymentMethods: [
 			{
 				isPrimary: true,
 				paymentName: "Cash",
@@ -60,7 +63,7 @@ const users = [
 		// tenant #2
 		firstName: "Alice",
 		lastName: "Smith",
-		phoneNumber: [
+		phoneNumbers: [
 			{
 				countryCode: "+1",
 				number: "444-444-4444",
@@ -71,7 +74,7 @@ const users = [
 		email: "alice@test.com",
 		password: "password123",
 		role: "tenant",
-		paymentMethod: [
+		paymentMethods: [
 			{
 				isPrimary: true,
 				paymentName: "My Checking",
@@ -90,7 +93,7 @@ const users = [
 		// tenant #3
 		firstName: "Sam",
 		lastName: "Jones",
-		phoneNumber: [
+		phoneNumbers: [
 			{
 				countryCode: "+1",
 				number: "777-777-7777",
@@ -101,7 +104,7 @@ const users = [
 		email: "sam@test.com",
 		password: "password123",
 		role: "tenant",
-		paymentMethod: [
+		paymentMethods: [
 			{
 				isPrimary: true,
 				paymentName: "Mastercard",
@@ -129,7 +132,7 @@ const users = [
 		// tenant #4
 		firstName: "Katie",
 		lastName: "Ames",
-		phoneNumber: [
+		phoneNumbers: [
 			{
 				countryCode: "+1",
 				number: "800-222-3333",
@@ -140,13 +143,15 @@ const users = [
 		email: "katie@test.com",
 		password: "password123",
 		role: "tenant",
-		paymentMethod: [
+		paymentMethods: [
 			{
 				isPrimary: true,
 				paymentName: "Visa",
 				cardHolerName: "Katie Ames",
 				cardNumber: "1234563330123456",
-				expirationDate: new Date(new Date().getFullYear() + 2, 11, 31),
+				expirationDate: new Date(
+					new Date(new Date().getFullYear() + 2, 11, 31)
+				),
 				cvv: "112",
 			},
 		],
@@ -160,7 +165,7 @@ const users = [
 		// tenant #5
 		firstName: "Jason",
 		lastName: "Borne",
-		phoneNumber: [
+		phoneNumbers: [
 			{
 				countryCode: "+1",
 				number: "999-999-9999",
@@ -171,7 +176,7 @@ const users = [
 		email: "jason@test.com",
 		password: "password123",
 		role: "tenant",
-		paymentMethod: [
+		paymentMethods: [
 			{
 				isPrimary: true,
 				paymentName: "check",
@@ -189,98 +194,101 @@ const users = [
 	},
 ]
 
-const rooms = [
+// Rooms data for Bookings
+const roomsData = [
 	{
 		type: "shared",
 		roomNumber: "101A",
-		status: "available",
+		status: "occupied",
 		deposit: 100,
-		bookedBy: "",
 		name: "Room 101A",
-		occupants: 4,
+		size: 4,
+		occupants: [],
 	},
 	{
 		type: "shared",
 		roomNumber: "101B",
-		status: "available",
+		status: "occupied",
 		deposit: 100,
-		bookedBy: "",
 		name: "Room 101B",
-		occupants: 4,
+		size: 4,
+		occupants: [],
 	},
 	{
 		type: "single",
 		roomNumber: "102",
-		status: "available",
+		status: "occupied",
 		deposit: 300,
-		bookedBy: "",
 		name: "Room 102",
-		occupants: 1,
+		size: 1,
+		occupants: [],
 	},
 	{
 		type: "double",
 		roomNumber: "103",
-		status: "available",
+		status: "occupied",
 		deposit: 500,
-		bookedBy: "",
 		name: "Room 103",
-		occupants: 2,
+		size: 2,
+		occupants: [],
 	},
 	{
 		type: "suite",
 		roomNumber: "104",
-		status: "available",
+		status: "occupied",
 		deposit: 800,
-		bookedBy: "",
 		name: "Room 104",
-		occupants: 2,
+		size: 2,
+		occupants: [],
 	},
 ]
 
-const bookings = [
+// Bookings data
+const bookingsData = [
 	{
 		roomId: "",
-		checkIn: new Date().getDate() - 4,
-		checkOut: new Date().getDate() + 3,
+		checkIn: setDate(-4),
+		checkOut: setDate(3),
 		status: "paid",
 		DepositAmount: null,
 		depositReturned: false,
 	},
 	{
 		roomId: "",
-		checkIn: new Date().getDate() - 1,
-		checkOut: new Date().getDate() + 5,
+		checkIn: setDate(-1),
+		checkOut: setDate(5),
 		status: "pending",
 		DepositAmount: null,
 		depositReturned: false,
 	},
 	{
 		roomId: "",
-		checkIn: new Date().getDate() - 1,
-		checkOut: new Date().getDate() + 30,
+		checkIn: setDate(-2),
+		checkOut: setDate(30),
 		status: "paid",
 		DepositAmount: null,
 		depositReturned: false,
 	},
 	{
 		roomId: "",
-		checkIn: new Date(),
-		checkOut: new Date().getDate() + 7,
+		checkIn: setDate(0),
+		checkOut: setDate(7),
 		status: "pending",
 		DepositAmount: null,
 		depositReturned: false,
 	},
 	{
 		roomId: "",
-		checkIn: new Date().getDate() + 3,
-		checkOut: new Date().getDate() + 7,
+		checkIn: setDate(3),
+		checkOut: setDate(10),
 		status: "booked",
 		DepositAmount: null,
 		depositReturned: false,
 	},
 ]
 
-const notes = [
+// Notes data for Bookings
+const notesData = [
 	{
 		content: "Tenant is delinquent",
 		createdBy: "",
@@ -303,4 +311,4 @@ const notes = [
 	},
 ]
 
-export { users, rooms, bookings, notes }
+export { usersData, roomsData, bookingsData, notesData }

@@ -1,10 +1,12 @@
 import { Schema, model, models } from "mongoose"
-import { getOldDoc, logChanges } from "@/lib/utils/helpers"
 import { v4 as uuidv4 } from "uuid"
-import { IUser } from "@/lib/types/interfaces/user.interface"
-import { changeLogSchema } from "@/lib/models/Log.schema"
-import { phoneNumberSchema } from "@/lib/models/PhoneNumber.schema"
 import bcrypt from "bcrypt"
+import { IUser } from "@/interfaces/user.interface"
+import { ChangeLogSchema } from "@/models/Log.schema"
+import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
+import { PaymentMethodSchema } from "@/models/PaymentMethod.schema"
+import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
+import { IPaymentMethod } from "../types/interfaces/payment-method.interface"
 
 // User Schema
 const UserSchema = new Schema<IUser>(
@@ -19,8 +21,7 @@ const UserSchema = new Schema<IUser>(
 			minlength: [2, "First name must be at least 2 characters long"],
 			maxlength: [50, "First name must be at most 50 characters long"],
 			trim: true,
-			lowercase: true,
-			get: (v: string) => v.charAt(0).toUpperCase() + v.slice(1), // Capitalize firstName
+			set: (v: string) => v.charAt(0).toUpperCase() + v.slice(1).toLowerCase(), // Capitalize firstName
 			match: [
 				/^[A-Za-zÀ-ÖØ-öø-ÿ'\-]{2,50}$/,
 				"First name contains invalid characters",
@@ -32,12 +33,18 @@ const UserSchema = new Schema<IUser>(
 			minlength: [2, "Last name must be at least 2 characters long"],
 			maxlength: [50, "Last name must be at most 50 characters long"],
 			trim: true,
-			lowercase: true,
-			get: (v: string) => v.charAt(0).toUpperCase() + v.slice(1), // Capitalize lastName
+			set: (v: string) => v.charAt(0).toUpperCase() + v.slice(1).toLowerCase(), // Capitalize lastName
 			match: [
 				/^[A-Za-zÀ-ÖØ-öø-ÿ'\-]{2,50}$/,
 				"Last name contains invalid characters",
 			],
+		},
+		fullname: {
+			type: String,
+			default: function (this: IUser): string {
+				return `${this.firstName} ${this.lastName}`
+			},
+			trim: true,
 		},
 		email: {
 			type: String,
@@ -64,66 +71,23 @@ const UserSchema = new Schema<IUser>(
 			},
 		},
 		bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
-		paymentMethods: [
-			{
-				isPrimary: {
-					type: Boolean,
-					required: [true, "Primary payment method indicator is required"],
+		paymentMethods: {
+			type: [PaymentMethodSchema],
+			validate: {
+				validator: function (paymentMethods: IPaymentMethod[]) {
+					// If role is Tenant, paymentMethods must not be empty
+					if (
+						this.role === "tenant" &&
+						(!paymentMethods || paymentMethods.length === 0)
+					) {
+						return false // Validation fails
+					}
+					return true // Validation passes
 				},
-				method: {
-					type: String,
-					required: [true, "Payment method is required"],
-					enum: {
-						values: ["cash", "credit", "debit", "bank", "money order", "check"],
-						message: "{VALUE} is not a valid payment method",
-					},
-				},
-				cardHolderName: {
-					type: String,
-					minlength: [2, "Card Holder Name must be at least 2 characters long"],
-					maxlength: [
-						50,
-						"Card Holder Name must be at most 50 characters long",
-					],
-					match: [
-						/^[A-Za-zÀ-ÖØ-öø-ÿ'\-]{2,50}$/,
-						"Card Holder Name contains invalid characters",
-					],
-				},
-				cardNumber: {
-					type: String,
-					minlength: [15, "Card Number must be at least 15 characters long"],
-					maxlength: [16, "Card Number must be at most 16 characters long"],
-				},
-				expirationDate: {
-					type: Date,
-					validate: {
-						validator: (v: Date) => v > new Date(),
-						message: (props) => `${props.value} is not a valid expiration date`,
-					},
-				},
-				cvv: {
-					type: String,
-					minlength: [3, "CVV must be at least 3 characters long"],
-					maxlength: [4, "CVV must be at most 4 characters long"],
-				},
-				routingNumber: {
-					type: String,
-					minlength: [9, "Routing Number must be 9 characters long"],
-					maxlength: [9, "Routing Number must be 9 characters long"],
-				},
-				accountNumber: {
-					type: String,
-					minlength: [10, "Account Number must be at least 10 characters long"],
-					maxlength: [12, "Account Number must be at most 12 characters long"],
-				},
-				bankName: {
-					type: String,
-					minlength: [2, "Bank Name must be at least 2 characters long"],
-					maxlength: [50, "Bank Name must be at most 50 characters long"],
-				},
+				message: "Tenants must have at least one payment method.",
 			},
-		],
+			default: [], // Default to empty array
+		},
 		tags: [
 			{
 				type: String,
@@ -142,10 +106,14 @@ const UserSchema = new Schema<IUser>(
 				},
 			},
 		],
-		history: [changeLogSchema],
+		history: [ChangeLogSchema],
 		createdBy: {
 			type: String,
 			ref: "User",
+			// get: function (createdBy: IUser) { // Return only the fullname of the createdBy user
+			// 	// Here, you return the fullName instead of the entire user object
+			// 	return createdBy ? createdBy.fullname : null
+			// },
 		},
 		updatedBy: {
 			type: String,
@@ -154,11 +122,10 @@ const UserSchema = new Schema<IUser>(
 	},
 	{
 		timestamps: true, // Add createdAt and updatedAt fields
-		toJSON: { getters: true, virtuals: true },
-		toObject: { getters: true, virtuals: true },
 	}
 )
 
+// MIDDLWARE
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
 UserSchema.pre("findOneAndUpdate", getOldDoc) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
 UserSchema.pre("updateOne", getOldDoc)
@@ -190,21 +157,32 @@ UserSchema.methods.isCorrectPassword = async function (
 }
 
 // GETTERS
-// Return the First Name and Last Name with the first letter capitalized
-UserSchema.path("firstName").get(function (firstName: string) {
-	return firstName.charAt(0).toUpperCase() + firstName.slice(1) // Capitalize firstName
-})
-
-UserSchema.path("lastName").get(function (lastName: string) {
-	return lastName.toUpperCase() // Convert lastName to uppercase
-})
+// Convert the 'createdAt' field to MMM DD, YYYY format e.g. Jan 30, 2025
+UserSchema.path("createdAt").get(formatDate)
+UserSchema.path("updatedAt").get(formatDate)
 
 // SETTERS
-// None
+// Set toObject options to exclude _id and password fields automatically
+UserSchema.set("toObject", {
+	getters: true,
+	virtuals: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+		delete ret.password // Exclude password field
+	},
+})
+
+// Set toJSON options to exclude _id and password fields automatically
+UserSchema.set("toJSON", {
+	virtuals: true,
+	getters: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+		delete ret.password // Exclude password field
+	},
+})
 
 // VIRTUALS
-UserSchema.virtual("fullname").get(function (this: IUser) {
-	return `${this.firstName} ${this.lastName}`
-})
+// None
 
 export const User = models.User || model<IUser>("User", UserSchema)

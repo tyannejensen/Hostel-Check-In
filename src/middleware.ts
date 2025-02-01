@@ -12,9 +12,9 @@ export async function middleware(req: NextRequest) {
   }
 
   // Redirect to login if the user is not authenticated and trying to access dashboard routes
-  // if (req.nextUrl.pathname.startsWith("/dashboard") && !token) {
-  //   return NextResponse.redirect(new URL("/login", req.url));
-  // }
+  if (req.nextUrl.pathname.startsWith("/dashboard") && !token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
 
   return NextResponse.next();
 }

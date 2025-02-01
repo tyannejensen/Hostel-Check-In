@@ -3,7 +3,7 @@ import { IBooking } from "@/lib/types/interfaces/booking.interface"
 import { IChangeLog } from "@/lib/types/interfaces/change-log.interface"
 
 // Change Log Schema - subdocument of Booking Schema
-export const changeLogSchema = new Schema<IChangeLog>(
+export const ChangeLogSchema = new Schema<IChangeLog>(
 	{
 		field: {
 			type: String,
@@ -31,7 +31,7 @@ export const changeLogSchema = new Schema<IChangeLog>(
 )
 
 // Booking Update Pre Save Hook -> Middleware to enforce immutability of notes
-changeLogSchema.pre<IBooking>("save", function (next) {
+ChangeLogSchema.pre<IBooking>("save", function (next) {
 	if (this.isNew) {
 		// If the Log is new, allow it to save
 		return next()
