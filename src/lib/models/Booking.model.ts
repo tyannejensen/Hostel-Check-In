@@ -1,6 +1,6 @@
 import { Schema, model, models } from "mongoose"
 import { IBooking } from "@/interfaces/booking.interface"
-import { changeLogSchema } from "@/models/Log.schema"
+import { ChangeLogSchema } from "@/models/Log.schema"
 import { noteSchema } from "@/models/Note.schema"
 import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
 
@@ -60,7 +60,7 @@ const BookingSchema = new Schema<IBooking>(
 			},
 		],
 		Notes: [noteSchema],
-		history: [changeLogSchema],
+		history: [ChangeLogSchema],
 	},
 	{
 		timestamps: true,

@@ -1,8 +1,9 @@
 import { Schema, model, models } from "mongoose"
 import { IPayment } from "@/interfaces/payment.interface"
+import { PaymentMethodSchema } from "@/models/PaymentMethod.schema"
 
 // Payment Schema - subdocument of Booking Schema
-const paymentSchema = new Schema<IPayment>(
+const PaymentSchema = new Schema<IPayment>(
 	{
 		bookingId: {
 			type: Schema.Types.ObjectId,
@@ -23,52 +24,9 @@ const paymentSchema = new Schema<IPayment>(
 			required: [true, "Employee ID is required"],
 			ref: "User",
 		},
-		method: {
-			type: String,
-			enum: ["cash", "credit", "debit", "bank", "money order", "check"],
+		paymentMethod: {
+			type: PaymentMethodSchema,
 			required: [true, "Payment method is required"],
-		},
-		cardHolderName: {
-			type: String,
-			minlength: [2, "Card Holder Name must be at least 2 characters long"],
-			maxlength: [50, "Card Holder Name must be at most 50 characters long"],
-		},
-		cardNumber: {
-			type: String,
-			minlength: [15, "Card Number must be at least 15 characters long"],
-			maxlength: [16, "Card Number must be at most 16 characters long"],
-		},
-		expirationDate: {
-			type: Date,
-			validate: {
-				validator: (v: Date) => v > new Date(),
-				message: "{VALUE} is not a valid expiration date",
-			},
-		},
-		cvv: {
-			type: String,
-			minlength: [3, "CVV must be at least 3 characters long"],
-			maxlength: [4, "CVV must be at most 4 characters long"],
-		},
-		routingNumber: {
-			type: String,
-			minlength: [9, "Routing Number must be 9 characters long"],
-			maxlength: [9, "Routing Number must be 9 characters long"],
-		},
-		accountNumber: {
-			type: String,
-			minlength: [10, "Account Number must be at least 10 characters long"],
-			maxlength: [12, "Account Number must be at most 12 characters long"],
-		},
-		bankName: {
-			type: String,
-			minlength: [2, "Bank Name must be at least 2 characters long"],
-			maxlength: [50, "Bank Name must be at most 50 characters long"],
-		},
-		checkNumber: {
-			type: String,
-			minlength: [5, "Check Number must be at least 5 characters long"],
-			maxlength: [5, "Check Number must be at most 5 characters long"],
 		},
 	},
 	{
@@ -78,7 +36,7 @@ const paymentSchema = new Schema<IPayment>(
 )
 
 // Notes Pre Save Hook -> Middleware to enforce immutability of notes
-paymentSchema.pre("save", function (next) {
+PaymentSchema.pre("save", function (next) {
 	if (this.isNew) {
 		// If the Payment is new, allow it to save
 		return next()
@@ -90,4 +48,4 @@ paymentSchema.pre("save", function (next) {
 })
 
 export const Payment =
-	models.Payment || model<IPayment>("Payment", paymentSchema)
+	models.Payment || model<IPayment>("Payment", PaymentSchema)

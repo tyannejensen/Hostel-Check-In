@@ -2,9 +2,9 @@ import { Schema, model, models } from "mongoose"
 import { v4 as uuidv4 } from "uuid"
 import bcrypt from "bcrypt"
 import { IUser } from "@/interfaces/user.interface"
-import { changeLogSchema } from "@/models/Log.schema"
+import { ChangeLogSchema } from "@/models/Log.schema"
 import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
-import { paymentMethodSchema } from "@/models/PaymentMethod.schema"
+import { PaymentMethodSchema } from "@/models/PaymentMethod.schema"
 import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
 import { IPaymentMethod } from "../types/interfaces/payment-method.interface"
 
@@ -72,7 +72,7 @@ const UserSchema = new Schema<IUser>(
 		},
 		bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
 		paymentMethods: {
-			type: [paymentMethodSchema],
+			type: [PaymentMethodSchema],
 			validate: {
 				validator: function (paymentMethods: IPaymentMethod[]) {
 					// If role is Tenant, paymentMethods must not be empty
@@ -106,7 +106,7 @@ const UserSchema = new Schema<IUser>(
 				},
 			},
 		],
-		history: [changeLogSchema],
+		history: [ChangeLogSchema],
 		createdBy: {
 			type: String,
 			ref: "User",
