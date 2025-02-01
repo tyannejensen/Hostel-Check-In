@@ -8,7 +8,7 @@ export interface IRoom extends Document {
 	roomNumber: number | string
 	status: IRoomStatus
 	deposit: number
-	bookedBy: string // reference to the user (tenant) who made the booking - uses uuid v4
 	name?: string
-	occupants?: number
+	size: number
+	occupants: string[] // reference to the tenent(s) who are staying in the room - uses uuid v4
 }
