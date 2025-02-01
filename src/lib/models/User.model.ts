@@ -1,10 +1,10 @@
 import { Schema, model, models } from "mongoose"
-import { getOldDoc, logChanges } from "@/server-utils/helpers"
 import { v4 as uuidv4 } from "uuid"
+import bcrypt from "bcrypt"
 import { IUser } from "@/interfaces/user.interface"
 import { changeLogSchema } from "@/models/Log.schema"
 import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
-import bcrypt from "bcrypt"
+import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
 
 // User Schema
 const UserSchema = new Schema<IUser>(
@@ -19,8 +19,7 @@ const UserSchema = new Schema<IUser>(
 			minlength: [2, "First name must be at least 2 characters long"],
 			maxlength: [50, "First name must be at most 50 characters long"],
 			trim: true,
-			lowercase: true,
-			get: (v: string) => v.charAt(0).toUpperCase() + v.slice(1), // Capitalize firstName
+			set: (v: string) => v.charAt(0).toUpperCase() + v.slice(1).toLowerCase(), // Capitalize firstName
 			match: [
 				/^[A-Za-zÀ-ÖØ-öø-ÿ'\-]{2,50}$/,
 				"First name contains invalid characters",
@@ -32,12 +31,18 @@ const UserSchema = new Schema<IUser>(
 			minlength: [2, "Last name must be at least 2 characters long"],
 			maxlength: [50, "Last name must be at most 50 characters long"],
 			trim: true,
-			lowercase: true,
-			get: (v: string) => v.charAt(0).toUpperCase() + v.slice(1), // Capitalize lastName
+			set: (v: string) => v.charAt(0).toUpperCase() + v.slice(1).toLowerCase(), // Capitalize lastName
 			match: [
 				/^[A-Za-zÀ-ÖØ-öø-ÿ'\-]{2,50}$/,
 				"Last name contains invalid characters",
 			],
+		},
+		fullname: {
+			type: String,
+			default: function (this: IUser): string {
+				return `${this.firstName} ${this.lastName}`
+			},
+			trim: true,
 		},
 		email: {
 			type: String,
@@ -146,6 +151,10 @@ const UserSchema = new Schema<IUser>(
 		createdBy: {
 			type: String,
 			ref: "User",
+			// get: function (createdBy: IUser) {
+			// 	// Here, you return the fullName instead of the entire user object
+			// 	return createdBy ? createdBy.fullname : null
+			// },
 		},
 		updatedBy: {
 			type: String,
@@ -154,11 +163,10 @@ const UserSchema = new Schema<IUser>(
 	},
 	{
 		timestamps: true, // Add createdAt and updatedAt fields
-		toJSON: { getters: true, virtuals: true },
-		toObject: { getters: true, virtuals: true },
 	}
 )
 
+// MIDDLWARE
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
 UserSchema.pre("findOneAndUpdate", getOldDoc) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
 UserSchema.pre("updateOne", getOldDoc)
@@ -190,21 +198,32 @@ UserSchema.methods.isCorrectPassword = async function (
 }
 
 // GETTERS
-// Return the First Name and Last Name with the first letter capitalized
-UserSchema.path("firstName").get(function (firstName: string) {
-	return firstName.charAt(0).toUpperCase() + firstName.slice(1) // Capitalize firstName
-})
-
-UserSchema.path("lastName").get(function (lastName: string) {
-	return lastName.toUpperCase() // Convert lastName to uppercase
-})
+// Convert the 'createdAt' field to MMM DD, YYYY format e.g. Jan 30, 2025
+UserSchema.path("createdAt").get(formatDate)
+UserSchema.path("updatedAt").get(formatDate)
 
 // SETTERS
-// None
+// Set toObject options to exclude _id and password fields automatically
+UserSchema.set("toObject", {
+	getters: true,
+	virtuals: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+		delete ret.password // Exclude password field
+	},
+})
+
+// Set toJSON options to exclude _id and password fields automatically
+UserSchema.set("toJSON", {
+	virtuals: true,
+	getters: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+		delete ret.password // Exclude password field
+	},
+})
 
 // VIRTUALS
-UserSchema.virtual("fullname").get(function (this: IUser) {
-	return `${this.firstName} ${this.lastName}`
-})
+// None
 
 export const User = models.User || model<IUser>("User", UserSchema)

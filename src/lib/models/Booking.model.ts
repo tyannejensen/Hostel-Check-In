@@ -1,8 +1,8 @@
 import { Schema, model, models } from "mongoose"
-import { getOldDoc, logChanges } from "@/server-utils/helpers"
 import { IBooking } from "@/interfaces/booking.interface"
 import { changeLogSchema } from "@/models/Log.schema"
 import { noteSchema } from "@/models/Note.schema"
+import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
 
 const BookingSchema = new Schema<IBooking>(
 	{
@@ -87,6 +87,13 @@ BookingSchema.post("findOneAndUpdate", logChanges) // IMPORTANT: Use findOneAndU
 BookingSchema.post("updateOne", logChanges)
 BookingSchema.post("replaceOne", logChanges)
 // DO NOT USE findByIdAndUpdate as it does not trigger the post hook
+
+// GETTERS
+BookingSchema.path("createdAt").get(formatDate)
+BookingSchema.path("updatedAt").get(formatDate)
+
+// SETTERS
+// None
 
 export const Booking =
 	models.Booking || model<IBooking>("Booking", BookingSchema)

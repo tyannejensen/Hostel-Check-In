@@ -71,3 +71,12 @@ export async function logChanges(
 		await result.save() // Save the document with the new history
 	}
 }
+
+export function formatDate(v: Date): string {
+	const date = new Date(v)
+	return date.toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "2-digit",
+	})
+}

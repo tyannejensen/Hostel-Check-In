@@ -9,7 +9,7 @@ export interface IUser extends Document {
 	_id: string // string in UUID v4 format - example: 123e4567-e89b-12d3-a456-426614174000
 	firstName: string
 	lastName: string
-	fullname?: string
+	fullname: string
 	email: string
 	phoneNumbers: IPhoneNumber[] // reference to PhoneNumber Subdocument
 	password: string
