@@ -6,6 +6,7 @@ import { changeLogSchema } from "@/models/Log.schema"
 import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
 import { paymentMethodSchema } from "@/models/PaymentMethod.schema"
 import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
+import { IPaymentMethod } from "../types/interfaces/payment-method.interface"
 
 // User Schema
 const UserSchema = new Schema<IUser>(
@@ -70,7 +71,23 @@ const UserSchema = new Schema<IUser>(
 			},
 		},
 		bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
-		paymentMethods: [paymentMethodSchema],
+		paymentMethods: {
+			type: [paymentMethodSchema],
+			validate: {
+				validator: function (paymentMethods: IPaymentMethod[]) {
+					// If role is Tenant, paymentMethods must not be empty
+					if (
+						this.role === "tenant" &&
+						(!paymentMethods || paymentMethods.length === 0)
+					) {
+						return false // Validation fails
+					}
+					return true // Validation passes
+				},
+				message: "Tenants must have at least one payment method.",
+			},
+			default: [], // Default to empty array
+		},
 		tags: [
 			{
 				type: String,

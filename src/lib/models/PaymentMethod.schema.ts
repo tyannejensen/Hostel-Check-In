@@ -7,10 +7,11 @@ export const paymentMethodSchema = new Schema<IPaymentMethod>(
 		isPrimary: {
 			type: Boolean,
 			required: [true, "Primary payment method indicator is required"],
+			default: false,
 		},
 		method: {
 			type: String,
-			required: [true, "Payment method is required"],
+			// required: [true, "Payment method is required"],
 			enum: {
 				values: ["cash", "credit", "debit", "bank", "money order", "check"],
 				message: "{VALUE} is not a valid payment method",
@@ -49,8 +50,8 @@ export const paymentMethodSchema = new Schema<IPaymentMethod>(
 		},
 		accountNumber: {
 			type: String,
-			minlength: [10, "Account Number must be at least 10 characters long"],
-			maxlength: [12, "Account Number must be at most 12 characters long"],
+			minlength: [8, "Account Number must be at least 8 characters long"],
+			maxlength: [20, "Account Number must be at most 20 characters long"],
 		},
 		bankName: {
 			type: String,
