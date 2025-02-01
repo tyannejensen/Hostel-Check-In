@@ -110,7 +110,7 @@ const UserSchema = new Schema<IUser>(
 		createdBy: {
 			type: String,
 			ref: "User",
-			// get: function (createdBy: IUser) {
+			// get: function (createdBy: IUser) { // Return only the fullname of the createdBy user
 			// 	// Here, you return the fullName instead of the entire user object
 			// 	return createdBy ? createdBy.fullname : null
 			// },

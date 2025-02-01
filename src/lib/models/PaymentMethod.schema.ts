@@ -1,5 +1,6 @@
 import { Schema } from "mongoose"
 import { IPaymentMethod } from "../types/interfaces/payment-method.interface"
+import { formatDate } from "../utils/helpers"
 
 // PaymentMethod Schema - subdocument of Booking Schema
 export const paymentMethodSchema = new Schema<IPaymentMethod>(
@@ -63,3 +64,28 @@ export const paymentMethodSchema = new Schema<IPaymentMethod>(
 		timestamps: true, // Add createdAt and updatedAt fields
 	}
 )
+
+// GETTERS
+// Convert the 'createdAt' field to MMM DD, YYYY format e.g. Jan 30, 2025
+paymentMethodSchema.path("createdAt").get(formatDate)
+paymentMethodSchema.path("updatedAt").get(formatDate)
+paymentMethodSchema.path("expirationDate").get(formatDate)
+
+// SETTERS
+// Set toObject options to exclude _id and password fields automatically
+paymentMethodSchema.set("toObject", {
+	getters: true,
+	virtuals: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+	},
+})
+
+// Set toJSON options to exclude _id and password fields automatically
+paymentMethodSchema.set("toJSON", {
+	virtuals: true,
+	getters: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+	},
+})
