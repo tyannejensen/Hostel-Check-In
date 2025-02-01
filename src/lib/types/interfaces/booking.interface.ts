@@ -19,6 +19,6 @@ export interface IBooking extends Document {
 	depositReturnAmount?: number
 	payments: IPayment[]
 	totalPayment?: number
-	Notes?: INote[]
+	notes?: INote[]
 	history?: IChangeLog[]
 }

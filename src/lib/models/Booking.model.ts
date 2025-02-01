@@ -1,7 +1,7 @@
 import { Schema, model, models } from "mongoose"
 import { IBooking } from "@/interfaces/booking.interface"
 import { ChangeLogSchema } from "@/models/Log.schema"
-import { noteSchema } from "@/models/Note.schema"
+import { NoteSchema } from "@/models/Note.schema"
 import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
 
 const BookingSchema = new Schema<IBooking>(
@@ -32,8 +32,8 @@ const BookingSchema = new Schema<IBooking>(
 		},
 		status: {
 			type: String,
-			enum: ["paid", "pending", "due"],
-			default: "pending",
+			enum: ["paid", "pending", "booked", "due"],
+			default: "due",
 		},
 		depositAmount: {
 			type: Number,
@@ -52,20 +52,20 @@ const BookingSchema = new Schema<IBooking>(
 			type: Number,
 			get: (v: number) => v * 100, // Convert deposit amount to cents
 			set: (v: number) => v / 100, // Convert deposit amount to dollars
+			default: 0,
 		},
 		payments: [
 			{
 				type: Schema.Types.ObjectId,
 				ref: "Payment",
+				required: [true, "Payment ID is required"],
 			},
 		],
-		Notes: [noteSchema],
+		notes: [NoteSchema],
 		history: [ChangeLogSchema],
 	},
 	{
-		timestamps: true,
-		toJSON: { getters: true, virtuals: true },
-		toObject: { getters: true, virtuals: true },
+		timestamps: true, // Add createdAt and updatedAt fields
 	}
 )
 
@@ -86,15 +86,30 @@ BookingSchema.post("replaceOne", logChanges)
 // Convert the 'createdAt' and 'updatedAt' fields to MMM DD, YYYY format e.g. Jan 30, 2025
 BookingSchema.path("createdAt").get(formatDate)
 BookingSchema.path("updatedAt").get(formatDate)
+BookingSchema.path("checkIn").get(formatDate)
+BookingSchema.path("checkOut").get(formatDate)
 
 // SETTERS
-// None
+// Set toObject options to exclude _id and password fields automatically
+BookingSchema.set("toObject", {
+	getters: true,
+	virtuals: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+	},
+})
+
+// Set toJSON options to exclude _id and password fields automatically
+BookingSchema.set("toJSON", {
+	virtuals: true,
+	getters: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+	},
+})
 
 // VIRTUALS
-// Virtual to calculate the total payment made for a booking
-BookingSchema.virtual("totalPayment").get(function () {
-	return this.payments.reduce((acc, curr) => acc + curr.amount, 0)
-})
+// None
 
 export const Booking =
 	models.Booking || model<IBooking>("Booking", BookingSchema)
