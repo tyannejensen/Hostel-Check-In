@@ -69,12 +69,6 @@ const BookingSchema = new Schema<IBooking>(
 	}
 )
 
-// VIRTUALS
-// Virtual to calculate the total payment made for a booking
-BookingSchema.virtual("totalPayment").get(function () {
-	return this.payments.reduce((acc, curr) => acc + curr.amount, 0)
-})
-
 // MIDDLEWARE
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
 BookingSchema.pre("findOneAndUpdate", getOldDoc) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
@@ -89,11 +83,18 @@ BookingSchema.post("replaceOne", logChanges)
 // DO NOT USE findByIdAndUpdate as it does not trigger the post hook
 
 // GETTERS
+// Convert the 'createdAt' and 'updatedAt' fields to MMM DD, YYYY format e.g. Jan 30, 2025
 BookingSchema.path("createdAt").get(formatDate)
 BookingSchema.path("updatedAt").get(formatDate)
 
 // SETTERS
 // None
+
+// VIRTUALS
+// Virtual to calculate the total payment made for a booking
+BookingSchema.virtual("totalPayment").get(function () {
+	return this.payments.reduce((acc, curr) => acc + curr.amount, 0)
+})
 
 export const Booking =
 	models.Booking || model<IBooking>("Booking", BookingSchema)
