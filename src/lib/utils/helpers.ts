@@ -72,6 +72,7 @@ export async function logChanges(
 	}
 }
 
+// Setter function to format dates for createdAt and updatedAt fields
 export function formatDate(v: Date): string {
 	const date = new Date(v)
 	return date.toLocaleDateString("en-US", {
