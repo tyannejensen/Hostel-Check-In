@@ -1,4 +1,9 @@
-import mongoose from "mongoose"
+"use server"
+
+// Used to access environment variables
+import dotenv from "dotenv"
+dotenv.config({ path: ".env.local" })
+
 import { dbConnect } from "@/lib/db"
 import { User } from "@/lib/models/User.model"
 import { Room } from "@/lib/models/Room.model"
@@ -6,26 +11,27 @@ import { Booking } from "@/lib/models/Booking.model"
 import { IRoom } from "@/lib/types/interfaces/room.interface"
 import { IUser } from "@/lib/types/interfaces/user.interface"
 import { users, rooms, bookings, notes } from "@/server-utils/test-data"
+import mongoose from "mongoose"
+import { transform } from "next/dist/build/swc/generated-native"
 
 async function dropAllCollections() {
-	const db = await dbConnect()
+	await dbConnect() // Ensure connection is established
 
-	console.log(db)
+	const db = mongoose.connection.db
+	if (!db) {
+		console.error("Database connection is not established.")
+		process.exit(1)
+	}
 
-	if (!db)
-		return new Response(
-			JSON.stringify({ message: "Error connecting to database" }),
-			{
-				status: 500,
-				headers: { "Content-Type": "application/json" },
-			}
-		)
+	const collections = await db.listCollections().toArray()
 
-	// Reomve all data from collections
-	const collections = await db.collections()
-	console.log(collections)
 	for (const collection of collections) {
-		await collection.deleteMany({})
+		try {
+			await mongoose.connection.collection(collection.name).deleteMany({})
+			console.log(`Cleared collection: ${collection.name}`)
+		} catch (error) {
+			console.error(`Error clearing collection ${collection.name}:`, error)
+		}
 	}
 }
 
@@ -34,16 +40,32 @@ async function addAdminUser() {
 	return adminUser.save()
 }
 
-async function seedUsers() {
+async function seedUsers(admin: IUser) {
 	const insertedUsers = await Promise.all(
 		// Add all users except the first one who was created in the previous function step (addAdminUser)
 		users.slice(1).map(async (user) => {
-			const newUser = new User(user)
-			return newUser.save()
+			// build new user
+			const userObj = {
+				...user,
+				createdBy: admin._id,
+			}
+			const newUser = await new User(userObj).save()
+			return newUser
 		})
 	)
-	console.table(insertedUsers)
-	return insertedUsers
+	const formatedUsers = await Promise.all(
+		insertedUsers.map(async (user) => {
+			const populatedUser = await User.findOne({ _id: user._id })
+				.populate(
+					"createdBy",
+					"fullname" // Populate createdBy field with fullname and email
+				)
+				.select("fullname email createdAt tags role") // Select only these fields
+			return populatedUser.toObject()
+		})
+	)
+	console.table(formatedUsers)
+	return formatedUsers
 }
 
 async function seedRooms() {
@@ -89,7 +111,7 @@ async function seedBookings(
 	return insertedBookings
 }
 
-export async function GET() {
+async function seedDatabase() {
 	try {
 		await dbConnect() // Connect to the database
 
@@ -102,31 +124,25 @@ export async function GET() {
 		console.log("Admin user added")
 
 		// Add all tenants
-		const tenants = await seedUsers() // Add all tenents
+		const tenants = await seedUsers(admin) // Add all tenents
 		console.log("Tenants added")
 
 		// Add all rooms
-		const rooms = await seedRooms() // Add all rooms
+		// await seedRooms() // Add all rooms
 
 		// Add all bookings and link to the tenants
-		await seedBookings(admin, tenants, tenants, notes)
+		// await seedBookings(admin, tenants, tenants, notes)
 
 		// Add all notes and link to the bookings
 
 		// Add all payments and link to the bookings
 
-		return new Response(
-			JSON.stringify({ message: "Database seeded successfully" }),
-			{
-				status: 200,
-				headers: { "Content-Type": "application/json" },
-			}
-		)
+		process.exit(0)
 	} catch (error) {
 		console.error("Error seeding database:", error)
-		return new Response(JSON.stringify({ message: "Error seeding database" }), {
-			status: 500,
-			headers: { "Content-Type": "application/json" },
-		})
+		process.exit(1)
 	}
 }
+
+// Run the seedDatabase function
+seedDatabase()
