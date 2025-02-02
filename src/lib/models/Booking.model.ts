@@ -22,10 +22,6 @@ const BookingSchema = new Schema<IBooking>(
       ref: "Room",
       required: [true, "Room ID is required"],
     },
-    roomNumber: {
-      type: Schema.Types.Mixed,
-      required: [true, "Room number is required"],
-    },
     checkIn: {
       type: Date,
       required: [true, "Check-in date is required"],
@@ -115,6 +111,5 @@ BookingSchema.set("toJSON", {
 // VIRTUALS
 // None
 
-export const Booking = models
-  ? models.Booking || model<IBooking>("Booking", BookingSchema)
-  : model<IBooking>("Booking", BookingSchema);
+export const Booking =
+  models.Booking || model<IBooking>("Booking", BookingSchema);
