@@ -172,7 +172,7 @@ async function seedBookingsWithPayments(
 					.populate({
 						// Populate payments field with paidBy field
 						path: "payments",
-						// select: "amount paidBy",
+						select: "amount paidBy",
 						populate: {
 							path: "paidBy",
 							select: "fullname email",
@@ -216,11 +216,19 @@ async function seedNotes(admin: IUser, bookings: IBooking[]) {
 				createdBy: admin.id,
 			})
 			await booking.save()
-			const bookingObject = booking.toObject()
-			return bookingObject.notes[0]
+			const bookingObject = await Booking.findOne({
+				_id: booking._id,
+			}).populate({
+				path: "notes",
+				populate: {
+					path: "createdBy",
+					select: "fullname email",
+				},
+			})
+			return bookingObject.notes[0].toObject()
 		})
 	)
-	console.table(formatedNotes, ["Content", "createdBy", "createdAt"])
+	console.table(formatedNotes, ["content", "createdBy", "createdAt"])
 }
 
 async function seedDatabase() {
