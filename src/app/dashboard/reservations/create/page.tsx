@@ -197,6 +197,10 @@ export default function Page() {
     console.log(values);
   }
 
+  async function getRoomsData() {
+    return await getRoomsData();
+  }
+
   return (
     <>
       <div className="page">

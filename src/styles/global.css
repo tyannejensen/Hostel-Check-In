@@ -186,6 +186,8 @@ h3 {
 .circular-styled-button {
   position: absolute;
   top: 4px;
+  white-space: nowrap;
+  padding: 5px 10px;
 }
 .back-button-container {
   padding: 15px;
