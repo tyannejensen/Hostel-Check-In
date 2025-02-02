@@ -50,7 +50,8 @@ const usersData = [
 		paymentMethods: [
 			{
 				isPrimary: true,
-				paymentName: "Cash",
+				paymentName: "My Pocket",
+				method: "cash",
 			},
 		],
 		bookings: [],
@@ -77,6 +78,7 @@ const usersData = [
 		paymentMethods: [
 			{
 				isPrimary: true,
+				method: "bank",
 				paymentName: "My Checking",
 				routingNumber: "123456789",
 				accountNumber: "987654321",
@@ -107,6 +109,7 @@ const usersData = [
 		paymentMethods: [
 			{
 				isPrimary: true,
+				method: "credit",
 				paymentName: "Mastercard",
 				cardHolerName: "Sam Jones",
 				cardNumber: "1234567890123456",
@@ -115,6 +118,7 @@ const usersData = [
 			},
 			{
 				isPrimary: false,
+				method: "credit",
 				paymentName: "Visa",
 				cardHolerName: "Sam Jones",
 				cardNumber: "1234567890150000",
@@ -146,6 +150,7 @@ const usersData = [
 		paymentMethods: [
 			{
 				isPrimary: true,
+				method: "credit",
 				paymentName: "Visa",
 				cardHolerName: "Katie Ames",
 				cardNumber: "1234563330123456",
@@ -179,7 +184,8 @@ const usersData = [
 		paymentMethods: [
 			{
 				isPrimary: true,
-				paymentName: "check",
+				method: "check",
+				paymentName: "Check",
 				routingNumber: "123456789",
 				accountNumber: "987654321",
 				bankName: "US Bank",
