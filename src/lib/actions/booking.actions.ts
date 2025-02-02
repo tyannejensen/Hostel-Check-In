@@ -10,6 +10,7 @@ export async function getBookings() {
 	const bookings = await Booking.find()
 		.populate("bookedBy", "fullname email")
 		.populate("createdBy", "fullname")
+		.populate("roomId", "roomNumber roomType")
 		.populate({
 			path: "payments",
 			select: "amount",
