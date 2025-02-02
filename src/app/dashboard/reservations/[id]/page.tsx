@@ -1,4 +1,8 @@
+"use client";
 // import { getTenantById } from "@/lib/data";
+import React, { useEffect, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { useParams } from "next/navigation"
 
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
@@ -57,7 +61,92 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 }
 
 
-// Tested code. Adjustments needed!
+
+
+
+// Test code 2. Adjustments needed!
+// const mockData = {
+//   id: "1",
+//   name: "John Doe",
+//   email: "test@gmail.com",
+//   room: "101",
+//   checkInDate: "Jan 01, 2025",
+//   checkOutDate: "Jan 15, 2025",
+//   status: "paid",
+// }
+
+// // Adjusted export function to remove async from the function declaration
+// // export default async function Page(props: { params: Promise<{ id: string }> }) {
+// //   const params = await props.params;
+// //   const id = params.id;
+
+// export default function Page() {
+//   const { id } = useParams()
+//   const [reservation, setReservation] = useState(null)
+//   const [loading, setLoading] = useState(true)
+//   const [error, setError] = useState(null)
+
+//   useEffect(() => {
+//     const fetchReservation = async () => {
+//       try {
+//         // Uncomment and use the actual fetch request
+//         const response = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+//         if (!response.ok) {
+//           throw new Error("Network response was not ok");
+//         }
+//         const data = await response.json();
+//         setReservation(data);
+//       } catch (error) {
+//         setError(error.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchReservation();
+//   }, [id]);
+
+//   if (loading) {
+//     return <div>Loading...</div>;
+//   }
+
+//   if (error) {
+//     return (
+//       <div>
+//         <h1>Error</h1>
+//         <p>{error}</p>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <>
+//       {reservation ? (
+//         // if reservation exists show the reservation details
+//         <Card>
+//           <CardHeader>
+//             <CardTitle>{reservation.name}</CardTitle>
+//           </CardHeader>
+//           <CardContent>
+//             <CardDescription>Email: {reservation.email}</CardDescription>
+//             <CardDescription>Room: {reservation.room}</CardDescription>
+//             <CardDescription>Check-in Date: {reservation.checkInDate}</CardDescription>
+//             <CardDescription>Check-out Date: {reservation.checkOutDate}</CardDescription>
+//             <CardDescription>Status: {reservation.status}</CardDescription>
+//           </CardContent>
+//         </Card>
+//       ) : (
+//         // if reservation does not exist show a not found message
+//         <div>
+//           <h1>Not Found</h1>
+//           <p>Could not find reservation with id: {id}</p>
+//         </div>
+//       )}
+//     </>
+//   );
+
+
+// Tested code 1. Adjustments needed!
 // import { useState, useEffect } from "react";
 
 // // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
