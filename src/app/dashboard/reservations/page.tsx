@@ -88,8 +88,10 @@ export default function Page() {
                       <TableCell>{rowData.room}</TableCell>
                       <TableCell>{rowData.checkInDate}</TableCell>
                       <TableCell>{rowData.checkOutDate}</TableCell>
-                      <TableCell className={rowData.status + "-status"}>
-                        {rowData.statusLabel}
+                      <TableCell className="cell-status-container">
+                        <div className={rowData.status + "-status cell-status"}>
+                          {rowData.statusLabel}
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
