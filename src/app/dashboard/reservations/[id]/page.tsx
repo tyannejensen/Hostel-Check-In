@@ -1,64 +1,139 @@
-"use client";
-// import { getTenantById } from "@/lib/data";
+"use client"
+
 import React, { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useParams } from "next/navigation"
 
-// TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
-// TODO: how can we have the edit and view pages be the same but the URL change upon state change?
+export default function Page() {
+  const { id } = useParams()
+  const [reservation, setReservation] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-//remove this line after uncommenting the fetch request in the fetchTenants function
-const mockData = {
-  id: "1",
-  name: "John Doe",
-  email: "test@gmail.com",
-};
+  useEffect(() => {
+    const fetchReservation = async () => {
+      try {
+        // Replace with actual fetch request
+        const response = await fetch(`/api/reservations/${id}`)
+        if (!response.ok) {
+          throw new Error("Network response was not ok")
+        }
+        const data = await response.json()
+        setReservation(data)
+      } catch (error) {
+        setError(error.message)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const id = params.id;
+    fetchReservation()
+  }, [id])
 
-  const fetchReservation = async (): Promise<any> => {
-    let result = null;
-    // TODO: replace with actual fetch request
-    // result = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then((res) => res.json());
-    // mock return data
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
-    // After uncommenting the above code delete this result assignment
-    result = new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(mockData);
-      }, 200);
-    }).then((data) => {
-      return data;
-    });
-
-    return result;
-  };
-
-  const tenant = await fetchReservation();
-
-  // TODO: create function to fetch the a tenant by id -> add function to data.ts file
-  // const tenant = await getTenantById(id)
+  if (error) {
+    return (
+      <div>
+        <h1>Error</h1>
+        <p>{error}</p>
+      </div>
+    )
+  }
 
   return (
     <>
-      {tenant ? (
-        // if tenant exists show the tenant details
-        <div>
-          <h1>{tenant.name}</h1>
-          <p>{tenant.email}</p>
+      {reservation ? (
+        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-white to-violet-950 text-black font-sans">
+          <Card className="w-[400px] p-6 rounded-lg shadow-lg bg-white text-black text-center">
+            <CardHeader>
+              <CardTitle className="text-3xl font-semibold">Reservation Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <p><strong>Name:</strong> {reservation.name}</p>
+              <p><strong>Email:</strong> {reservation.email}</p>
+              <p><strong>Room:</strong> {reservation.room}</p>
+              <p><strong>Check-in Date:</strong> {reservation.checkInDate}</p>
+              <p><strong>Check-out Date:</strong> {reservation.checkOutDate}</p>
+              <p><strong>Status:</strong> {reservation.status}</p>
+            </CardContent>
+          </Card>
         </div>
       ) : (
-        // if tenant does not exist show a not found message
+        // if reservation does not exist show a not found message
         <div>
           <h1>Not Found</h1>
-          <p>Could not find tenant with id: {id}</p>
+          <p>Could not find reservation with id: {id}</p>
         </div>
       )}
     </>
-  );
+  )
 }
+
+// Original code
+// "use client";
+// // import { getTenantById } from "@/lib/data";
+// import React, { useEffect, useState } from "react"
+// import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+// import { useParams } from "next/navigation"
+
+// // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
+// // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
+
+// //remove this line after uncommenting the fetch request in the fetchTenants function
+// const mockData = {
+//   id: "1",
+//   name: "John Doe",
+//   email: "test@gmail.com",
+// };
+
+// export default async function Page(props: { params: Promise<{ id: string }> }) {
+//   const params = await props.params;
+//   const id = params.id;
+
+//   const fetchReservation = async (): Promise<any> => {
+//     let result = null;
+//     // TODO: replace with actual fetch request
+//     // result = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then((res) => res.json());
+//     // mock return data
+
+//     // After uncommenting the above code delete this result assignment
+//     result = new Promise((resolve) => {
+//       setTimeout(() => {
+//         resolve(mockData);
+//       }, 200);
+//     }).then((data) => {
+//       return data;
+//     });
+
+//     return result;
+//   };
+
+//   const tenant = await fetchReservation();
+
+//   // TODO: create function to fetch the a tenant by id -> add function to data.ts file
+//   // const tenant = await getTenantById(id)
+
+//   return (
+//     <>
+//       {tenant ? (
+//         // if tenant exists show the tenant details
+//         <div>
+//           <h1>{tenant.name}</h1>
+//           <p>{tenant.email}</p>
+//         </div>
+//       ) : (
+//         // if tenant does not exist show a not found message
+//         <div>
+//           <h1>Not Found</h1>
+//           <p>Could not find tenant with id: {id}</p>
+//         </div>
+//       )}
+//     </>
+//   );
+// }
 
 
 
