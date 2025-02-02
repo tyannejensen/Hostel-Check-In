@@ -14,7 +14,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = params.id;
 
-  const fetchTenants = async (): Promise<any> => {
+  const fetchTenant = async (): Promise<any> => {
     let result = null;
     // TODO: replace with actual fetch request
     // result = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then((res) => res.json());
@@ -32,7 +32,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     return result;
   };
 
-  const tenant = await fetchTenants();
+  const tenant = await fetchTenant();
 
   // TODO: create function to fetch the a tenant by id -> add function to data.ts file
   // const tenant = await getTenantById(id)

@@ -1,3 +1,9 @@
+/* @media screen and (max-width: 992px) {
+  body {
+    background-color: blue;
+  }
+} */
+
 @import url("https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap");
 @tailwind base;
 @tailwind components;
@@ -10,6 +16,8 @@
   --contrast: #3ef0ae;
   --text: #360559;
   --dark-button: #6036b9;
+  --dark-opaque: rgba(96 54 185/0.36);
+  --red: #ff5555;
   --glow: conic-gradient(
     from 90deg at 50% 50%,
     #360559 170deg,
@@ -28,6 +36,10 @@ body {
 main {
   width: 100vw;
   height: 100%;
+}
+
+#text-dark {
+  color: var(--text);
 }
 
 /* --------------------------- LOGIN PAGE --------------------------- */
@@ -67,10 +79,16 @@ main {
 
 /* --------------------------- SIDEBAR --------------------------- */
 
+.nav-item {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
 .nav-item:hover {
   background-color: var(--light) !important;
   color: var(--dark-button) !important;
-  transform: scale(1.2);
+  transform: scale(1.1);
+  cursor: pointer;
 }
 
 .sidebar {
@@ -191,21 +209,45 @@ h3 {
   border-radius: 50%;
 }
 
+.cell-status {
+  width: 80px;
+  height: 30px;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
 .paid-status {
   background-color: var(--contrast);
   color: var(--text);
   text-align: center;
+  border-radius: 50%;
 }
 
 .not-paid-status {
-  background-color: var(--highlight);
-  color: var(--text);
-  border: 3px solid var(--dark-button);
-  text-align: center;
-  font-weight: bold;
+  background-color: var(--red);
+  color: var(--light);
+  border-radius: 50%;
+  /* text-align: center; */
+  font-weight: 600;
 }
 
 /* --------------------------- CREATE RESERVATIONS --------------------------- */
+.b-box {
+  display: flex;
+  border-top: 2px dashed var(--dark-opaque);
+  margin-top: 20px !important;
+  gap: 10px !important;
+}
+.selector-box {
+  width: 400px;
+  margin-top: 15px !important;
+}
+
+.label-title {
+  color: var(--text);
+  font-weight: bold;
+  margin-top: 20px;
+}
 
 .create-res-page {
   padding: 30px;
@@ -231,12 +273,44 @@ h3 {
 .rdp-caption_start {
   color: var(--text);
 }
-rdp-button [selected="true"] {
+.rdp-button[aria-selected="true"] {
   background-color: var(--dark-button);
   color: #fff !important;
 }
 [aria-selected="false"] {
   color: var(--light);
+}
+[data-selected="false"] {
+  background-color: var(--light);
+  color: var(--text);
+}
+.bg-accent[tabindex="-1"] {
+  background-color: var(--highlight);
+  color: var(--text);
+}
+
+.submit-button {
+  background-color: var(--dark-button);
+  color: var(--light);
+  padding: 15px;
+}
+
+.submit-button:hover {
+  background-color: var(--contrast);
+  color: var(--text) !important;
+  transform: scale(1.1);
+}
+
+.select-option {
+  color: var(--text) !important;
+}
+.select-option:hover {
+  background-color: var(--dark-button);
+  color: var(--light) !important;
+}
+.selected-option {
+  background-color: var(--dark-button);
+  color: var(--light) !important;
 }
 
 /* --------------------------- ROOT --------------------------- */
@@ -296,7 +370,7 @@ rdp-button [selected="true"] {
 
 @layer base {
   * {
-    border: var(--border);
+    @apply border-border;
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
@@ -305,7 +379,7 @@ rdp-button [selected="true"] {
 
 @layer base {
   * {
-    border: var(--border);
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
