@@ -1,16 +1,160 @@
-## Hostel Checkin
+# Hostel Check-in
 
+## Data
 [Google doc styling plan](https://docs.google.com/presentation/d/11RYitEGkZ5XRuh7On5uIOO2Pr0RQkRgv4wdLylspSEE/edit#slide=id.p)
 
-[Ty](https://github.com/tyannejensen)
-[Luke](https://github.com/flynno-io)
-[Sky](https://github.com/skylark-shae)
-[Chris](https://github.com/cjsquared-dev)
-
-[Repo](https://github.com/tyannejensen/Hostel-Check-In)
+## Description
+Hostel Check-In System is a Next.js + TypeScript application designed to help hostel managers efficiently track check-ins, check-outs, and tenant transactions. The system enables secure user authentication, records tenant details, manages payments, and monitors room availability in real-time. With a polished, interactive UI and a backend powered by Node.js, Express, and MongoDB, this project streamlines hostel operations while ensuring data security through JWT authentication. The application is designed for easy deployment using Vercel and Render for seamless cloud hosting.
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Table of Contents
+0. [Data](#data)
+1. [Description](#description)
+2. [Table of Contents](#table-of-contents)
+3. [Usage](#usage)
+4. [Installation](#installation)
+5. [Demonstration](#demonstration)
+6. [Technologies Employed](#technologies-employed)
+7. [Future Development](#future-development)
+8. [Contributing](#contributing)
+9. [Credits](#credits)
+10. [Tests](#tests)
+11. [Questions](#questions)
+12. [License](#license)
+
+## Usage
+### User Story
+AS A HOSTEL MANAGER, I want to:
+- Record and track the check-in and check-out process of each tenant as a unique transaction.
+
+WHEN A tenant checks in, I want to:
+- Collect the following information as part of a unique transaction:
+  - First Name
+  - Last Name
+  - Room Number
+  - Deposit Amount
+  - Payment Amount
+  - Check-in Date
+- Automatically calculate their check-out or renewal date based on their payment.
+
+WHEN I log in each day, I want to:
+- See a weekly view of tenants who are required to check out or renew within the next 7 days.
+
+- WHEN I renew a tenant and accept payment, I want to:
+Update their existing check-in transaction to reflect the additional payment for the room.
+
+WHEN A tenant checks out, I want to:
+- Record the room they are vacating.
+- Mark the transaction as complete.
+- Display the returned deposit amount.
+
+## Installation
+This application is deployed on [?](FILL).
+
+## Demonstration
+<div style="margin-left: 40px;">
+  Demonstration of the application's desktop interface:<br/>
+  <img src="./src/assets/README-Desktop.gif" alt="Desktop demonstration video" width="550"/>
+</div>
+<br/>
+
+<div style="margin-left: 40px;">
+  Demonstration of the application's mobile interface:<br/>
+  <img src="./src/assets/README-Mobile.gif" alt="Mobile demonstration video" width="175"/>
+</div>
+<br/>
+
+## Technologies Employed
+Main Technologies:
+- Next.js (React framework for building full-stack apps)
+- React (UI library for component-based development)
+- TypeScript (Adds type safety to JavaScript)
+- Mongoose (MongoDB ORM for database handling)
+
+Styling & UI:
+- Tailwind CSS (Utility-based styling)
+- Radix UI + ShadCN/UI (Accessible, pre-built components)
+- Lucide & Heroicons (Icon sets for UI)
+
+Forms & Validation:
+- React Hook Form (Form handling)
+- Zod (Schema validation)
+
+Authentication & Security:
+- NextAuth.js (User authentication)
+- Bcrypt (Password hashing)
+
+Other Utilities:
+- ESLint (Code linting)
+- Dotenv (Environment variables)
+- UUID (Unique ID generation)
+
+## Future Development
+
+Front End:
+  - Improve UI responsiveness and accessibility
+  - Add dark mode support
+  - Enhance tenant dashboard for better usability
+
+Back End
+- Optimize database queries for better performance
+- Implement caching strategies for frequently accessed data
+- Strengthen authentication and authorization measures
+
+Admin
+- Develop advanced analytics and reporting tools
+- Add role-based access controls for different user levels
+- Improve logging and monitoring for system activities
+
+Tenant
+- Allow tenants to submit maintenance requests online
+- Implement a chat system for tenant-landlord communication
+- Enable profile management with document uploads
+
+Payment
+- Integrate additional payment gateways
+- Automate invoicing and receipt generation
+- Implement payment reminders and late fee calculations
+
+## Contributing
+Contributions are welcome and encouraged. To do so:
+- Fork this repository. 
+- Your pull request will need approval in order to merge to ```main```.
+- Take a look at the [Future Development](#future-development) section to see what I am currently working on.
+
+## Credits
+Tyanne:   
+[GitHub](https://github.com/tyannejensen)
+
+Luke:   
+[GitHub](https://github.com/flynno-io)
+
+Skylar:   
+[GitHub](https://github.com/skylark-shae)
+
+Chris:  
+[GitHub](https://github.com/cjsquared-dev)
+
+## Tests
+Fill
+
+## Questions
+Fill
+
+## License
+
+This project is licensed under the MIT license.
+
+The MIT License is a permissive software license originating at the Massachusetts Institute of Technology (MIT)[6] in the late 1980s.[7] As a permissive license, it puts very few restrictions on reuse and therefore has high license compatibility.
+
+For more information visit [MIT Licensing](https://choosealicense.com/licenses/mit/).
+
+- - -
+
+
+
+# NEXT.JS
 ## Getting Started
 
 First, run the development server:
