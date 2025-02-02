@@ -10,7 +10,6 @@ export interface IBooking extends Document {
   bookedBy: string; // reference to the user (tenant) who made the booking - uses uuid v4
   createdBy: string; // reference to the user (employee) who created the booking - uses uuid v4
   roomId: ObjectId;
-  roomNumber: string;
   checkIn: Date;
   checkOut: Date;
   status: IBookingStatus;
