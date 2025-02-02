@@ -12,8 +12,8 @@ export const NoteSchema = new Schema<INote>(
 			maxLength: [1000, "Note must not exceed 1000 characters"],
 		},
 		createdBy: {
-			ref: "User",
 			type: String, // reference to the user (employee) who created the note - uses uuid v4
+			ref: "User",
 			required: [true, "Employee ID is required"],
 		},
 	},
@@ -53,6 +53,9 @@ NoteSchema.set("toJSON", {
 	virtuals: true,
 	getters: true,
 	transform: function (doc, ret) {
+		if (ret.createdBy && ret.createdBy.fullname) {
+			ret.createdBy = ret.createdBy.fullname // Transform createdBy to fullname
+		}
 		delete ret._id // Exclude _id field
 	},
 })

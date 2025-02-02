@@ -5,6 +5,12 @@ import { formatDate } from "../utils/helpers"
 // PaymentMethod Schema - subdocument of Booking Schema
 export const PaymentMethodSchema = new Schema<IPaymentMethod>(
 	{
+		paymentName: {
+			type: String,
+			required: false,
+			minlength: [2, "Payment Name must be at least 2 characters long"],
+			maxlength: [30, "Payment Name must be at most 30 characters long"],
+		},
 		isPrimary: {
 			type: Boolean,
 			required: [true, "Primary payment method indicator is required"],
@@ -12,7 +18,7 @@ export const PaymentMethodSchema = new Schema<IPaymentMethod>(
 		},
 		method: {
 			type: String,
-			// required: [true, "Payment method is required"],
+			required: [true, "Payment method is required"],
 			enum: {
 				values: ["cash", "credit", "debit", "bank", "money order", "check"],
 				message: "{VALUE} is not a valid payment method",
