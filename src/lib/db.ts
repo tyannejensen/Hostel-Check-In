@@ -15,9 +15,18 @@ export async function dbConnect() {
 	if (cached.conn) return cached.conn
 
 	if (!cached.promise) {
-		cached.promise = mongoose.connect(MONGO_URI, {
-			dbName: "hostel_db",
-		} as mongoose.ConnectOptions)
+		cached.promise = mongoose
+			.connect(MONGO_URI, {
+				dbName: "hostel_db",
+			} as mongoose.ConnectOptions)
+			.then((connection) => {
+				// Force-load all models
+				require("@/models/Booking.model")
+				require("@/models/User.model")
+				require("@/models/Payment.model")
+				require("@/models/Room.model")
+				return connection
+			})
 	}
 
 	cached.conn = await cached.promise
