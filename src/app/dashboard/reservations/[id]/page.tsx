@@ -1,14 +1,24 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { useParams } from "next/navigation"
+
+// Define the Reservation interface
+interface Reservation {
+  name: string
+  email: string
+  room: string
+  checkInDate: string
+  checkOutDate: string
+  status: string
+}
 
 export default function Page() {
   const { id } = useParams()
-  const [reservation, setReservation] = useState(null)
+  const [reservation, setReservation] = useState<Reservation | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchReservation = async () => {
@@ -18,9 +28,9 @@ export default function Page() {
         if (!response.ok) {
           throw new Error("Network response was not ok")
         }
-        const data = await response.json()
+        const data: Reservation = await response.json()
         setReservation(data)
-      } catch (error) {
+      } catch (error: any) {
         setError(error.message)
       } finally {
         setLoading(false)
@@ -52,12 +62,12 @@ export default function Page() {
               <CardTitle className="text-3xl font-semibold">Reservation Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <p><strong>Name:</strong> {reservation.name}</p>
-              <p><strong>Email:</strong> {reservation.email}</p>
-              <p><strong>Room:</strong> {reservation.room}</p>
-              <p><strong>Check-in Date:</strong> {reservation.checkInDate}</p>
-              <p><strong>Check-out Date:</strong> {reservation.checkOutDate}</p>
-              <p><strong>Status:</strong> {reservation.status}</p>
+              <CardDescription>Name: {reservation.name}</CardDescription>
+              <CardDescription>Email: {reservation.email}</CardDescription>
+              <CardDescription>Room: {reservation.room}</CardDescription>
+              <CardDescription>Check-in Date: {reservation.checkInDate}</CardDescription>
+              <CardDescription>Check-out Date: {reservation.checkOutDate}</CardDescription>
+              <CardDescription>Status: {reservation.status}</CardDescription>
             </CardContent>
           </Card>
         </div>
