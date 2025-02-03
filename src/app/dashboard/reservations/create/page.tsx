@@ -197,6 +197,8 @@ export default function Page() {
     console.log(values);
   }
 
+  async function getRoomsData() {}
+
   return (
     <>
       <div className="page">

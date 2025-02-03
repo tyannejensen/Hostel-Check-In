@@ -2,7 +2,7 @@ import { Schema, model, models } from "mongoose"
 import { v4 as uuidv4 } from "uuid"
 import bcrypt from "bcrypt"
 import { IUser } from "@/interfaces/user.interface"
-import { ChangeLogSchema } from "@/models/Log.schema"
+import { ChangeLogSchema } from "@/lib/models/ChangeLog.schema"
 import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
 import { PaymentMethodSchema } from "@/models/PaymentMethod.schema"
 import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
@@ -106,7 +106,10 @@ const UserSchema = new Schema<IUser>(
 				},
 			},
 		],
-		history: [ChangeLogSchema],
+		history: {
+			type: [ChangeLogSchema],
+			default: [],
+		},
 		createdBy: {
 			type: String,
 			ref: "User",
@@ -125,20 +128,17 @@ const UserSchema = new Schema<IUser>(
 	}
 )
 
+// TODO: Create a solution for capturing updates using the 'save' pre and post hooks to create a history of changes to User and Booking documents.
+// NOTE: Only use the findOne(), new Model(), and save() methods to update documents to trigger the pre and post hooks
+
 // MIDDLWARE
+
+// Record document updates in the history array
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
-UserSchema.pre("findOneAndUpdate", getOldDoc) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
-UserSchema.pre("updateOne", getOldDoc)
-UserSchema.pre("replaceOne", getOldDoc)
-// DO NOT USE findByIdAndUpdate as it does not trigger the pre hook
-
+UserSchema.pre("findOneAndUpdate", getOldDoc)
 // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-UserSchema.post("findOneAndUpdate", logChanges) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
-UserSchema.post("updateOne", logChanges)
-UserSchema.post("replaceOne", logChanges)
-// DO NOT USE findByIdAndUpdate as it does not trigger the post hook
+UserSchema.post("findOneAndUpdate", logChanges)
 
-// MIDDLEWARE
 // Pre-save hook to hash password
 UserSchema.pre<IUser>("save", async function (next) {
 	if (this.isNew || this.isModified("password")) {
@@ -168,6 +168,7 @@ UserSchema.set("toObject", {
 	virtuals: true,
 	transform: function (doc, ret) {
 		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
 		delete ret.password // Exclude password field
 	},
 })
@@ -178,6 +179,7 @@ UserSchema.set("toJSON", {
 	getters: true,
 	transform: function (doc, ret) {
 		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
 		delete ret.password // Exclude password field
 	},
 })

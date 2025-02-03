@@ -1,6 +1,6 @@
 import { Schema, model, models } from "mongoose"
 import { IBooking } from "@/interfaces/booking.interface"
-import { ChangeLogSchema } from "@/models/Log.schema"
+import { ChangeLogSchema } from "@/lib/models/ChangeLog.schema"
 import { NoteSchema } from "@/models/Note.schema"
 import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
 
@@ -33,13 +33,16 @@ const BookingSchema = new Schema<IBooking>(
 		status: {
 			type: String,
 			enum: ["paid", "pending", "booked", "due"],
-			default: "due",
+			default: "pending",
 		},
+		// TODO: Add a field for "cost"
+		// TODO: Add a field for the "totalCost" of the booking (cost + deposit)
+		// TODO: Add virtual for "totalCost" that calculates the total cost of the booking
 		depositAmount: {
 			type: Number,
 			required: [true, "Deposit amount is required"],
-			get: (v: number) => v * 100, // Convert deposit amount to cents
-			set: (v: number) => v / 100, // Convert deposit amount to dollars
+			get: (v: number) => v / 100, // Convert deposit amount to cents
+			set: (v: number) => v * 100, // Convert deposit amount to dollars
 		},
 		depositReturned: {
 			type: Boolean,
@@ -50,8 +53,8 @@ const BookingSchema = new Schema<IBooking>(
 		},
 		depositReturnAmount: {
 			type: Number,
-			get: (v: number) => v * 100, // Convert deposit amount to cents
-			set: (v: number) => v / 100, // Convert deposit amount to dollars
+			get: (v: number) => v / 100, // Convert deposit amount to cents
+			set: (v: number) => v * 100, // Convert deposit amount to dollars
 			default: 0,
 		},
 		payments: [
@@ -62,7 +65,10 @@ const BookingSchema = new Schema<IBooking>(
 			},
 		],
 		notes: [NoteSchema],
-		history: [ChangeLogSchema],
+		history: {
+			type: [ChangeLogSchema],
+			default: [],
+		},
 	},
 	{
 		timestamps: true, // Add createdAt and updatedAt fields
@@ -70,17 +76,12 @@ const BookingSchema = new Schema<IBooking>(
 )
 
 // MIDDLEWARE
-// Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
-BookingSchema.pre("findOneAndUpdate", getOldDoc) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
-BookingSchema.pre("updateOne", getOldDoc)
-BookingSchema.pre("replaceOne", getOldDoc)
-// DO NOT USE findByIdAndUpdate as it does not trigger the pre hook
 
+// Record document updates in the history array
+// Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
+BookingSchema.pre("findOneAndUpdate", getOldDoc)
 // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-BookingSchema.post("findOneAndUpdate", logChanges) // IMPORTANT: Use findOneAndUpdate as the standard unless you have a good reason not to
-BookingSchema.post("updateOne", logChanges)
-BookingSchema.post("replaceOne", logChanges)
-// DO NOT USE findByIdAndUpdate as it does not trigger the post hook
+BookingSchema.post("findOneAndUpdate", logChanges)
 
 // GETTERS
 // Convert the 'createdAt' and 'updatedAt' fields to MMM DD, YYYY format e.g. Jan 30, 2025
@@ -96,6 +97,7 @@ BookingSchema.set("toObject", {
 	virtuals: true,
 	transform: function (doc, ret) {
 		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
 	},
 })
 
@@ -105,6 +107,7 @@ BookingSchema.set("toJSON", {
 	getters: true,
 	transform: function (doc, ret) {
 		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
 	},
 })
 

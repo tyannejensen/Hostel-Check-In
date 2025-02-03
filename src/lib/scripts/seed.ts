@@ -155,12 +155,17 @@ async function seedBookingsWithPayments(
 			booking.payments.push(payment._id)
 			await booking.save({ session })
 
-			// Store the created documents for logging
+			// Step 4: Update User with the Booking reference
+			const user = await User.findOne({ _id: users[i].id })
+			user.bookings.push(booking._id)
+			await user.save({ session })
+
+			// Step 5: Store the created documents for logging
 			newBookings.push(booking)
 			newPayments.push(payment)
 		}
 
-		// Step 4: Commit transaction
+		// Step 6: Commit transaction
 		await session.commitTransaction()
 		session.endSession()
 
@@ -204,13 +209,7 @@ async function seedNotes(admin: IUser, bookings: IBooking[]) {
 	// Add all notes and link to the bookings
 	const formatedNotes = await Promise.all(
 		notesData.map(async (note, i) => {
-			const booking = await Booking.findOne({ _id: bookings[i].id }).populate({
-				path: "notes",
-				populate: {
-					path: "createdBy",
-					select: "fullname email",
-				},
-			})
+			const booking = await Booking.findOne({ _id: bookings[i].id })
 			booking.notes.push({
 				...note,
 				createdBy: admin.id,
@@ -229,6 +228,30 @@ async function seedNotes(admin: IUser, bookings: IBooking[]) {
 		})
 	)
 	console.table(formatedNotes, ["content", "createdBy", "createdAt"])
+}
+
+async function updateBookingStatus(
+	admin: IUser,
+	oldStatus: string,
+	newStatus: string
+) {
+	const selectedBooking = await Booking.findOneAndUpdate(
+		{ status: oldStatus },
+		{ $set: { status: newStatus } },
+		{ new: true, userId: admin.id }
+	)
+	console.log(
+		`Old Status: ${oldStatus}, New Status: ${selectedBooking.toObject().status}`
+	) // Log the status change
+}
+
+async function updateUser(admin: IUser, id: string, updates: {}) {
+	const selectedUser = await User.findOneAndUpdate(
+		{ _id: id },
+		{ $set: updates },
+		{ new: true, userId: admin.id }
+	)
+	console.log("User fullname: ", selectedUser.toObject().fullname)
 }
 
 async function seedDatabase() {
@@ -258,6 +281,18 @@ async function seedDatabase() {
 		// Add all notes and link to the bookings
 		await seedNotes(admin, bookings) // Add all notes
 		console.log("Notes added to Bookings successfully!\n")
+
+		// Update Booking status to create a history log
+		await updateBookingStatus(admin, "pending", "paid") // Update Booking status
+		console.log("Booking status updated successfully!\n")
+
+		// Update User to create a history log
+		await updateUser(admin, tenants[2].id, {
+			// Update User
+			lastName: "johnson",
+			email: "the.johnson@test.com",
+		})
+		console.log("User updated successfully!\n")
 
 		console.log("Database seeded successfully!")
 

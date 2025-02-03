@@ -27,5 +27,5 @@ export const phoneNumberSchema = new Schema<IPhoneNumber>(
 			required: [true, "Primary phone indicator is required"],
 		},
 	},
-	{ _id: false }
+	{ _id: false, timestamps: true }
 )

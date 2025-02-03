@@ -1,9 +1,8 @@
 import { Schema } from "mongoose"
-import { IBooking } from "@/lib/types/interfaces/booking.interface"
-import { IChangeLog } from "@/lib/types/interfaces/change-log.interface"
+import { ILog } from "@/interfaces/log.interface"
 
-// Change Log Schema - subdocument of Booking Schema
-export const ChangeLogSchema = new Schema<IChangeLog>(
+// Log Schema - subdocument of ChangeLog Schema
+export const LogSchema = new Schema<ILog>(
 	{
 		field: {
 			type: String,
@@ -17,27 +16,6 @@ export const ChangeLogSchema = new Schema<IChangeLog>(
 			type: Schema.Types.Mixed,
 			required: [true, "New value is required"],
 		},
-		updatedAt: {
-			type: Date,
-			default: Date.now,
-		},
-		updatedBy: {
-			ref: "User",
-			type: String, // reference to the user (employee) who updated the booking - uses uuid v4
-			required: [true, "Employee ID is required"],
-		},
 	},
-	{ versionKey: false, timestamps: true } // Disable versioning (__v) field to prevent Booking Updates from being updated
+	{ _id: false, versionKey: false }
 )
-
-// Booking Update Pre Save Hook -> Middleware to enforce immutability of notes
-ChangeLogSchema.pre<IBooking>("save", function (next) {
-	if (this.isNew) {
-		// If the Log is new, allow it to save
-		return next()
-	}
-
-	// Prevent updating the note if it already exists
-	this.invalidate("content", "A Booking Log cannot be modified after creation")
-	next(new Error("Booking Logs are immutable once created"))
-})
