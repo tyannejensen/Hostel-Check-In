@@ -23,10 +23,8 @@ export const NoteSchema = new Schema<INote>(
 // MIDDLEWARE
 // Notes Pre Save Hook -> Middleware to enforce immutability of notes
 NoteSchema.pre("save", function (next) {
-	if (this.isNew) {
-		// If the note is new, allow it to save
-		return next()
-	}
+	if (this.isNew) return next() // If the note is new, allow it to save
+	if (!this.isModified()) return next() // If the note is not modified, allow it to save
 
 	// Prevent updating the note if it already exists
 	this.invalidate("content", "Notes cannot be modified after creation")

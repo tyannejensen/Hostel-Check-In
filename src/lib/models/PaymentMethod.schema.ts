@@ -29,7 +29,7 @@ export const PaymentMethodSchema = new Schema<IPaymentMethod>(
 			minlength: [2, "Card Holder Name must be at least 2 characters long"],
 			maxlength: [50, "Card Holder Name must be at most 50 characters long"],
 			match: [
-				/^[A-Za-zÀ-ÖØ-öø-ÿ'\-]{2,50}$/,
+				/^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,50}( [A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,50})*$/,
 				"Card Holder Name contains invalid characters",
 			],
 		},

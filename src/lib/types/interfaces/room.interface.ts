@@ -4,9 +4,10 @@ import { IRoomStatus, IRoomType } from "@/mytypes/index"
 // Interfaces for Room Schema
 export interface IRoom extends Document {
 	_id: ObjectId
-	type: IRoomType
+	roomType: IRoomType
 	roomNumber: number | string
 	status: IRoomStatus
+	costPerDay: number
 	deposit: number
 	name?: string
 	size: number

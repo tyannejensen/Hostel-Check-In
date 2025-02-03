@@ -4,7 +4,7 @@ import { IRoom } from "@/interfaces/room.interface"
 // Room Schema
 export const roomSchema = new Schema<IRoom>(
 	{
-		type: {
+		roomType: {
 			type: String,
 			enum: ["shared", "single", "double", "suite"],
 			required: [true, "Room type is required"],
@@ -27,11 +27,17 @@ export const roomSchema = new Schema<IRoom>(
 			enum: ["available", "occupied", "maintenance", "cleaning"],
 			default: "available",
 		},
+		costPerDay: {
+			type: Number,
+			required: [true, "Cost per night is required"],
+			get: (v: number) => v / 100, // Convert cost per night to cents
+			set: (v: number) => v * 100, // Convert cost per night to dollars
+		},
 		deposit: {
 			type: Number,
 			required: [true, "Deposit amount is required"],
-			get: (v: number) => v * 100, // Convert deposit amount to cents
-			set: (v: number) => v / 100, // Convert deposit amount to dollars
+			get: (v: number) => v / 100, // Convert deposit amount to cents
+			set: (v: number) => v * 100, // Convert deposit amount to dollars
 		},
 		name: {
 			type: String,
