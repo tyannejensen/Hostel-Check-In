@@ -1,5 +1,3 @@
-"user server"
-
 import { dbConnect } from "@/lib/db"
 import { Booking } from "@/models/Booking.model"
 
@@ -27,9 +25,12 @@ export async function getBookings() {
 			},
 		})
 
-	const bookingsAsObj = bookings.map((booking) => booking.toObject())
+	const bookingsAsObj = bookings.map((booking: any) =>
+		booking.toObject({ getters: true, virtuals: false })
+	)
 
-	return bookingsAsObj
+	// Ensure final data is fully JSON-serializable
+	return JSON.parse(JSON.stringify(bookingsAsObj))
 }
 
 export async function getBookingById(id: string) {

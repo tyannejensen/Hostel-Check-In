@@ -4,7 +4,7 @@ import { IRoom } from "@/interfaces/room.interface"
 // Room Schema
 export const roomSchema = new Schema<IRoom>(
 	{
-		type: {
+		roomType: {
 			type: String,
 			enum: ["shared", "single", "double", "suite"],
 			required: [true, "Room type is required"],

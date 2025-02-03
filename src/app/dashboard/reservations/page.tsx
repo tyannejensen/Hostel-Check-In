@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { z } from "zod";
 
@@ -16,8 +14,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
+import { getBookings } from "@/actions/booking.actions";
+import { IBooking } from "@/lib/types/interfaces/booking.interface";
 
-export default function Page() {
+export default async function Page() {
+  const bookings = await getBookings();
+
+  console.log(bookings);
   const data = [
     {
       name: "John E Doe.",
@@ -53,6 +57,26 @@ export default function Page() {
     },
   ];
 
+  const statusMap: { [key in "paid" | "not-paid" | "pending"]: string } = {
+    paid: "Paid",
+    "not-paid": "Not Paid",
+    pending: "Pending",
+  };
+
+  function convertBookingIntoTableData(bookings: any) {
+    return bookings.map((booking: any) => {
+      return {
+        name: booking.bookedBy.fullname,
+        room: booking.roomId,
+        checkInDate: booking.checkIn,
+        checkOutDate: booking.checkOut,
+        status: booking.status,
+        statusLabel:
+          statusMap[booking.status as keyof typeof statusMap] || "Unknown",
+      };
+    });
+  }
+
   return (
     <>
       <div className="page">
@@ -64,9 +88,12 @@ export default function Page() {
               <h1 className="pb-[20px]">Reservations</h1>
               <div className="add-new-button-container">
                 <div className="add-button-container circular-styled-container">
-                  <Button className="circular-styled-button p-4 -my-6 border-2 border-[var(--dark-button)] bg-[var(--dark-button)] rounded-lg text-[var(--light)] cursor-pointer hover:bg-[var(--contrast)] hover:text-[var(--dark-button)] hover:border-[var(--contrast)]">
+                  <Link
+                    href="/dashboard/reservations/create"
+                    className="circular-styled-button p-4 -my-6 border-2 border-[var(--dark-button)] bg-[var(--dark-button)] rounded-lg text-[var(--light)] cursor-pointer hover:bg-[var(--contrast)] hover:text-[var(--dark-button)] hover:border-[var(--contrast)]"
+                  >
                     Add New
-                  </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -81,19 +108,25 @@ export default function Page() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.map((rowData: any, index: number) => {
-                  return (
-                    <TableRow key={index} className="table-data-row">
-                      <TableCell>{rowData.name}</TableCell>
-                      <TableCell>{rowData.room}</TableCell>
-                      <TableCell>{rowData.checkInDate}</TableCell>
-                      <TableCell>{rowData.checkOutDate}</TableCell>
-                      <TableCell className={rowData.status + "-status"}>
-                        {rowData.statusLabel}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                {convertBookingIntoTableData(bookings).map(
+                  (rowData: any, index: number) => {
+                    return (
+                      <TableRow key={index} className="table-data-row">
+                        <TableCell>{rowData.name}</TableCell>
+                        <TableCell>{rowData.room}</TableCell>
+                        <TableCell>{rowData.checkInDate}</TableCell>
+                        <TableCell>{rowData.checkOutDate}</TableCell>
+                        <TableCell className="cell-status-container">
+                          <div
+                            className={rowData.status + "-status cell-status"}
+                          >
+                            {rowData.statusLabel}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+                )}
               </TableBody>
             </Table>
           </div>
