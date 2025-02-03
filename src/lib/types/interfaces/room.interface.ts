@@ -7,6 +7,7 @@ export interface IRoom extends Document {
 	type: IRoomType
 	roomNumber: number | string
 	status: IRoomStatus
+	costPerDay: number
 	deposit: number
 	name?: string
 	size: number
