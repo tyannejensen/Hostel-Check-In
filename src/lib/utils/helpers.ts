@@ -1,6 +1,7 @@
 // For Mongoose Model Pre and Post Hook Functions
-import { Query } from "mongoose"
+import { Query, Document } from "mongoose"
 import { ObjectId } from "mongodb"
+import { _doc } from "@/interfaces/_doc.interface"
 
 // Functions to help with logging changes to documents
 
@@ -30,6 +31,11 @@ export async function logChanges(
 		const newDoc = doc.toObject()
 		const changes = []
 
+		console.log("Old Doc: ", this.getOptions()._oldDoc.isModified())
+		console.log("New Doc: ", doc.isModified("email"))
+
+		// Log if old and dnew docs were modified
+
 		// Fields to ignore when logging changes
 		const blockedFields = new Set(["history", "payments", "notes"])
 
@@ -45,17 +51,14 @@ export async function logChanges(
 						key
 					]}`
 				)
-				// const newDocArray = doc[key].toString()
-				// const oldDocArray = oldDoc[key].toString()
-				// for (const index in newDocArray) {
-				//   if (oldDocArray[index] !== newDocArray[index]) {
-				//     changes.push({
-				//       field: `${key}.${index}`,
-				//       oldValue: oldDocArray[index],
-				//       newValue: newDocArray[index],
-				//     })
-				//   }
-				// }
+				// if OldArray not equal to newArray
+				// else OldArray equal to newArray
+
+				if (newDoc[key][0] instanceof ObjectId) {
+				} else if (typeof newDoc[key] === "object") {
+				}
+
+				newDoc[key].forEach((item: any, index: number) => {})
 				continue
 			} else if (newDoc[key] instanceof ObjectId) {
 				console.log(
@@ -98,15 +101,11 @@ export async function logChanges(
 					oldValue: oldDoc[key],
 					newValue: doc[key],
 				})
-			} else {
-				console.log(`No change to: ${key}`)
-				continue
 			}
 		}
 
 		// If there are no changes, move to the next middleware
 		if (changes.length === 0) {
-			console.log("No changes")
 			return next()
 		}
 
@@ -120,6 +119,35 @@ export async function logChanges(
 
 		await doc.save()
 		next()
+	}
+}
+
+export async function logHistory(this: _doc, next: (err?: any) => void) {
+	// Do not check for changes if the document is new
+	if (this.isNew) {
+		return next()
+	}
+	// 'this' refers to the new document (after modifications)
+	const newDoc = this
+	const newDocObj = newDoc.toObject() // used to loop through only the plain document fields
+
+	// Access the old document (before modifications)
+	const oldDoc = this._doc
+
+	console.log(newDoc.isModified())
+	for (const key in newDocObj) {
+		// Skip the history field
+		if (key === "history") continue
+
+		// Add all modified fields to the updatedFields array
+		const updatedFields = []
+		if (newDoc.isModified(key)) {
+			updatedFields.push(key)
+		} else {
+			continue
+		}
+
+		console.log(`Path: ${key}, Modified: ${newDoc.isModified(key)}`)
 	}
 }
 
