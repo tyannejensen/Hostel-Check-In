@@ -14,3 +14,5 @@ export type IPaymentType =
 	| "bank"
 	| "money order"
 	| "check"
+
+export type ICardBrand = "Visa" | "Mastercard" | "Amex" | "Discover"
