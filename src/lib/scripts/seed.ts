@@ -254,24 +254,6 @@ async function updateUser(admin: IUser, id: string, updates: {}) {
 	console.log("User fullname: ", selectedUser.toObject().fullname)
 }
 
-async function updateUserSave(admin: IUser, id: string) {
-	const selectedUser = await User.findOne({ _id: id })
-	selectedUser.lastName = "johnson"
-	selectedUser.email = "the.johnson@test.com"
-	selectedUser.paymentMethods.push({
-		isPrimary: false,
-		method: "credit",
-		cardNumber: "1234567812345678",
-		expiration: "12/25",
-		cvv: "123",
-		cardHolderName: "Sam Johnson",
-		paymentName: "Discover",
-	})
-	selectedUser.updatedBy = admin.id
-	await selectedUser.save()
-	console.log("User fullname: ", selectedUser.toObject().fullname)
-}
-
 async function seedDatabase() {
 	try {
 		await dbConnect() // Connect to the database
@@ -305,12 +287,12 @@ async function seedDatabase() {
 		console.log("Booking status updated successfully!\n")
 
 		// Update User to create a history log
-		// await updateUser(admin, tenants[2].id, {
-		// 	// Update User
-		// 	lastName: "johnson",
-		// 	email: "the.johnson@test.com",
-		// })
-		// console.log("User updated successfully!\n")
+		await updateUser(admin, tenants[2].id, {
+			// Update User
+			lastName: "johnson",
+			email: "the.johnson@test.com",
+		})
+		console.log("User updated successfully!\n")
 
 		console.log("Database seeded successfully!")
 

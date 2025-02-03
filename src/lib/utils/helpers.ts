@@ -122,35 +122,6 @@ export async function logChanges(
 	}
 }
 
-export async function logHistory(this: _doc, next: (err?: any) => void) {
-	// Do not check for changes if the document is new
-	if (this.isNew) {
-		return next()
-	}
-	// 'this' refers to the new document (after modifications)
-	const newDoc = this
-	const newDocObj = newDoc.toObject() // used to loop through only the plain document fields
-
-	// Access the old document (before modifications)
-	const oldDoc = this._doc
-
-	console.log(newDoc.isModified())
-	for (const key in newDocObj) {
-		// Skip the history field
-		if (key === "history") continue
-
-		// Add all modified fields to the updatedFields array
-		const updatedFields = []
-		if (newDoc.isModified(key)) {
-			updatedFields.push(key)
-		} else {
-			continue
-		}
-
-		console.log(`Path: ${key}, Modified: ${newDoc.isModified(key)}`)
-	}
-}
-
 // Setter function to format dates for createdAt and updatedAt fields
 export function formatDate(v: Date): string {
 	const date = new Date(v)
