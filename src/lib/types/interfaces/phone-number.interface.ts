@@ -6,4 +6,6 @@ export interface IPhoneNumber extends Document {
 	number: string
 	isMobile: boolean
 	isPrimary: boolean
+	createdAt: Date
+	updatedAt: Date
 }
