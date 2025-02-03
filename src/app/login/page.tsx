@@ -20,6 +20,7 @@ import { registerUser } from "@/actions/user.actions"
 import { useSearchParams } from "next/navigation"
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline"
 
+// Page component
 export default function Page() {
 	const searchParams = useSearchParams()
 	const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard/"
@@ -295,3 +296,105 @@ export default function Page() {
 		</>
 	)
 }
+
+
+// Testing using below code only
+// "use client"
+
+// import { Button } from "@/components/ui/button"
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardFooter,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card"
+// import { Input } from "@/components/ui/input"
+// import { Label } from "@/components/ui/label"
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+// import { useActionState } from "react"
+// import { authenticate } from "@/actions/auth.actions"
+// import { registerUser } from "@/lib/actions/user.actions" // Import the function here
+// import { useSearchParams } from "next/navigation"
+// import { ExclamationCircleIcon } from "@heroicons/react/24/outline"
+
+// export default function Page() {
+//   const searchParams = useSearchParams()
+//   const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard/"
+//   const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined)
+//   const [registerErrorMessage, registerFormAction, isRegisterPending] = useActionState(registerUser, undefined)
+
+//   const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
+//     event.preventDefault()
+//     const formData = new FormData(event.currentTarget)
+//     const result = await registerFormAction(formData)
+//     if (result.token) {
+//       localStorage.setItem("token", result.token)
+//       window.location.href = callBackUrl
+//     }
+//   }
+
+//   return (
+//     <>
+//       <div id="grad">
+//         <div id="text" className="flex items-center justify-center h-screen">
+//           <Tabs defaultValue="register" id="text" className="w-[400px] text">
+//             <TabsList className="grid w-full grid-cols-2">
+//               <TabsTrigger id="text" value="register">
+//                 Register
+//               </TabsTrigger>
+//               <TabsTrigger id="text" value="login">
+//                 Login
+//               </TabsTrigger>
+//             </TabsList>
+//             <TabsContent value="register">
+//               <form onSubmit={handleRegister}>
+//                 <Card>
+//                   <CardHeader>
+//                     <CardTitle id="text" className="font-bold text-xl">
+//                       Register
+//                     </CardTitle>
+//                     <CardDescription>
+//                       Join us today! Create your account below.
+//                     </CardDescription>
+//                   </CardHeader>
+//                   <CardContent className="space-y-2">
+//                     <div id="text" className="space-y-1">
+//                       <Label htmlFor="first">First Name</Label>
+//                       <Input id="first" placeholder="John" type="input" name="firstName" />
+//                     </div>
+//                     <div id="text" className="space-y-1">
+//                       <Label htmlFor="last">Last Name</Label>
+//                       <Input id="last" placeholder="Doe" type="input" name="lastName" />
+//                     </div>
+//                     <div id="text" className="space-y-1">
+//                       <Label htmlFor="email">Email</Label>
+//                       <Input id="email" placeholder="Email" type="email" name="email" />
+//                     </div>
+//                     <div id="text" className="space-y-1">
+//                       <Label htmlFor="password">Password</Label>
+//                       <Input id="password" placeholder="Password" type="password" name="password" />
+//                     </div>
+//                   </CardContent>
+//                   <CardFooter className="flex justify-end">
+//                     <Button id="contrast" className="drop-shadow-lg" aria-disabled={isRegisterPending}>
+//                       Register
+//                     </Button>
+//                     {registerErrorMessage && (
+//                       <>
+//                         <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+//                         <p className="text-sm text-red-500">{registerErrorMessage}</p>
+//                       </>
+//                     )}
+//                   </CardFooter>
+//                 </Card>
+//               </form>
+//             </TabsContent>
+//             {/* Login form goes here */}
+//           </Tabs>
+//         </div>
+//       </div>
+//     </>
+//   )
+// }
