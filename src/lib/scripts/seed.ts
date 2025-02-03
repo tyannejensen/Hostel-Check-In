@@ -310,10 +310,7 @@ async function seedDatabase() {
 		// 	lastName: "johnson",
 		// 	email: "the.johnson@test.com",
 		// })
-
-		// Update User to create a history log (using pre-save method)
-		await updateUserSave(admin, tenants[2].id)
-		console.log("User updated successfully!\n")
+		// console.log("User updated successfully!\n")
 
 		console.log("Database seeded successfully!")
 

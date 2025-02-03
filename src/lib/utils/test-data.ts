@@ -203,7 +203,7 @@ const usersData = [
 // Rooms data for Bookings
 const roomsData = [
 	{
-		roomType: "shared",
+		type: "shared",
 		roomNumber: "101A",
 		status: "occupied",
 		costPerDay: 50.0,
@@ -213,7 +213,7 @@ const roomsData = [
 		occupants: [],
 	},
 	{
-		roomType: "shared",
+		type: "shared",
 		roomNumber: "101B",
 		status: "occupied",
 		costPerDay: 50.0,
@@ -223,7 +223,7 @@ const roomsData = [
 		occupants: [],
 	},
 	{
-		roomType: "single",
+		type: "single",
 		roomNumber: "102",
 		status: "occupied",
 		costPerDay: 85.0,
@@ -233,7 +233,7 @@ const roomsData = [
 		occupants: [],
 	},
 	{
-		roomType: "double",
+		type: "double",
 		roomNumber: "103",
 		status: "occupied",
 		costPerDay: 115.0,
@@ -243,7 +243,7 @@ const roomsData = [
 		occupants: [],
 	},
 	{
-		roomType: "suite",
+		type: "suite",
 		roomNumber: "104",
 		status: "occupied",
 		costPerDay: 150.0,
