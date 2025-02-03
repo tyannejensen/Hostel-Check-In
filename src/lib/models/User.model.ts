@@ -5,7 +5,12 @@ import { IUser } from "@/interfaces/user.interface"
 import { ChangeLogSchema } from "@/lib/models/ChangeLog.schema"
 import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
 import { PaymentMethodSchema } from "@/models/PaymentMethod.schema"
-import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
+import {
+	formatDate,
+	getOldDoc,
+	logChanges,
+	logHistory,
+} from "@/server-utils/helpers"
 import { IPaymentMethod } from "../types/interfaces/payment-method.interface"
 
 // User Schema
@@ -139,7 +144,8 @@ UserSchema.pre("findOneAndUpdate", getOldDoc)
 // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
 UserSchema.post("findOneAndUpdate", logChanges)
 
-// MIDDLEWARE
+UserSchema.pre("save", logHistory)
+
 // Pre-save hook to hash password
 UserSchema.pre<IUser>("save", async function (next) {
 	if (this.isNew || this.isModified("password")) {
@@ -169,6 +175,7 @@ UserSchema.set("toObject", {
 	virtuals: true,
 	transform: function (doc, ret) {
 		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
 		delete ret.password // Exclude password field
 	},
 })
@@ -179,6 +186,7 @@ UserSchema.set("toJSON", {
 	getters: true,
 	transform: function (doc, ret) {
 		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
 		delete ret.password // Exclude password field
 	},
 })

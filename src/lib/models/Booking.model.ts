@@ -33,13 +33,16 @@ const BookingSchema = new Schema<IBooking>(
 		status: {
 			type: String,
 			enum: ["paid", "pending", "booked", "due"],
-			default: "due",
+			default: "pending",
 		},
+		// TODO: Add a field for "cost"
+		// TODO: Add a field for the "totalCost" of the booking (cost + deposit)
+		// TODO: Add virtual for "totalCost" that calculates the total cost of the booking
 		depositAmount: {
 			type: Number,
 			required: [true, "Deposit amount is required"],
-			get: (v: number) => v * 100, // Convert deposit amount to cents
-			set: (v: number) => v / 100, // Convert deposit amount to dollars
+			get: (v: number) => v / 100, // Convert deposit amount to cents
+			set: (v: number) => v * 100, // Convert deposit amount to dollars
 		},
 		depositReturned: {
 			type: Boolean,
@@ -50,8 +53,8 @@ const BookingSchema = new Schema<IBooking>(
 		},
 		depositReturnAmount: {
 			type: Number,
-			get: (v: number) => v * 100, // Convert deposit amount to cents
-			set: (v: number) => v / 100, // Convert deposit amount to dollars
+			get: (v: number) => v / 100, // Convert deposit amount to cents
+			set: (v: number) => v * 100, // Convert deposit amount to dollars
 			default: 0,
 		},
 		payments: [
@@ -94,6 +97,7 @@ BookingSchema.set("toObject", {
 	virtuals: true,
 	transform: function (doc, ret) {
 		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
 	},
 })
 
@@ -103,6 +107,7 @@ BookingSchema.set("toJSON", {
 	getters: true,
 	transform: function (doc, ret) {
 		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
 	},
 })
 

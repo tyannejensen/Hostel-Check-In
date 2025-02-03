@@ -14,8 +14,8 @@ const PaymentSchema = new Schema<IPayment>(
 		amount: {
 			type: Number,
 			required: [true, "Payment amount is required"],
-			get: (v: number) => v * 100, // Convert deposit amount to cents
-			set: (v: number) => v / 100, // Convert deposit amount to dollars
+			get: (v: number) => v / 100, // Convert deposit amount to cents
+			set: (v: number) => v * 100, // Convert deposit amount to dollars
 		},
 		paidBy: {
 			type: String,
