@@ -24,6 +24,7 @@ export async function dbConnect() {
 				require("@/models/Booking.model")
 				require("@/models/User.model")
 				require("@/models/Payment.model")
+				require("@/models/PaymentMethod.model")
 				require("@/models/Room.model")
 				return connection
 			})

@@ -4,6 +4,7 @@
 import dotenv from "dotenv"
 dotenv.config({ path: ".env.local" })
 
+// import mongoose, models, and interfaces
 import mongoose from "mongoose"
 import { dbConnect } from "@/lib/db"
 import { Booking } from "@/models/Booking.model"
@@ -13,12 +14,17 @@ import { User } from "@/models/User.model"
 import { IBooking } from "@/interfaces/booking.interface"
 import { IRoom } from "@/interfaces/room.interface"
 import { IUser } from "@/interfaces/user.interface"
+import { IPaymentMethod } from "@/interfaces/payment-method.interface"
+
+// Import test data
 import {
 	usersData,
 	roomsData,
 	bookingsData,
 	notesData,
+	paymentMethodsData,
 } from "@/server-utils/test-data"
+import { PaymentMethod } from "../models/PaymentMethod.model"
 
 async function dropAllCollections() {
 	await dbConnect() // Ensure connection is established
@@ -88,6 +94,42 @@ async function seedUsers(admin: IUser) {
 	return formatedUsers
 }
 
+async function seedPaymentMethods(users: IUser[]) {
+	try {
+		const newPayments = []
+
+		for (let i = 0; i < bookingsData.length; i++) {
+			// Step 1: Get a user
+			const user = await User.findOne({ _id: users[i].id })
+
+			// Step 2: Create Payment Method and reference the User
+			const paymentMethod = await new PaymentMethod({
+				...paymentMethodsData[i],
+				userId: user.id,
+			}).save()
+
+			// Step 3: Update User with the Payment Method reference
+			user.paymentMethods.push(paymentMethod._id)
+			await user.save()
+
+			// Step 4: Store the created documents for logging
+			newPayments.push(paymentMethod.toObject())
+		}
+		console.table(newPayments, [
+			"id",
+			"userId",
+			"isPrimary",
+			"method",
+			"cardNumberLastFour",
+			"expiration",
+		])
+		return newPayments
+	} catch (error) {
+		console.error("Failed to seed Payment methods:", error)
+		throw error
+	}
+}
+
 async function seedRooms(users: IUser[]) {
 	const insertedRooms = await Promise.all(
 		roomsData.map(async (room, i) => {
@@ -119,6 +161,7 @@ async function seedRooms(users: IUser[]) {
 async function seedBookingsWithPayments(
 	admin: IUser,
 	users: IUser[],
+	paymentMethods: IPaymentMethod[],
 	rooms: IRoom[]
 ) {
 	const session = await mongoose.startSession()
@@ -139,15 +182,22 @@ async function seedBookingsWithPayments(
 			})
 			await booking.save({ session })
 
-			// Step 2: Create Payment and reference the Booking
+			// Step 2a: Find the Payment Method for the User
+			const paymentMethod = paymentMethods.find(
+				(method) => method.userId === users[i].id
+			)
+
+			if (!paymentMethod) {
+				throw new Error("Payment method not found")
+			}
+
+			// Step 2b: Create Payment and reference the Booking
 			const payment = new Payment({
 				bookingId: booking._id,
 				amount: rooms[i].deposit + 85.23,
 				paidBy: users[i].id,
 				createdBy: admin.id,
-				paymentMethod: {
-					...usersData[i + 1].paymentMethods[0],
-				},
+				paymentMethod: paymentMethod?.id,
 			})
 			await payment.save({ session })
 
@@ -254,23 +304,23 @@ async function updateUser(admin: IUser, id: string, updates: {}) {
 	console.log("User fullname: ", selectedUser.toObject().fullname)
 }
 
-async function updateUserSave(admin: IUser, id: string) {
-	const selectedUser = await User.findOne({ _id: id })
-	selectedUser.lastName = "johnson"
-	selectedUser.email = "the.johnson@test.com"
-	selectedUser.paymentMethods.push({
-		isPrimary: false,
-		method: "credit",
-		cardNumber: "1234567812345678",
-		expiration: "12/25",
-		cvv: "123",
-		cardHolderName: "Sam Johnson",
-		paymentName: "Discover",
-	})
-	selectedUser.updatedBy = admin.id
-	await selectedUser.save()
-	console.log("User fullname: ", selectedUser.toObject().fullname)
-}
+// async function updateUserSave(admin: IUser, id: string) {
+// 	const selectedUser = await User.findOne({ _id: id })
+// 	selectedUser.lastName = "johnson"
+// 	selectedUser.email = "the.johnson@test.com"
+// 	selectedUser.paymentMethods.push({
+// 		isPrimary: false,
+// 		method: "credit",
+// 		cardNumber: "9999",
+// 		expiration: new Date("2029-08-1"),
+// 		cardBrand: "Discover",
+// 	})
+// 	selectedUser.paymentMethods[0].cardNumber = "4321"
+// 	selectedUser.paymentMethods[0].cardBrand = "Discover"
+// 	selectedUser.updatedBy = admin.id
+// 	await selectedUser.save()
+// 	console.log("User fullname: ", selectedUser.toObject().fullname)
+// }
 
 async function seedDatabase() {
 	try {
@@ -288,12 +338,21 @@ async function seedDatabase() {
 		const tenants = await seedUsers(admin) // Add all tenents
 		console.log("Tenants added successfully!\n")
 
+		// Add all payment methods
+		const paymentMethods = await seedPaymentMethods(tenants) // Add all payment methods
+		console.log("Payment methods added successfully!\n")
+
 		// Add all rooms
 		const rooms = await seedRooms(tenants) // Add all rooms
 		console.log("Rooms added successfully!\n")
 
 		// Add all bookings and link to the tenants
-		const bookings = await seedBookingsWithPayments(admin, tenants, rooms) // Add all bookings
+		const bookings = await seedBookingsWithPayments(
+			admin,
+			tenants,
+			paymentMethods,
+			rooms
+		) // Add all bookings
 		console.log("Bookings and Payments added successfully!\n")
 
 		// Add all notes and link to the bookings
@@ -312,7 +371,7 @@ async function seedDatabase() {
 		// })
 
 		// Update User to create a history log (using pre-save method)
-		await updateUserSave(admin, tenants[2].id)
+		// await updateUserSave(admin, tenants[2].id)
 		console.log("User updated successfully!\n")
 
 		console.log("Database seeded successfully!")
