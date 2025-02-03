@@ -9,7 +9,7 @@ export interface IPaymentMethod extends Document {
 	isPrimary: boolean
 	method: IPaymentType
 	cardBrand?: ICardBrand
-	cardNumberlastFour?: string // TODO: Update to use 'Tokenization' for PCI compliance
+	cardNumberLastFour?: string // TODO: Update to use 'Tokenization' for PCI compliance
 	expirationDate?: Date
 	routingNumber?: string
 	accountNumber?: string

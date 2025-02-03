@@ -36,7 +36,7 @@ const PaymentMethodSchema = new Schema<IPaymentMethod>(
 				message: "{VALUE} is not a valid payment method",
 			},
 		},
-		cardNumberlastFour: {
+		cardNumberLastFour: {
 			type: String,
 			minlength: [4, "Card Number must be at least 4 characters long"],
 			maxlength: [4, "Card Number must be at most 4 characters long"],

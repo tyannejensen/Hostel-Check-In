@@ -98,7 +98,7 @@ async function seedPaymentMethods(users: IUser[]) {
 	try {
 		const newPayments = []
 
-		for (let i = 0; i < bookingsData.length; i++) {
+		for (let i = 0; i < users.length; i++) {
 			// Step 1: Get a user
 			const user = await User.findOne({ _id: users[i].id })
 
@@ -107,6 +107,8 @@ async function seedPaymentMethods(users: IUser[]) {
 				...paymentMethodsData[i],
 				userId: user.id,
 			}).save()
+
+			console.log(paymentMethod)
 
 			// Step 3: Update User with the Payment Method reference
 			user.paymentMethods.push(paymentMethod._id)
