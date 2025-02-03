@@ -38,6 +38,7 @@ export async function getBookingById(id: string) {
 	const booking = await Booking.findById(id)
 		.populate("bookedBy", "fullname email")
 		.populate("createdBy", "fullname")
+		.populate("roomId", "roomNumber roomType")
 		.populate({
 			path: "payments",
 			select: "amount",
@@ -64,6 +65,7 @@ export async function getBookingsByTenantId(id: string) {
 	const tenantBookings = await Booking.find({ bookedBy: id })
 		.populate("bookedBy", "fullname email")
 		.populate("createdBy", "fullname")
+		.populate("roomId", "roomNumber roomType")
 		.populate({
 			path: "payments",
 			select: "amount",
