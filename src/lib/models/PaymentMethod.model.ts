@@ -63,10 +63,6 @@ const PaymentMethodSchema = new Schema<IPaymentMethod>(
 			minlength: [2, "Bank Name must be at least 2 characters long"],
 			maxlength: [50, "Bank Name must be at most 50 characters long"],
 		},
-		history: {
-			type: [ChangeLogSchema],
-			default: [],
-		},
 	},
 	{
 		timestamps: true, // Add createdAt and updatedAt fields

@@ -123,7 +123,7 @@ async function seedPaymentMethods(users: IUser[]) {
 			"isPrimary",
 			"method",
 			"cardNumberLastFour",
-			"expiration",
+			"expirationDate",
 		])
 		return newPayments
 	} catch (error) {
