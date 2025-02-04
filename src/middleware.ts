@@ -16,6 +16,14 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
+  // If token exists, add userId to the request headers
+  if (token && token.userId) {
+    const response = NextResponse.next();
+    response.headers.set("x-user-id", String(token.userId));
+    console.log("Middleware Response:", response); // Debugging line
+    return response;
+  }
+
   return NextResponse.next();
 }
 

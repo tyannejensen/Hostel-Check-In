@@ -1,5 +1,6 @@
 import { dbConnect } from "@/lib/db"
 import { Booking } from "@/models/Booking.model"
+import { NextRequest } from "next/server"
 
 // GET DATA
 export async function getBookings() {
@@ -60,10 +61,15 @@ export async function getBookingById(id: string) {
 	return bookingObj
 }
 
-export async function getBookingsByTenantId(id: string) {
+export async function getBookingsByTenantId(req: NextRequest) {
 	await dbConnect()
 
-	const tenantBookings = await Booking.find({ bookedBy: id })
+	const userId = req.headers.get("x-user-id");
+	if (!userId) {
+	  throw new Error("User ID not found in request headers");
+	}
+
+	const tenantBookings = await Booking.find({ bookedBy: userId })
 		.populate("bookedBy", "fullname email")
 		.populate("createdBy", "fullname")
 		.populate("roomId", "roomNumber roomType")

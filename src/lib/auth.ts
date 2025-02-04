@@ -49,4 +49,19 @@ export const { auth, signIn, signOut } = NextAuth({
 			},
 		}),
 	],
-})
+	callbacks: {
+	  async jwt({ token, user }: { token: any, user: any }) {
+		// Add userId to the token if it exists
+		if (user) {
+		  token.userId = user.id;
+		}
+		return token;
+	  },
+	  async session({ session, token }: { session: any, token: any }) {
+		// Add userId to the session
+		session.userId = token.userId;
+		return session;
+	  },
+	},
+	secret: process.env.AUTH_SECRET,
+  });
