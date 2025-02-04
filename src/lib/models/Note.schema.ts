@@ -1,5 +1,5 @@
 import { Schema } from "mongoose"
-import { INote } from "@/interfaces/note.interface"
+import { INote } from "@/interfaces/index"
 import { formatDate } from "@/server-utils/helpers"
 
 // Note Schema - subdocument of Booking Schema

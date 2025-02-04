@@ -1,5 +1,5 @@
 import { Schema } from "mongoose"
-import { ILog } from "@/interfaces/log.interface"
+import { ILog } from "@/interfaces/index"
 
 // Log Schema - subdocument of ChangeLog Schema
 export const LogSchema = new Schema<ILog>(
