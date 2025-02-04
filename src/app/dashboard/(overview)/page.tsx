@@ -1,5 +1,6 @@
 import React from "react";
 import "@/styles/global.css";
+import { getTenants } from "@/actions/tenant.actions";
 import { BedDouble, CircleSlash2, CalendarCheck2 } from "lucide-react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import {
@@ -13,48 +14,29 @@ import {
 } from "@/components/ui/table";
 
 export default async function Page() {
-  const data = [
-    {
-      name: "John E Doe.",
-      room: "444",
-      duration: "14 Days",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-      notes: "$250.00",
-    },
-    {
-      name: "John E Doe.",
-      room: "444",
-      duration: "14 Days",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-      notes: "$250.00",
-    },
-    {
-      name: "John E Doe.",
-      room: "444",
-      duration: "14 Days",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-      notes: "$250.00",
-    },
-    {
-      name: "John E Doe.",
-      room: "444",
-      duration: "14 Days",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-      notes: "$250.00",
-    },
-    {
-      name: "John E Doe.",
-      room: "444",
-      duration: "14 Days",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-      notes: "$250.00",
-    },
-  ];
+const tenants = await getTenants();
+  console.log(tenants);
+
+  function convertTenantIntoTableData(tenants: any) {
+    return tenants.map((tenant: any) => {
+      const primaryPhone = tenant.phoneNumbers.find((phone: any) => phone.isPrimary)?.number || "N/A";
+      const booking = tenant.bookings[0]; // Assuming you want to display the first booking
+  
+      return {
+        name: tenant.fullname,
+        phone: primaryPhone,
+        email: tenant.email,
+        balance: tenant.balance,
+        room: booking?.roomId?.roomNumber || "N/A",
+        duration: booking ? `${booking.checkIn} - ${booking.checkOut}` : "N/A",
+        checkInDate: booking?.checkIn || "N/A",
+        checkOutDate: booking?.checkOut || "N/A",
+        notes: booking?.notes.map((note: any) => note.content).join(", ") || "N/A",
+      };
+    });
+  }
+  
+
 
   return (
     <div>
@@ -127,7 +109,7 @@ export default async function Page() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((rowData: any, index: number) => {
+          {convertTenantIntoTableData(tenants).map((rowData: any, index: number) => {
               return (
                 <TableRow key={index} className="table-data-row">
                   <TableCell>{rowData.name}</TableCell>
