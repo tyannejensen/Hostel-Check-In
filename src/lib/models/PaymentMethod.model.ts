@@ -1,12 +1,11 @@
 import { Schema, model, models } from "mongoose"
-import { IPaymentMethod } from "@/interfaces/payment-method.interface"
+import { IPaymentMethod } from "@/interfaces/index"
 import {
 	formatDate,
 	getOldDoc,
 	logChanges,
 	// logHistory,
 } from "@/server-utils/helpers"
-import { ChangeLogSchema } from "@/models/ChangeLog.schema"
 
 // PaymentMethod Schema - subdocument of Booking Schema
 const PaymentMethodSchema = new Schema<IPaymentMethod>(

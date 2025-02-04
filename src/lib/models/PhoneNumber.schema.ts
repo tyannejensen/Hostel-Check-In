@@ -1,7 +1,7 @@
 import { Schema } from "mongoose"
-import { IPhoneNumber } from "@/interfaces/phone-number.interface"
+import { IPhoneNumber } from "@/interfaces/index"
 
-export const phoneNumberSchema = new Schema<IPhoneNumber>(
+export const PhoneNumberSchema = new Schema<IPhoneNumber>(
 	{
 		countryCode: {
 			type: String,
@@ -27,5 +27,5 @@ export const phoneNumberSchema = new Schema<IPhoneNumber>(
 			required: [true, "Primary phone indicator is required"],
 		},
 	},
-	{ _id: false, timestamps: true }
+	{ timestamps: true }
 )

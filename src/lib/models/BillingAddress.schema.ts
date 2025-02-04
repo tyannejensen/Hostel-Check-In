@@ -1,5 +1,5 @@
 import { Schema } from "mongoose"
-import { IBillingAddress } from "../types/interfaces"
+import { IBillingAddress } from "@/interfaces/index"
 import { formatDate } from "@/server-utils/helpers"
 
 export const BillingAddressSchema = new Schema<IBillingAddress>(

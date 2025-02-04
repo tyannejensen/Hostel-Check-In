@@ -2,9 +2,9 @@ import { Schema, model, models } from "mongoose"
 import { v4 as uuidv4 } from "uuid"
 import bcrypt from "bcrypt"
 import { IUser, IBillingAddress } from "@/interfaces/index"
-import { BillingAddressSchema } from "@/models/BillingAddress.schema"
-import { PhoneNumberSchema } from "@/models/PhoneNumber.schema"
-import { ChangeLogSchema } from "@/models/ChangeLog.schema"
+import { BillingAddressSchema } from "@/models/BillingAddress.schema" // require invidual import to avoid circular dependency
+import { ChangeLogSchema } from "@/models/index" // require invidual import to avoid circular dependency
+import { PhoneNumberSchema } from "@/models/PhoneNumber.schema" // require invidual import to avoid circular dependency
 import {
 	formatDate,
 	// getOldDoc,
