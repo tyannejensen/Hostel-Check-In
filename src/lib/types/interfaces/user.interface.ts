@@ -1,7 +1,10 @@
 import { Document, ObjectId } from "mongoose"
-import { IPhoneNumber } from "@/interfaces/phone-number.interface"
-import { IPaymentMethod } from "@/interfaces/payment-method.interface"
-import { IChangeLog } from "@/interfaces/change-log.interface"
+import {
+	IBillingAddress,
+	IPhoneNumber,
+	IPaymentMethod,
+	IChangeLog,
+} from "@/interfaces/index"
 import { IRole } from "@/mytypes/index"
 
 // Interfaces for User Schema
@@ -16,6 +19,7 @@ export interface IUser extends Document {
 	role: IRole
 	bookings: ObjectId[] // reference to Booking Schema
 	paymentMethods: IPaymentMethod[] // reference to PaymentMethod Subdocument
+	billingAddress?: IBillingAddress
 	createdAt?: Date
 	updatedAt?: Date
 	tags: string[]

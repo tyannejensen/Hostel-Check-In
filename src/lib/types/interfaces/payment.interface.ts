@@ -1,5 +1,5 @@
 import { Document, ObjectId } from "mongoose"
-import { IPaymentMethod } from "./payment-method.interface"
+import { IPaymentMethod } from "@/interfaces/index"
 
 // Interfaces for Payment Schema
 export interface IPayment extends Document {
