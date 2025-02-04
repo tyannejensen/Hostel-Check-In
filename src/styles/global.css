@@ -314,6 +314,20 @@ h3 {
   background-color: var(--dark-button);
   color: var(--light) !important;
 }
+/* --------------------------- TENANT OVERVIEW --------------------------- */
+.dark-circle {
+  background-color: var(--dark-button);
+  width: 1.7rem;
+  height: 1.7rem;
+  box-shadow: 6px 6px 3.5px 0px rgba(2, 44, 34, 0.25);
+  margin-top: -25px;
+  margin-left: -25px;
+  border-radius: 50%;
+}
+.tran-his-table {
+  background-color: var(--highlight);
+  color: var(--text);
+}
 
 /* --------------------------- ROOT --------------------------- */
 @layer base {
