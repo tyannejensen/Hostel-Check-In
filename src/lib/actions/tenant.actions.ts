@@ -10,6 +10,7 @@ export async function getTenants() {
   const tenants = await User.find( { role: "tenant" })
     .populate("fullname")
 
+
   const tenantsAsObj = tenants.map((tenant: any) =>
     tenant.toObject({ getters: true, virtuals: false })
   );
