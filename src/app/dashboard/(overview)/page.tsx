@@ -19,14 +19,23 @@ const tenants = await getTenants();
 
   function convertTenantIntoTableData(tenants: any) {
     return tenants.map((tenant: any) => {
+      const primaryPhone = tenant.phoneNumbers.find((phone: any) => phone.isPrimary)?.number || "N/A";
+      const booking = tenant.bookings[0]; // Assuming you want to display the first booking
+  
       return {
         name: tenant.fullname,
-        phone: tenant.phoneNumbers.find((phone: any) => phone.isPrimary).number,
+        phone: primaryPhone,
         email: tenant.email,
         balance: tenant.balance,
+        room: booking?.roomId?.roomNumber || "N/A",
+        duration: booking ? `${booking.checkIn} - ${booking.checkOut}` : "N/A",
+        checkInDate: booking?.checkIn || "N/A",
+        checkOutDate: booking?.checkOut || "N/A",
+        notes: booking?.notes.map((note: any) => note.content).join(", ") || "N/A",
       };
     });
   }
+  
 
 
   return (

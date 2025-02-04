@@ -1,6 +1,5 @@
 import { dbConnect } from "@/lib/db";
 import { User } from "@/models/User.model";
-import { NextRequest } from "next/server";
 
 // GET DATA
 
@@ -8,7 +7,14 @@ export async function getTenants() {
   await dbConnect();
 
   const tenants = await User.find( { role: "tenant" })
-    .populate("fullname")
+  .populate({
+    path: "bookings",
+    populate: {
+      path: "roomId",
+      select: "roomNumber",
+    },
+  })
+  .populate("fullname");
 
 
   const tenantsAsObj = tenants.map((tenant: any) =>
