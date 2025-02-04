@@ -106,7 +106,9 @@ async function seedPaymentMethods(users: IUser[]) {
 			const paymentMethod = await new PaymentMethod({
 				...paymentMethodsData[i],
 				userId: user.id,
-			}).save()
+			})
+
+			await paymentMethod.save()
 
 			// Step 3: Update User with the Payment Method reference
 			user.paymentMethods.push(paymentMethod._id)
@@ -304,23 +306,23 @@ async function updateUser(admin: IUser, id: string, updates: {}) {
 	console.log("User fullname: ", selectedUser.toObject().fullname)
 }
 
-// async function updateUserSave(admin: IUser, id: string) {
-// 	const selectedUser = await User.findOne({ _id: id })
-// 	selectedUser.lastName = "johnson"
-// 	selectedUser.email = "the.johnson@test.com"
-// 	selectedUser.paymentMethods.push({
-// 		isPrimary: false,
-// 		method: "credit",
-// 		cardNumber: "9999",
-// 		expiration: new Date("2029-08-1"),
-// 		cardBrand: "Discover",
-// 	})
-// 	selectedUser.paymentMethods[0].cardNumber = "4321"
-// 	selectedUser.paymentMethods[0].cardBrand = "Discover"
-// 	selectedUser.updatedBy = admin.id
-// 	await selectedUser.save()
-// 	console.log("User fullname: ", selectedUser.toObject().fullname)
-// }
+async function updateUserSave(admin: IUser, id: string) {
+	const selectedUser = await User.findOne({ _id: id })
+	selectedUser.lastName = "johnson"
+	selectedUser.email = "the.johnson@test.com"
+	selectedUser.paymentMethods.push({
+		isPrimary: false,
+		method: "credit",
+		cardNumber: "9999",
+		expiration: new Date("2029-08-1"),
+		cardBrand: "Discover",
+	})
+	selectedUser.paymentMethods[0].cardNumber = "4321"
+	selectedUser.paymentMethods[0].cardBrand = "Discover"
+	selectedUser.updatedBy = admin.id
+	await selectedUser.save()
+	console.log("User fullname: ", selectedUser.toObject().fullname)
+}
 
 async function seedDatabase() {
 	try {
@@ -364,11 +366,14 @@ async function seedDatabase() {
 		console.log("Booking status updated successfully!\n")
 
 		// Update User to create a history log
-		await updateUser(admin, tenants[2].id, {
-			// Update User
-			lastName: "johnson",
-			email: "the.johnson@test.com",
-		})
+		// await updateUser(admin, tenants[2].id, {
+		// 	// Update User
+		// 	lastName: "johnson",
+		// 	email: "the.johnson@test.com",
+		// })
+
+		// Update User to create a history log (using pre-save method)
+		await updateUserSave(admin, tenants[2].id)
 		console.log("User updated successfully!\n")
 
 		console.log("Database seeded successfully!")

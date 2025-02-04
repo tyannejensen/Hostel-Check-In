@@ -88,3 +88,20 @@ export async function getBookingsByTenantId(id: string) {
 }
 
 // SET DATA
+
+export async function createBooking(data: any) {
+	await dbConnect()
+
+	const booking = await Booking.create(data)
+	const bookingObj = booking.toObject()
+	return bookingObj
+}
+
+// addNewReservation()
+// - tenantId: the tenant the reservation will be under
+// - checkInDate
+// - checkOutDate
+// - roomId
+// - totalCost
+// - deposit
+// - status: paid, not-paid, pending

@@ -46,6 +46,7 @@ const PaymentMethodSchema = new Schema<IPaymentMethod>(
 				validator: (v: Date) => v > new Date(),
 				message: (props) => `${props.value} is not a valid expiration date`,
 			},
+			get: (v: Date) => formatDate(v),
 		},
 		routingNumber: {
 			type: String,
