@@ -1,47 +1,61 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { useParams } from "next/navigation"
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { useParams } from "next/navigation";
 
 // Define the Reservation interface
 interface Reservation {
-  name: string
-  email: string
-  room: string
-  checkInDate: string
-  checkOutDate: string
-  status: string
+  name: string;
+  email: string;
+  room: string;
+  checkInDate: string;
+  checkOutDate: string;
+  status: string;
 }
 
 export default function Page() {
-  const { id } = useParams()
-  const [reservation, setReservation] = useState<Reservation | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { id } = useParams();
+  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchReservation = async () => {
       try {
         // Replace with actual fetch request
-        const response = await fetch(`/api/reservations/${id}`)
-        if (!response.ok) {
-          throw new Error("Network response was not ok")
-        }
-        const data: Reservation = await response.json()
-        setReservation(data)
+        // const response = await fetch(`/api/reservations/${id}`)
+        // if (!response.ok) {
+        //   throw new Error("Network response was not ok")
+        // }
+        // const data: Reservation = await response.json()
+        // setReservation(data)
+        setReservation({
+          name: "John Doe",
+          email: "",
+          room: "101",
+          checkInDate: "Jan 01, 2025",
+          checkOutDate: "Jan 15, 2025",
+          status: "paid",
+        });
       } catch (error: any) {
-        setError(error.message)
+        setError(error.message);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchReservation()
-  }, [id])
+    fetchReservation();
+  }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   if (error) {
@@ -50,7 +64,7 @@ export default function Page() {
         <h1>Error</h1>
         <p>{error}</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -59,14 +73,20 @@ export default function Page() {
         <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-white to-violet-950 text-black font-sans">
           <Card className="w-[400px] p-6 rounded-lg shadow-lg bg-white text-black text-center">
             <CardHeader>
-              <CardTitle className="text-3xl font-semibold">Reservation Details</CardTitle>
+              <CardTitle className="text-3xl font-semibold">
+                Reservation Details
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <CardDescription>Name: {reservation.name}</CardDescription>
               <CardDescription>Email: {reservation.email}</CardDescription>
               <CardDescription>Room: {reservation.room}</CardDescription>
-              <CardDescription>Check-in Date: {reservation.checkInDate}</CardDescription>
-              <CardDescription>Check-out Date: {reservation.checkOutDate}</CardDescription>
+              <CardDescription>
+                Check-in Date: {reservation.checkInDate}
+              </CardDescription>
+              <CardDescription>
+                Check-out Date: {reservation.checkOutDate}
+              </CardDescription>
               <CardDescription>Status: {reservation.status}</CardDescription>
             </CardContent>
           </Card>
@@ -79,7 +99,7 @@ export default function Page() {
         </div>
       )}
     </>
-  )
+  );
 }
 
 // Original code
@@ -144,10 +164,6 @@ export default function Page() {
 //     </>
 //   );
 // }
-
-
-
-
 
 // Test code 2. Adjustments needed!
 // const mockData = {
@@ -229,7 +245,6 @@ export default function Page() {
 //       )}
 //     </>
 //   );
-
 
 // Tested code 1. Adjustments needed!
 // import { useState, useEffect } from "react";
