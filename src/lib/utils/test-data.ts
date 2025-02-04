@@ -20,7 +20,6 @@ const usersData = [
 		email: "john@test.com",
 		password: "password123",
 		role: "admin",
-		paymentMethods: [],
 		bookings: [],
 		tags: ["boss"],
 		history: [],
@@ -47,13 +46,7 @@ const usersData = [
 		email: "jane@test.com",
 		password: "password123",
 		role: "tenant",
-		paymentMethods: [
-			{
-				isPrimary: true,
-				paymentName: "My Pocket",
-				method: "cash",
-			},
-		],
+		paymentMethods: [],
 		bookings: [],
 		tags: ["delinquent"],
 		history: [],
@@ -75,16 +68,7 @@ const usersData = [
 		email: "alice@test.com",
 		password: "password123",
 		role: "tenant",
-		paymentMethods: [
-			{
-				isPrimary: true,
-				method: "bank",
-				paymentName: "My Checking",
-				routingNumber: "123456789",
-				accountNumber: "987654321",
-				bankName: "US Bank",
-			},
-		],
+		paymentMethods: [],
 		bookings: [],
 		tags: ["regular"],
 		history: [],
@@ -106,26 +90,7 @@ const usersData = [
 		email: "sam@test.com",
 		password: "password123",
 		role: "tenant",
-		paymentMethods: [
-			{
-				isPrimary: true,
-				method: "credit",
-				paymentName: "Mastercard",
-				cardHolerName: "Sam Jones",
-				cardNumber: "1234567890123456",
-				expirationDate: new Date("2028-12-31"),
-				cvv: "567",
-			},
-			{
-				isPrimary: false,
-				method: "credit",
-				paymentName: "Visa",
-				cardHolerName: "Sam Jones",
-				cardNumber: "1234567890150000",
-				expirationDate: new Date("2026-12-31"),
-				cvv: "123",
-			},
-		],
+		paymentMethods: [],
 		bookings: [],
 		tags: ["regular"],
 		history: [],
@@ -147,19 +112,7 @@ const usersData = [
 		email: "katie@test.com",
 		password: "password123",
 		role: "tenant",
-		paymentMethods: [
-			{
-				isPrimary: true,
-				method: "credit",
-				paymentName: "Visa",
-				cardHolerName: "Katie Ames",
-				cardNumber: "1234563330123456",
-				expirationDate: new Date(
-					new Date(new Date().getFullYear() + 2, 11, 31)
-				),
-				cvv: "112",
-			},
-		],
+		paymentMethods: [],
 		bookings: [],
 		tags: ["regular"],
 		history: [],
@@ -181,17 +134,7 @@ const usersData = [
 		email: "jason@test.com",
 		password: "password123",
 		role: "tenant",
-		paymentMethods: [
-			{
-				isPrimary: true,
-				method: "check",
-				paymentName: "Check",
-				routingNumber: "123456789",
-				accountNumber: "987654321",
-				bankName: "US Bank",
-				checkNumber: "10021",
-			},
-		],
+		paymentMethods: [],
 		bookings: [],
 		tags: ["secret-agent"],
 		history: [],
@@ -200,8 +143,67 @@ const usersData = [
 	},
 ]
 
+const paymentMethodsData = [
+	// 8 payment methods, only 2 tenants get 2 payment methods each
+	{
+		isPrimary: true,
+		method: "cash",
+	},
+	{
+		isPrimary: true,
+		method: "bank",
+		routingNumber: "123456789",
+		accountNumber: "987654321",
+		bankName: "US Bank",
+	},
+	{
+		isPrimary: true,
+		method: "credit",
+		cardBrand: "Visa",
+		cardNumberLastFour: "3456",
+		expirationDate: new Date(new Date(new Date().getFullYear() + 2, 5, 31)),
+	},
+	{
+		isPrimary: true,
+		method: "credit",
+		cardBrand: "Mastercard",
+		cardNumberLastFour: "1122",
+		expirationDate: new Date(new Date(new Date().getFullYear() + 2, 11, 31)),
+	},
+	{
+		isPrimary: true,
+		method: "credit",
+		cardBrand: "Amex",
+		cardNumberLastFour: "1233",
+		expirationDate: new Date(new Date(new Date().getFullYear() + 5, 2, 31)),
+	},
+	{
+		isPrimary: false,
+		method: "credit",
+		cardBrand: "Discover",
+		cardNumberLastFour: "6677",
+		expirationDate: new Date(new Date(new Date().getFullYear() + 4, 5, 31)),
+	},
+	{
+		isPrimary: true,
+		method: "check",
+		routingNumber: "123456789",
+		accountNumber: "987654321",
+		bankName: "US Bank",
+		checkNumber: "10021",
+	},
+	{
+		isPrimary: false,
+		method: "credit",
+		cardBrand: "Visa",
+		cardNumberLastFour: "4561",
+		expirationDate: new Date(new Date(new Date().getFullYear() + 2, 11, 31)),
+	},
+]
+
 // Rooms data for Bookings
 const roomsData = [
+	// 5 rooms, one for each tenant
 	{
 		roomType: "shared",
 		roomNumber: "101A",
@@ -256,6 +258,7 @@ const roomsData = [
 
 // Bookings data
 const bookingsData = [
+	// 5 bookings, one for each tenant
 	{
 		roomId: "",
 		checkIn: setDate(-4),
@@ -300,6 +303,7 @@ const bookingsData = [
 
 // Notes data for Bookings
 const notesData = [
+	// 5 notes, one for each booking
 	{
 		content: "Tenant is delinquent",
 		createdBy: "",
@@ -322,4 +326,4 @@ const notesData = [
 	},
 ]
 
-export { usersData, roomsData, bookingsData, notesData }
+export { usersData, paymentMethodsData, roomsData, bookingsData, notesData }

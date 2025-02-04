@@ -1,20 +1,32 @@
-import { Schema } from "mongoose"
-import { IPaymentMethod } from "../types/interfaces/payment-method.interface"
-import { formatDate } from "../utils/helpers"
+import { Schema, model, models } from "mongoose"
+import { IPaymentMethod } from "@/interfaces/payment-method.interface"
+import {
+	formatDate,
+	getOldDoc,
+	logChanges,
+	// logHistory,
+} from "@/server-utils/helpers"
+import { ChangeLogSchema } from "@/models/ChangeLog.schema"
 
 // PaymentMethod Schema - subdocument of Booking Schema
-export const PaymentMethodSchema = new Schema<IPaymentMethod>(
+const PaymentMethodSchema = new Schema<IPaymentMethod>(
 	{
-		paymentName: {
+		userId: {
 			type: String,
-			required: false,
-			minlength: [2, "Payment Name must be at least 2 characters long"],
-			maxlength: [30, "Payment Name must be at most 30 characters long"],
+			required: [true, "User ID is required"],
+			ref: "User",
 		},
 		isPrimary: {
 			type: Boolean,
 			required: [true, "Primary payment method indicator is required"],
 			default: false,
+		},
+		cardBrand: {
+			type: String,
+			enum: {
+				values: ["Visa", "Mastercard", "Amex", "Discover"],
+				message: "{VALUE} is not a valid card brand",
+			},
 		},
 		method: {
 			type: String,
@@ -24,19 +36,10 @@ export const PaymentMethodSchema = new Schema<IPaymentMethod>(
 				message: "{VALUE} is not a valid payment method",
 			},
 		},
-		cardHolderName: {
+		cardNumberLastFour: {
 			type: String,
-			minlength: [2, "Card Holder Name must be at least 2 characters long"],
-			maxlength: [50, "Card Holder Name must be at most 50 characters long"],
-			match: [
-				/^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,50}( [A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,50})*$/,
-				"Card Holder Name contains invalid characters",
-			],
-		},
-		cardNumber: {
-			type: String,
-			minlength: [15, "Card Number must be at least 15 characters long"],
-			maxlength: [16, "Card Number must be at most 16 characters long"],
+			minlength: [4, "Card Number must be at least 4 characters long"],
+			maxlength: [4, "Card Number must be at most 4 characters long"],
 		},
 		expirationDate: {
 			type: Date,
@@ -44,11 +47,6 @@ export const PaymentMethodSchema = new Schema<IPaymentMethod>(
 				validator: (v: Date) => v > new Date(),
 				message: (props) => `${props.value} is not a valid expiration date`,
 			},
-		},
-		cvv: {
-			type: String,
-			minlength: [3, "CVV must be at least 3 characters long"],
-			maxlength: [4, "CVV must be at most 4 characters long"],
 		},
 		routingNumber: {
 			type: String,
@@ -71,6 +69,16 @@ export const PaymentMethodSchema = new Schema<IPaymentMethod>(
 	}
 )
 
+// MIDDLWARE
+
+// Record document updates in the history array
+// Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
+PaymentMethodSchema.pre("findOneAndUpdate", getOldDoc)
+// Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
+PaymentMethodSchema.post("findOneAndUpdate", logChanges)
+
+// PaymentMethodSchema.pre("save", logHistory)
+
 // GETTERS
 // Convert the 'createdAt' field to MMM DD, YYYY format e.g. Jan 30, 2025
 PaymentMethodSchema.path("createdAt").get(formatDate)
@@ -83,6 +91,7 @@ PaymentMethodSchema.set("toObject", {
 	getters: true,
 	virtuals: true,
 	transform: function (doc, ret) {
+		delete ret.__v // Exclude __v (version) field
 		delete ret._id // Exclude _id field
 	},
 })
@@ -92,6 +101,12 @@ PaymentMethodSchema.set("toJSON", {
 	virtuals: true,
 	getters: true,
 	transform: function (doc, ret) {
+		delete ret.__v // Exclude __v (version) field
 		delete ret._id // Exclude _id field
 	},
 })
+
+// Compile and export the PaymentMethod model
+export const PaymentMethod =
+	models.PaymentMethod ||
+	model<IPaymentMethod>("PaymentMethod", PaymentMethodSchema)
