@@ -1,5 +1,5 @@
 import { ObjectId, Document } from "mongoose"
-import { ILog } from "@/interfaces/log.interface"
+import { ILog } from "@/interfaces/index"
 
 // Interfaces for Subdocument - Change Log Schema
 export interface IChangeLog extends Document {

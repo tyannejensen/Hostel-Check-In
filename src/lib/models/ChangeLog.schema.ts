@@ -1,7 +1,6 @@
 import { Schema } from "mongoose"
-import { IChangeLog } from "@/interfaces/change-log.interface"
-import { LogSchema } from "@/models/Log.schema"
-import { ILog } from "@/interfaces/log.interface"
+import { IChangeLog, ILog } from "@/interfaces/index"
+import { LogSchema } from "@/models/index"
 
 // Change Log Schema - subdocument of Booking Schema
 export const ChangeLogSchema = new Schema<IChangeLog>(

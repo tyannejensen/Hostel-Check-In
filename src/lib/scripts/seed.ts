@@ -108,8 +108,6 @@ async function seedPaymentMethods(users: IUser[]) {
 				userId: user.id,
 			}).save()
 
-			console.log(paymentMethod)
-
 			// Step 3: Update User with the Payment Method reference
 			user.paymentMethods.push(paymentMethod._id)
 			await user.save()

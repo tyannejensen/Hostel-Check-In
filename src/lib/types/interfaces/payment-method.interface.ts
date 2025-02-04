@@ -1,6 +1,6 @@
 import { Document, ObjectId } from "mongoose"
 import { ICardBrand, IPaymentType } from "@/mytypes/index"
-import { IChangeLog } from "@/interfaces/change-log.interface"
+import { IChangeLog } from "@/interfaces/index"
 
 // Interfaces for Payment Method Subdocument
 export interface IPaymentMethod extends Document {

@@ -1,12 +1,16 @@
 import { Schema, model, models } from "mongoose"
 import { v4 as uuidv4 } from "uuid"
 import bcrypt from "bcrypt"
-import { IUser } from "@/interfaces/user.interface"
-import { ChangeLogSchema } from "@/lib/models/ChangeLog.schema"
-import { phoneNumberSchema } from "@/models/PhoneNumber.schema"
-import { PaymentMethodSchema } from "@/models/PaymentMethod.schema"
-import { formatDate, getOldDoc, logChanges } from "@/server-utils/helpers"
-import { IPaymentMethod } from "../types/interfaces/payment-method.interface"
+import { IUser, IBillingAddress } from "@/interfaces/index"
+import { BillingAddressSchema } from "@/models/BillingAddress.schema" // require invidual import to avoid circular dependency
+import { ChangeLogSchema } from "@/models/index" // require invidual import to avoid circular dependency
+import { PhoneNumberSchema } from "@/models/PhoneNumber.schema" // require invidual import to avoid circular dependency
+import {
+	formatDate,
+	// getOldDoc,
+	// logChanges,
+	// logHistory,
+} from "@/server-utils/helpers"
 
 // User Schema
 const UserSchema = new Schema<IUser>(
@@ -61,7 +65,7 @@ const UserSchema = new Schema<IUser>(
 			required: [true, "Password is required"],
 			select: false,
 		},
-		phoneNumbers: [phoneNumberSchema],
+		phoneNumbers: [PhoneNumberSchema],
 		role: {
 			type: String,
 			required: [true, "Role is required"],
@@ -71,22 +75,18 @@ const UserSchema = new Schema<IUser>(
 			},
 		},
 		bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
-		paymentMethods: {
-			type: [PaymentMethodSchema],
+		paymentMethods: [{ type: Schema.Types.ObjectId, ref: "PaymentMethod" }],
+		billingAddress: {
+			type: BillingAddressSchema,
 			validate: {
-				validator: function (paymentMethods: IPaymentMethod[]) {
-					// If role is Tenant, paymentMethods must not be empty
-					if (
-						this.role === "tenant" &&
-						(!paymentMethods || paymentMethods.length === 0)
-					) {
-						return false // Validation fails
+				validator: function (this: IUser, billingAddress: IBillingAddress) {
+					if (this.role === "tenant") {
+						return !!billingAddress // if the role is tenant, billing address is required
 					}
-					return true // Validation passes
+					return this.role === "admin" || this.role === "employee"
 				},
-				message: "Tenants must have at least one payment method.",
+				message: "Billing address is required for tenants",
 			},
-			default: [], // Default to empty array
 		},
 		tags: [
 			{
@@ -119,7 +119,7 @@ const UserSchema = new Schema<IUser>(
 			// },
 		},
 		updatedBy: {
-			type: String,
+			type: String, // Reference to the user (employee/admin) who updated the user
 			ref: "User",
 		},
 	},
@@ -135,9 +135,11 @@ const UserSchema = new Schema<IUser>(
 
 // Record document updates in the history array
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
-UserSchema.pre("findOneAndUpdate", getOldDoc)
-// Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-UserSchema.post("findOneAndUpdate", logChanges)
+// UserSchema.pre("findOneAndUpdate", getOldDoc)
+// // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
+// UserSchema.post("findOneAndUpdate", logChanges)
+
+// UserSchema.pre("save", logHistory)
 
 // Pre-save hook to hash password
 UserSchema.pre<IUser>("save", async function (next) {
@@ -187,4 +189,5 @@ UserSchema.set("toJSON", {
 // VIRTUALS
 // None
 
+// Compile and export User model
 export const User = models.User || model<IUser>("User", UserSchema)

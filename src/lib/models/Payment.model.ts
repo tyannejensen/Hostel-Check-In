@@ -1,5 +1,5 @@
 import { Schema, model, models } from "mongoose"
-import { IPayment } from "@/interfaces/payment.interface"
+import { IPayment } from "@/interfaces/index"
 import { formatDate } from "@/server-utils/helpers"
 
 // Payment Schema - subdocument of Booking Schema
