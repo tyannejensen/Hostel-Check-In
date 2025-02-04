@@ -8,12 +8,7 @@ export async function getTenants() {
   await dbConnect();
 
   const tenants = await User.find( { role: "tenant" })
-    .populate("firstName", "lastName")
-    .populate("email", "phoneNumbers")
-    .populate("bookings")
-    .populate("paymentMethods", "createdAt")
-    .populate("tags", "history")
-    .populate("createdBy", "updatedBy");
+    .populate("fullname")
 
   const tenantsAsObj = tenants.map((tenant: any) =>
     tenant.toObject({ getters: true, virtuals: false })
