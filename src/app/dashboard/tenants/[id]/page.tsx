@@ -1,19 +1,13 @@
-// import { getTenantById } from "@/lib/data";
 import React from "react";
 import "@/styles/global.css";
-import {
-  BedDouble,
-  CircleSlash2,
-  CalendarCheck2,
-  Pencil,
-  Plus,
-} from "lucide-react";
+import { Pencil, Plus, Ellipsis, Link, UserRoundPlus } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
+import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { noSSR } from "next/dynamic";
-import { before } from "node:test";
 import { Separator } from "@radix-ui/react-separator";
+import Image from "next/image";
+import { Button } from "react-day-picker";
+import { DayPickerProvider, DayPicker } from "react-day-picker";
 
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
@@ -133,135 +127,160 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     <>
       {tenant ? (
         // if tenant exists show the tenant details
-        <div className="p-[30px]">
-          <div className="">
-            <div className="w rounded-xl border bg-card text-card-foreground shadow">
+        <div className="text-[var(--text)] p-[30px]">
+          <div className="rounded-md border bg-card text-card-foreground shadow p-6">
+            <div className="flex justify-between items-center">
               <div>
-                <h1 className="pt-[10px] pl-[30px] font-bold">{tenant.name}</h1>
-                <p className="pl-[30px] pb-1">{tenant.email}</p>
-                <p className="pl-[30px] pb-[40px]">{tenant.phoneNumber}</p>
-                <div className="flex flex-row justify-around pb-[50px]">
-                  <div className="flex flex-col gap-24">
-                    <Card className=" rounded-md border p-4">
-                      <CardTitle className="flex flex-row items-center justify-between">
-                        <div className="flex justify-between items-center pb-3 w-full">
-                          <p>DETAILS</p>
-                          <Pencil className="" />
+                <h1 className="text-[var(--dark-button)] font-bold">
+                  {tenant.name}
+                </h1>
+                <p>{tenant.email}</p>
+                <p>{tenant.phoneNumber}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+              <Card className="bg-[var(--highlight)] rounded-md border p-4">
+                <CardTitle className="flex flex-row items-center justify-between">
+                  <div className="flex justify-between items-center pb-3 w-full">
+                    <p className="font-bold text-[var(--text)]">DETAILS</p>
+                    <Pencil className="text-[var(--text)]" />
+                  </div>
+                </CardTitle>
+                <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
+                  <CardContent>
+                    <div className="p-1">
+                      <div className="flex flex-row pb-4 ">
+                        <h2 className="text-[var(--text)] font-bold pr-12">
+                          Name:
+                        </h2>
+                        <div>
+                          <p className="pl-[50px] text-[var(--dark-button)]">
+                            {tenant.name}
+                          </p>
                         </div>
-                      </CardTitle>
-                      <div className="h-[200px] items-center rounded-md border p-4">
-                        <CardContent className="items-center pt-3 flex align-center justify-center">
-                          <div className="w-[300px]">
-                            <div className="flex flex-row gap-4 pb-4 justify-between">
-                              <h2 className="font-bold pr-12">Name:</h2>
-                              <div>
-                                <p>{tenant.name}</p>
-                              </div>
-                            </div>
-                            <div className="flex flex-row gap-4 pb-4 justify-between">
-                              <h2 className="font-bold pr-14">DOB:</h2>
-                              <div>
-                                <p>{tenant.dob}</p>
-                              </div>
-                            </div>
-                            <div className="flex flex-row gap-4 pb-4 justify-between">
-                              <h2 className="font-bold pr-8">Address:</h2>
-                              <div>
-                                <p className="">{tenant.address}</p>
-                                <div className="">
-                                  <p>{`${tenant.city}, ${tenant.state}`}</p>
-                                  <p>{tenant.zip}</p>
-                                </div>
-                              </div>
+                      </div>
+                      <div className="flex flex-row pb-4">
+                        <h2 className="font-bold pr-14 text-[var(--text)]">
+                          DOB:
+                        </h2>
+                        <div>
+                          <p className="pl-[50px] text-[var(--dark-button)]">
+                            {tenant.dob}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-row pb-4">
+                        <h2 className="font-bold text-[var(--text)] pr-8">
+                          Address:
+                        </h2>
+                        <div>
+                          <p className="pl-[50px] text-[var(--dark-button)]">
+                            {tenant.address}
+                          </p>
+                          <div>
+                            <p className="pl-[50px] text-[var(--dark-button)]">
+                              {`${tenant.city}, ${tenant.state}`}
+                            </p>
+                            <p className="pl-[50px] text-[var(--dark-button)]">
+                              {tenant.zip}
+                            </p>
+                          </div>
+                        </div>
+                        <Separator className="my-2" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </ScrollArea>
+              </Card>
+
+              <Card className="bg-[var(--dark-button)] rounded-md border p-4">
+                <CardTitle className="flex flex-row items-center justify-between">
+                  <div className="flex justify-between items-center pb-3 w-full">
+                    <p className="font-bold text-[var(--light)]">NOTES</p>
+                    <Plus className="text-[var(--light)]" />
+                  </div>
+                </CardTitle>
+                <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
+                  <CardContent>
+                    {mockData.notes.map((note: any, index: number) => {
+                      return (
+                        <div className="p-4 w-full mx-20" key={index}>
+                          <div className="-ml-[100px] text-[var(--text)] mr-[100px]">
+                            {` "${note.comment}" `}
+                            <div>
+                              <p className="text-wrap text-[var(--dark-button)] text-end text-sm">{`${note.user} - ${note.date}`}</p>
                             </div>
                           </div>
-                        </CardContent>
-                      </div>
-                    </Card>
-
-                    <Card className=" rounded-md border p-4">
-                      <CardTitle className="flex flex-row items-center justify-between">
-                        <div className="flex justify-between items-center pb-3 w-full">
-                          <p>NOTES</p>
-                          <Plus />
+                          <Separator className="my-2" />
                         </div>
-                      </CardTitle>
-                      <ScrollArea className="h-[200px] rounded-md border p-4">
-                        <CardContent>
-                          {mockData.notes.map((note: any, index: number) => {
-                            return (
-                              <div className="p-1">
-                                <div className="border rounded-xl p-1 -ml-7 -mr-7 text-start text-wrap">
-                                  {note.comment}
-                                  <div>
-                                    <p className="text-wrap text-end text-sm">{`${note.user} - ${note.date}`}</p>
-                                  </div>
-                                </div>
-                                <Separator className="my-2" />
+                      );
+                    })}
+                  </CardContent>
+                </ScrollArea>
+              </Card>
+            </div>{" "}
+            <div className="grid grid-cols-1 gap-6 mt-6">
+              <Card className="bg-[var(--dark-button)] rounded-md border p-4">
+                <CardTitle className="flex flex-row items-center justify-between">
+                  <div className="flex justify-between items-center pb-3 w-full">
+                    <p className="font-bold text-[var(--light)]">
+                      RESERVATION HISTORY
+                    </p>
+                  </div>
+                </CardTitle>
+                <ScrollArea className="h-[200px] bg-[var(--light)] text-[var(--text)] rounded-md border p-4">
+                  <CardContent>
+                    {mockData.reservationHistory.map(
+                      (reservation: any, index: number) => {
+                        return (
+                          <div className="p-1" key={index}>
+                            <div>
+                              <div className="border rounded-md p-2 -ml-4 -mr-4 text-start text-wrap">
+                                {`${mockData.name} stayed in ${reservation.roomNumber} 
+                              from ${reservation.checkInDate} to ${reservation.checkOutDate}`}
                               </div>
-                            );
-                          })}
-                        </CardContent>
-                      </ScrollArea>
-                    </Card>
+                            </div>
+                            <Separator className="my-2" />
+                          </div>
+                        );
+                      }
+                    )}
+                  </CardContent>
+                </ScrollArea>
+              </Card>
+
+              <Card className="min-w-3xs bg-[var(--highlight)] rounded-md border p-4">
+                <CardTitle className="flex flex-wrap flex-row items-center justify-between">
+                  <div className="flex justify-between items-center pb-3 w-full">
+                    <p className="font-bold">TRANSACTION HISTORY</p>
                   </div>
-                  <div className="flex flex-col gap-24">
-                    <Card className=" rounded-md border p-4">
-                      <CardTitle className="flex flex-row items-center justify-between">
-                        <div className="flex justify-between items-center pb-3 w-full">
-                          <p>RESERVATION HISTORY</p>
-                          <Plus />
-                        </div>
-                      </CardTitle>
-                      <ScrollArea className="h-[200px] rounded-md border p-4">
-                        <CardContent>
-                          {mockData.reservationHistory.map(
-                            (reservation: any, index: number) => {
-                              return (
-                                <div className="p-1">
-                                  <div className="border rounded-xl p-1 -ml-7 -mr-7 text-start text-wrap">
-                                    {`${mockData.name} stayed in ${reservation.roomNumber} 
-                                    from ${reservation.checkInDate} to ${reservation.checkOutDate}`}
-                                  </div>
-                                  <Separator className="my-2" />
-                                </div>
-                              );
-                            }
-                          )}
-                        </CardContent>
-                      </ScrollArea>
-                    </Card>
-                    <Card className=" rounded-md border p-4">
-                      <CardTitle className="flex flex-row items-center justify-between">
-                        <div className="flex justify-between items-center pb-3 w-full">
-                          <p>TRANSACTION HISTORY</p>
-                          <Plus />
-                        </div>
-                      </CardTitle>
-                      <ScrollArea className="h-[200px] rounded-md border p-4">
-                        <CardContent>
-                          {mockData.reservationHistory.map(
-                            (reservation: any, index: number) => {
-                              return (
-                                <div className="p-1">
-                                  <div>
-                                    <div className="dark-circle"></div>
-                                    <div className="tran-his-table border rounded-xl p-1 mt-3 -ml-7 -mr-7 text-start text-wrap">
-                                      {`${mockData.name} stayed in ${reservation.roomNumber} 
-                                    from ${reservation.checkInDate} to ${reservation.checkOutDate}`}
-                                    </div>
-                                  </div>
-                                  <Separator className="my-2" />
-                                </div>
-                              );
-                            }
-                          )}
-                        </CardContent>
-                      </ScrollArea>
-                    </Card>
-                  </div>
-                </div>
-              </div>
+                </CardTitle>
+                <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
+                  <CardContent>
+                    {mockData.reservationHistory.map(
+                      (reservation: any, index: number) => {
+                        return (
+                          <div key={index}>
+                            <div className="flex flex-wrap items-center border rounded-md space-x-4">
+                              <Skeleton className="h-12 w-12 dark-circle rounded-full" />
+                              <div className="-mt-5 pr-5 mb-2">
+                                <Skeleton className="h-4 w-[250px]" />
+                                <Skeleton className="h-4 w-[200px]" />
+                                {`${mockData.name} stayed in Room #${reservation.roomNumber} 
+                              from ${reservation.checkInDate} to ${reservation.checkOutDate}`}
+                              </div>
+                              <div className="flex flex-wrap absolute right-20">
+                                <Ellipsis />
+                              </div>
+                            </div>
+                            <Separator className="my-2" />
+                          </div>
+                        );
+                      }
+                    )}
+                  </CardContent>
+                </ScrollArea>
+              </Card>
             </div>
           </div>
         </div>
