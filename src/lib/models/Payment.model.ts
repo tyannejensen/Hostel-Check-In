@@ -1,6 +1,5 @@
 import { Schema, model, models } from "mongoose";
-import { IPayment } from "@/interfaces/payment.interface";
-import { PaymentMethodSchema } from "@/models/PaymentMethod.schema";
+import { IPayment } from "@/interfaces/index";
 import { formatDate } from "@/server-utils/helpers";
 
 // Payment Schema - subdocument of Booking Schema
@@ -28,7 +27,8 @@ const PaymentSchema = new Schema<IPayment>(
       ref: "User",
     },
     paymentMethod: {
-      type: PaymentMethodSchema,
+      type: [Schema.Types.ObjectId],
+      ref: "PaymentMethod",
       required: [true, "Payment method is required"],
     },
   },

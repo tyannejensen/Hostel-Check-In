@@ -79,9 +79,9 @@ const BookingSchema = new Schema<IBooking>(
 
 // Record document updates in the history array
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
-BookingSchema.pre("findOneAndUpdate", getOldDoc);
-// Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-BookingSchema.post("findOneAndUpdate", logChanges);
+// BookingSchema.pre("findOneAndUpdate", getOldDoc)
+// // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
+// BookingSchema.post("findOneAndUpdate", logChanges)
 
 // GETTERS
 // Convert the 'createdAt' and 'updatedAt' fields to MMM DD, YYYY format e.g. Jan 30, 2025

@@ -1,5 +1,5 @@
 import { Schema, model, models } from "mongoose"
-import { IRoom } from "@/interfaces/room.interface"
+import { IRoom } from "@/interfaces/index"
 
 // Room Schema
 export const roomSchema = new Schema<IRoom>(
