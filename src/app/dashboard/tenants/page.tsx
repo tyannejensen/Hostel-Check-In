@@ -60,7 +60,7 @@ export default async function Page() {
 
           <div className="rounded-xl table-container border bg-card text-card-foreground shadow">
             <div className="button-container align-middle content-center">
-              <h1 className="pb-[20px]">Reservations</h1>
+              <h1 className="pb-[20px]">Tenants</h1>
               <div className="add-new-button-container">
                 <div className="add-button-container circular-styled-container">
                   <Link
