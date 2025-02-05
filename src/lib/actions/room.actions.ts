@@ -14,10 +14,10 @@ export async function getRooms() {
 	return roomsAsObj
 }
 
-export async function getRoomById(_id: string) {
+export async function getRoomById(roomId: string) {
 	await dbConnect()
 
-	const room = await Room.findById(_id)
+	const room = await Room.findById(roomId)
 		.populate("occupants", "name")
 		.select("roomType roomNumber status costPerDay name size occupants")
 
@@ -32,15 +32,17 @@ export async function createRoom(data: any) {
 
 	const newRoom = new Room(data)
 	const room = await newRoom.save()
-	return room
+	return room.toObject()
 }
 
-export async function updateRoom(_id: string, data: any) {
+export async function updateRoom(roomId: string, data: any) {
 	await dbConnect()
 
-	const room = await Room.findByIdAndUpdate(_id, data, {
+	// TODO: replace 'findByIdAndUpdate' with 'find() and save()'
+	// to use the 'pre' and 'post' hooks for history logging
+	const room = await Room.findByIdAndUpdate(roomId, data, {
 		new: true,
 		runValidators: true,
 	})
-	return room
+	return room.toObject()
 }
