@@ -2,7 +2,6 @@
 
 import mongoose from "mongoose"
 import { dbConnect } from "@/lib/db"
-import { NextRequest } from "next/server"
 import { Booking, Payment, PaymentMethod, User } from "@/models/index"
 
 // GET DATA
@@ -30,9 +29,7 @@ export async function getBookings() {
 		})
 		.select("_id bookedBy createdBy roomId checkIn checkOut status")
 
-	const bookingsAsObj = bookings.map((booking: any) =>
-		booking.toObject({ getters: true, virtuals: true })
-	)
+	const bookingsAsObj = bookings.map((booking: any) => booking.toObject())
 
 	// Ensure final data is fully JSON-serializable
 	return bookingsAsObj
@@ -95,7 +92,6 @@ export async function getBookingsByTenantId(id: string) {
 }
 
 // SET DATA
-
 export async function addBookingAndPayment(data: any, userId: string) {
 	// Connect to the database
 	await dbConnect()
