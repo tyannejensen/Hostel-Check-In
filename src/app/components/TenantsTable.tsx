@@ -17,7 +17,7 @@ interface TenantsTableProps {
 export default function TenantsTable({ tenants }: TenantsTableProps) {
   const router = useRouter();
   function handleNavigateToReservationByID(id: string) {
-    router.push(`/dashboard/reservations/${id}`);
+    router.push(`/dashboard/tenants/${id}`);
   }
 
   return (

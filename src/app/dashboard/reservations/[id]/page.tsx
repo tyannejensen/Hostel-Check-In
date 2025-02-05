@@ -1,35 +1,36 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import "@/styles/global.css"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useParams } from "next/navigation"
-import { headers } from "next/headers"
-import { addBookingAndPayments } from "@/actions/booking.actions"
+import React, { useEffect, useState } from "react";
+import "@/styles/global.css";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useParams } from "next/navigation";
+// import { headers } from "next/headers"
+import { addBookingAndPayments } from "@/actions/booking.actions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Define the Reservation interface
 interface Reservation {
-  id: string
-  name: string
-  phone: string
-  email: string
-  room: string
-  checkInDate: string
-  checkOutDate: string
-  deposit: string
-  totalCharge: string
-  totalPaymentDue: string
-  notes: string
-  transactionHistory: { date: string, amount: string, description: string }[]
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  room: string;
+  checkInDate: string;
+  checkOutDate: string;
+  deposit: string;
+  totalCharge: string;
+  totalPaymentDue: string;
+  notes: string;
+  transactionHistory: { date: string; amount: string; description: string }[];
 }
 
-export default async function Page() {
-  const { id } = useParams()
-  const [reservation, setReservation] = useState<Reservation | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export default function Page() {
+  const { id } = useParams();
+  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchReservation = async () => {
@@ -49,40 +50,43 @@ export default async function Page() {
           notes: "No special requests.",
           transactionHistory: [
             { date: "2025-01-01", amount: "$100", description: "Deposit" },
-            { date: "2025-01-10", amount: "$200", description: "Partial Payment" },
+            {
+              date: "2025-01-10",
+              amount: "$200",
+              description: "Partial Payment",
+            },
           ],
-        }
+        };
         // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        setReservation(mockData)
+        setReservation(mockData);
       } catch (error: any) {
-        setError(error.message)
+        setError(error.message);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchReservation()
-  }, [id])
+    fetchReservation();
+  }, [id]);
 
   const handleAddBookingAndPayment = async () => {
     try {
-      const reqHeaders = await headers()
-      const userId = reqHeaders.get("x-user-id")
-      const data = {
-        // Add necessary data here
-        date: new Date().toISOString(),
-        reservationId: id,
-      }
-      const booking = await addBookingAndPayments(data, userId)
-      console.log("Booking and payment added:", booking)
+      // const reqHeaders = await headers()
+      // const userId = reqHeaders.get("x-user-id");
+      // const data = {
+      //   // Add necessary data here
+      //   date: new Date().toISOString(),
+      //   reservationId: id,
+      // };
+      // const booking = await addBookingAndPayments(data, userId);
+      // console.log("Booking and payment added:", booking);
     } catch (error) {
-      console.error("Error adding booking and payment:", error)
+      console.error("Error adding booking and payment:", error);
     }
-  }
+  };
 
   if (loading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   if (error) {
@@ -91,11 +95,11 @@ export default async function Page() {
         <h1>Error</h1>
         <p>{error}</p>
       </div>
-    )
+    );
   }
 
   if (!reservation) {
-    return <div>No reservation found</div>
+    return <div>No reservation found</div>;
   }
 
   return (
@@ -105,7 +109,9 @@ export default async function Page() {
 
         <Card className="min-w-3xs bg-[var(--highlight)] rounded-md border p-4">
           <CardHeader>
-            <CardTitle className="text-3xl font-semibold">Reservation Details</CardTitle>
+            <CardTitle className="text-3xl font-semibold">
+              Reservation Details
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-between items-center">
@@ -123,15 +129,30 @@ export default async function Page() {
             <Separator className="my-4" />
             <div className="flex">
               <div className="w-1/2 p-4 border rounded-md">
-                <p><strong>Room:</strong> {reservation.room}</p>
-                <p><strong>Check-In Date:</strong> {reservation.checkInDate}</p>
-                <p><strong>Check-Out Date:</strong> {reservation.checkOutDate}</p>
-                <p><strong>Deposit:</strong> {reservation.deposit}</p>
-                <p><strong>Total Charge:</strong> {reservation.totalCharge}</p>
-                <p><strong>Total Payment Due:</strong> {reservation.totalPaymentDue}</p>
+                <p>
+                  <strong>Room:</strong> {reservation.room}
+                </p>
+                <p>
+                  <strong>Check-In Date:</strong> {reservation.checkInDate}
+                </p>
+                <p>
+                  <strong>Check-Out Date:</strong> {reservation.checkOutDate}
+                </p>
+                <p>
+                  <strong>Deposit:</strong> {reservation.deposit}
+                </p>
+                <p>
+                  <strong>Total Charge:</strong> {reservation.totalCharge}
+                </p>
+                <p>
+                  <strong>Total Payment Due:</strong>{" "}
+                  {reservation.totalPaymentDue}
+                </p>
               </div>
               <div className="w-1/2 p-4 border rounded-md ml-4">
-                <p><strong>Notes:</strong></p>
+                <p>
+                  <strong>Notes:</strong>
+                </p>
                 <p>{reservation.notes}</p>
               </div>
             </div>
@@ -140,7 +161,10 @@ export default async function Page() {
               <h2 className="text-xl font-bold">Transaction History</h2>
               <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
                 {reservation.transactionHistory.map((transaction, index) => (
-                  <div key={index} className="flex justify-between items-center border-b py-2">
+                  <div
+                    key={index}
+                    className="flex justify-between items-center border-b py-2"
+                  >
                     <p>{transaction.date}</p>
                     <p>{transaction.amount}</p>
                     <p>{transaction.description}</p>
@@ -152,7 +176,7 @@ export default async function Page() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
 
 // // import { getTenantById } from "@/lib/data";
