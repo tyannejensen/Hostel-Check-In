@@ -16,7 +16,7 @@ interface ReservationTableProps {
 
 export default function ReservationsTable({ bookings }: ReservationTableProps) {
   const router = useRouter();
-  function handleNavigateToReservationByID(id: string) {
+  function handleNavigateToReservationById(id: string) {
     router.push(`/dashboard/reservations/${id}`);
   }
 
@@ -37,7 +37,7 @@ export default function ReservationsTable({ bookings }: ReservationTableProps) {
             <TableRow
               key={index}
               className="table-data-row"
-              onClick={() => handleNavigateToReservationByID(rowData.id)}
+              onClick={() => handleNavigateToReservationById(rowData.id)}
             >
               <TableCell>{rowData.name}</TableCell>
               <TableCell>{rowData.room}</TableCell>
