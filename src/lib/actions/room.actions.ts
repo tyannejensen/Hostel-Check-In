@@ -18,8 +18,8 @@ export async function getRoomById(roomId: string) {
 	await dbConnect()
 
 	const room = await Room.findById(roomId)
-		.populate("occupants", "name")
-		.select("roomType roomNumber status costPerDay name size occupants")
+		.populate("occupants", "fullname")
+		.select("roomType roomNumber status costPerDay deposit name size occupants")
 
 	const roomObj = room.toObject()
 	return roomObj
