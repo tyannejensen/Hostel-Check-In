@@ -15,7 +15,7 @@ export async function getBookings() {
 		.populate("roomId", "roomNumber roomType")
 		.populate({
 			path: "payments",
-			select: "amount",
+			select: "amount paymentMethod",
 			populate: {
 				path: "paymentMethod",
 				select: "method paymentName",
@@ -28,13 +28,14 @@ export async function getBookings() {
 				select: "fullname",
 			},
 		})
+		.select("_id bookedBy createdBy roomId checkIn checkOut status")
 
 	const bookingsAsObj = bookings.map((booking: any) =>
-		booking.toObject({ getters: true, virtuals: false })
+		booking.toObject({ getters: true, virtuals: true })
 	)
 
 	// Ensure final data is fully JSON-serializable
-	return JSON.parse(JSON.stringify(bookingsAsObj))
+	return bookingsAsObj
 }
 
 export async function getBookingById(id: string) {
@@ -46,7 +47,7 @@ export async function getBookingById(id: string) {
 		.populate("roomId", "roomNumber roomType")
 		.populate({
 			path: "payments",
-			select: "amount",
+			select: "amount paymentMethod",
 			populate: {
 				path: "paymentMethod",
 				select: "method paymentName",
@@ -59,26 +60,22 @@ export async function getBookingById(id: string) {
 				select: "fullname",
 			},
 		})
+		.select("_id bookedBy createdBy roomId checkIn checkOut status")
 
 	const bookingObj = booking.toObject()
 	return bookingObj
 }
 
-export async function getBookingsByTenantId(req: NextRequest) {
+export async function getBookingsByTenantId(id: string) {
 	await dbConnect()
 
-	const userId = req.headers.get("x-user-id")
-	if (!userId) {
-		throw new Error("User ID not found in request headers")
-	}
-
-	const tenantBookings = await Booking.find({ bookedBy: userId })
+	const tenantBookings = await Booking.find({ bookedBy: id })
 		.populate("bookedBy", "fullname email")
 		.populate("createdBy", "fullname")
 		.populate("roomId", "roomNumber roomType")
 		.populate({
 			path: "payments",
-			select: "amount",
+			select: "amount paymentMethod",
 			populate: {
 				path: "paymentMethod",
 				select: "method paymentName",
@@ -91,6 +88,7 @@ export async function getBookingsByTenantId(req: NextRequest) {
 				select: "fullname",
 			},
 		})
+		.select("_id bookedBy createdBy roomId checkIn checkOut status")
 
 	const tenantBookingsObjs = tenantBookings.map((booking) => booking.toObject())
 	return tenantBookingsObjs
@@ -160,12 +158,3 @@ export async function addBookingAndPayment(data: any, userId: string) {
 		throw new Error(`Failed to create booking and payment: ${String(error)}`)
 	}
 }
-
-// addNewReservation()
-// - tenantId: the tenant the reservation will be under
-// - checkInDate
-// - checkOutDate
-// - roomId
-// - totalCost
-// - deposit
-// - status: paid, not-paid, pending
