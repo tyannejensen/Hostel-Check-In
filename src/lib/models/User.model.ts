@@ -143,6 +143,9 @@ UserSchema.post("findOneAndUpdate", logChanges);
 // UserSchema.pre("findOneAndUpdate", getOldDoc)
 // // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
 // UserSchema.post("findOneAndUpdate", logChanges)
+// UserSchema.pre("findOneAndUpdate", getOldDoc)
+// // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
+// UserSchema.post("findOneAndUpdate", logChanges)
 
 // UserSchema.pre("save", logHistory)
 >>>>>>> main
