@@ -1,5 +1,9 @@
+"use server"
+
+import mongoose from "mongoose"
 import { dbConnect } from "@/lib/db"
-import { Booking } from "@/models/Booking.model"
+import { NextRequest } from "next/server"
+import { Booking, Payment, User } from "@/models/index"
 
 // GET DATA
 export async function getBookings() {
@@ -89,12 +93,71 @@ export async function getBookingsByTenantId(id: string) {
 
 // SET DATA
 
-export async function createBooking(data: any) {
-	await dbConnect()
+// {
+//   "dateRange": {
+//       "from": "2025-02-04T07:00:00.000Z",
+//       "to": "2025-02-08T07:00:00.000Z"
+//   },
+//   "name": {
+//       "value": "1",
+//       "label": "Peter"
+//   },
+//   "room": {
+//       "value": "2",
+//       "label": "102"
+//   },
+//   "total": "400",
+//   "status": "pending",
+//   "deposit": "200.00"
+// }
 
-	const booking = await Booking.create(data)
-	const bookingObj = booking.toObject()
-	return bookingObj
+export async function addBooking(req: NextRequest, data: any) {
+	// Step 1: Create Session
+	const session = await mongoose.startSession()
+	session.startTransaction()
+
+	try {
+		// Step 2: Create Booking (initially without a payment reference) and save it
+		const booking = new Booking({
+			bookedBy: data.name.value, // tenantId - uuid v4
+			createdBy: req.headers.get("x-user-id"),
+			roomId: data.room.value, // roomId - ObjectId
+			checkIn: new Date(data.dateRange.from),
+			checkOut: new Date(data.dateRange.to),
+			status: data.status,
+			depositAmount: data.deposit,
+		})
+		await booking.save({ session })
+
+		// Step 3: Get a Paymebt Method to use with the Payment
+		const paymentMethod = await User.findById(data.name.value, {
+			paymentMethods: { $elemMatch: { isPrimary: true } },
+		}).session(session)
+
+		// Step 4: Create Payment and save it
+		const payment = new Payment({
+			bookingId: booking._id,
+			amount: Number(data.total),
+			paidBy: data.name.value,
+			paymentMethod: paymentMethod.paymentMethods[0]._id,
+		})
+		await payment.save({ session })
+
+		// Step 5: Update Booking with the Payment reference
+		booking.payments.push(payment._id)
+		await booking.save({ session })
+
+		// Step 6: Commit the transaction
+		await session.commitTransaction()
+		session.endSession()
+
+		// Step 7: Return the booking object
+		return booking.toObject()
+	} catch (error) {
+		await session.abortTransaction()
+		session.endSession()
+		throw new Error(`Failed to create booking and payment: ${String(error)}`)
+	}
 }
 
 // addNewReservation()
