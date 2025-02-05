@@ -3,7 +3,7 @@
 import mongoose from "mongoose"
 import { dbConnect } from "@/lib/db"
 import { NextRequest } from "next/server"
-import { Booking, Payment, User } from "@/models/index"
+import { Booking, Payment, PaymentMethod, User } from "@/models/index"
 
 // GET DATA
 export async function getBookings() {
@@ -67,9 +67,9 @@ export async function getBookingById(id: string) {
 export async function getBookingsByTenantId(req: NextRequest) {
 	await dbConnect()
 
-	const userId = req.headers.get("x-user-id");
+	const userId = req.headers.get("x-user-id")
 	if (!userId) {
-	  throw new Error("User ID not found in request headers");
+		throw new Error("User ID not found in request headers")
 	}
 
 	const tenantBookings = await Booking.find({ bookedBy: userId })
@@ -98,25 +98,10 @@ export async function getBookingsByTenantId(req: NextRequest) {
 
 // SET DATA
 
-// {
-//   "dateRange": {
-//       "from": "2025-02-04T07:00:00.000Z",
-//       "to": "2025-02-08T07:00:00.000Z"
-//   },
-//   "name": {
-//       "value": "1",
-//       "label": "Peter"
-//   },
-//   "room": {
-//       "value": "2",
-//       "label": "102"
-//   },
-//   "total": "400",
-//   "status": "pending",
-//   "deposit": "200.00"
-// }
+export async function addBookingAndPayment(data: any, userId: string) {
+	// Connect to the database
+	await dbConnect()
 
-export async function addBookingAndPayment(req: NextRequest, data: any) {
 	// Step 1: Create Session
 	const session = await mongoose.startSession()
 	session.startTransaction()
@@ -125,7 +110,7 @@ export async function addBookingAndPayment(req: NextRequest, data: any) {
 		// Step 2: Create Booking (initially without a payment reference) and save it
 		const booking = new Booking({
 			bookedBy: data.name.value, // tenantId - uuid v4
-			createdBy: req.headers.get("x-user-id"),
+			createdBy: userId, // userId - ObjectId
 			roomId: data.room.value, // roomId - ObjectId
 			checkIn: new Date(data.dateRange.from),
 			checkOut: new Date(data.dateRange.to),
@@ -134,19 +119,30 @@ export async function addBookingAndPayment(req: NextRequest, data: any) {
 		})
 		await booking.save({ session })
 
+		console.log("function addBookingAndPayment -> booking", booking)
+
 		// Step 3: Get a Paymebt Method to use with the Payment
-		const paymentMethod = await User.findById(data.name.value, {
-			paymentMethods: { $elemMatch: { isPrimary: true } },
+		const paymentMethod = await PaymentMethod.findOne({
+			userId: data.name.value,
 		}).session(session)
+
+		console.group(
+			// debugging
+			"function addBookingAndPayment -> paymentMethod: ",
+			paymentMethod
+		)
 
 		// Step 4: Create Payment and save it
 		const payment = new Payment({
 			bookingId: booking._id,
 			amount: Number(data.total),
 			paidBy: data.name.value,
-			paymentMethod: paymentMethod.paymentMethods[0]._id,
+			createdBy: userId,
+			paymentMethod: paymentMethod._id,
 		})
 		await payment.save({ session })
+
+		console.log("function addBookingAndPayment -> payment", payment)
 
 		// Step 5: Update Booking with the Payment reference
 		booking.payments.push(payment._id)
