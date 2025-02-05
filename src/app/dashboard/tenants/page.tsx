@@ -34,6 +34,7 @@ export default async function Page() {
     console.log(tenants);
     return tenants.map((tenant: any) => {
       return {
+        _id: tenant._id,
         name: tenant.fullname,
         phone: tenant.phoneNumbers.find((phone: any) => phone.isPrimary).number,
         email: tenant.email,
