@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Noop, RefCallBack, useForm } from "react-hook-form";
 import "@/styles/global.css";
 import { Button } from "@/components/ui/button";
+import { saveTenant } from "@/actions/tenant.actions";
 
 import {
   Form,
@@ -36,6 +37,7 @@ const formSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   email: z.string().email(),
+  password: z.string().min(6, "Password must be at least 6 characters"), 
   phone: z.string(),
   address: z.string(),
   city: z.string(),
@@ -48,13 +50,18 @@ const formSchema = z.object({
     method: z.string(),
     cardHolderName: z.string(),
     cardNumber: z.string(),
-    expirationDate: z.date(),
+    expirationDate: z.string(),
     cvv: z.string(),
-  }),
+    routingNumber: z.string().optional(),
+    accountNumber: z.string().optional(),
+    bankName: z.string().optional(),
+  }).optional(),
 });
 
 export default function Page() {
   const [paymentMethodType, setPaymentMethodType] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [success, setSuccess] = React.useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,6 +69,7 @@ export default function Page() {
       firstName: "",
       lastName: "",
       email: "",
+      password: "",
       phone: "",
       address: "",
       city: "",
@@ -70,9 +78,20 @@ export default function Page() {
     },
   });
 
-  function handleFormSubmit(form: any) {
-    const values = form.getValues();
+  async function handleFormSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+
+    // Save the tenant to the database
+    const response = await saveTenant(values);
+    if (response.error) {
+      setError(response.message);
+      setSuccess("");
+    } else {
+      setError("");
+      setSuccess("Tenant Created Successfully");
+      form.reset();
+      // Handle successful tenant creation (e.g., redirect to tenant list)
+    }
   }
 
   function handlePaymentMethodSelected(value: string, field: any) {
@@ -150,6 +169,24 @@ export default function Page() {
                       <div className="label-title whitespace-nowrap">Email</div>
                       <FormControl>
                         <Input
+                          {...field}
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="b-box">
+                      <div className="label-title whitespace-nowrap">Password</div>
+                      <FormControl>
+                        <Input
+                          type="password"
                           {...field}
                           value={field.value || ""}
                           onChange={field.onChange}
@@ -442,10 +479,11 @@ export default function Page() {
                   <Button
                     className="mt-[20px] submit-button"
                     type="button"
-                    onClick={() => handleFormSubmit(form)}
+                    onClick={form.handleSubmit(handleFormSubmit)}
                   >
                     Submit
                   </Button>
+                  {success && <p className="text-green-500 ml-4">{success}</p>}
                 </div>
               </form>
             </Form>

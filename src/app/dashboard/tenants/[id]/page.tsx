@@ -15,84 +15,84 @@ import { mock } from "node:test";
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
 
 //remove this line after uncommenting the fetch request in the fetchTenants function
-const mockData = {
-  id: "1",
-  name: "John Doe",
-  email: "test@gmail.com",
-  dob: "01/01/1980",
-  phoneNumber: "444-444-4444",
-  address: "1234 Elm St",
-  city: "Springfield",
-  state: "IL",
-  zip: "62704",
-  reservationHistory: [
-    {
-      roomNumber: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-    },
-    {
-      roomNumber: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-    },
-    {
-      roomNumber: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-    },
-    {
-      roomNumber: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-    },
-    {
-      roomNumber: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-    },
-  ],
-  transactionHistory: [
-    {
-      paymentHistory: [
-        {
-          date: "01/01/2025",
-          amount: "$250.00",
-          type: "credit",
-        },
-      ],
-      notifications: [
-        {
-          date: "01/01/2025",
-          message: "Payment received",
-          user: "Luke Skywalker",
-        },
-      ],
-    },
-  ],
-  notes: [
-    {
-      comment: "Broke the blinds in room 444. Will need to replace.",
-      user: "Luke Skywalker",
-      date: "01/01/2025",
-    },
-    {
-      comment: "Broke the blinds in room 444. Will need to replace.",
-      user: "Luke Skywalker",
-      date: "01/01/2025",
-    },
-    {
-      comment: "Broke the blinds in room 444. Will need to replace.",
-      user: "Luke Skywalker",
-      date: "01/01/2025",
-    },
-    {
-      comment: "Broke the blinds in room 444. Will need to replace.",
-      user: "Luke Skywalker",
-      date: "01/01/2025",
-    },
-  ],
-};
+// const mockData = {
+//   id: "1",
+//   name: "John Doe",
+//   email: "test@gmail.com",
+//   dob: "01/01/1980",
+//   phoneNumber: "444-444-4444",
+//   address: "1234 Elm St",
+//   city: "Springfield",
+//   state: "IL",
+//   zip: "62704",
+//   reservationHistory: [
+//     {
+//       roomNumber: "444",
+//       checkInDate: "Jan 01, 2025",
+//       checkOutDate: "Jan 15, 2025",
+//     },
+//     {
+//       roomNumber: "444",
+//       checkInDate: "Jan 01, 2025",
+//       checkOutDate: "Jan 15, 2025",
+//     },
+//     {
+//       roomNumber: "444",
+//       checkInDate: "Jan 01, 2025",
+//       checkOutDate: "Jan 15, 2025",
+//     },
+//     {
+//       roomNumber: "444",
+//       checkInDate: "Jan 01, 2025",
+//       checkOutDate: "Jan 15, 2025",
+//     },
+//     {
+//       roomNumber: "444",
+//       checkInDate: "Jan 01, 2025",
+//       checkOutDate: "Jan 15, 2025",
+//     },
+//   ],
+//   transactionHistory: [
+//     {
+//       paymentHistory: [
+//         {
+//           date: "01/01/2025",
+//           amount: "$250.00",
+//           type: "credit",
+//         },
+//       ],
+//       notifications: [
+//         {
+//           date: "01/01/2025",
+//           message: "Payment received",
+//           user: "Luke Skywalker",
+//         },
+//       ],
+//     },
+//   ],
+//   notes: [
+//     {
+//       comment: "Broke the blinds in room 444. Will need to replace.",
+//       user: "Luke Skywalker",
+//       date: "01/01/2025",
+//     },
+//     {
+//       comment: "Broke the blinds in room 444. Will need to replace.",
+//       user: "Luke Skywalker",
+//       date: "01/01/2025",
+//     },
+//     {
+//       comment: "Broke the blinds in room 444. Will need to replace.",
+//       user: "Luke Skywalker",
+//       date: "01/01/2025",
+//     },
+//     {
+//       comment: "Broke the blinds in room 444. Will need to replace.",
+//       user: "Luke Skywalker",
+//       date: "01/01/2025",
+//     },
+//   ],
+// };
 // __________________ This code is to help with the ScrollArea component __________________
 // const tags = Array.from({ length: 50 }).map(
 //   (_, i, a) => `v1.2.0-beta.${a.length - i}`
@@ -100,40 +100,40 @@ const mockData = {
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
-  console.log(id);
+  // console.log(id); for debugging
   const tenant = await getTenantById(id);
   const notes = tenant.bookings.flatMap((booking: any) => booking.notes);
-  console.log(notes);
+  // console.log(notes); for debugging
 
   
 
-  mockData.reservationHistory = tenant.bookings.map((booking: any) => {
-    return {
-      roomNumber: booking.roomId.roomNumber,
-      checkInDate: booking.checkIn,
-      checkOutDate: booking.checkOut,
-    };
-  });
+  // mockData.reservationHistory = tenant.bookings.map((booking: any) => {
+  //   return {
+  //     roomNumber: booking.roomId.roomNumber,
+  //     checkInDate: booking.checkIn,
+  //     checkOutDate: booking.checkOut,
+  //   };
+  // });
 
 
 
-  const fetchTenant = async (): Promise<any> => {
-    let result = null;
-    // TODO: replace with actual fetch request
-    // result = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then((res) => res.json());
-    // mock return data
+  // const fetchTenant = async (): Promise<any> => {
+  //   let result = null;
+  //   // TODO: replace with actual fetch request
+  //   // result = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then((res) => res.json());
+  //   // mock return data
 
-    // After uncommenting the above code delete this result assignment
-    result = new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(mockData);
-      }, 200);
-    }).then((data) => {
-      return data;
-    });
+  //   // After uncommenting the above code delete this result assignment
+  //   result = new Promise((resolve) => {
+  //     setTimeout(() => {
+  //       resolve(mockData);
+  //     }, 200);
+  //   }).then((data) => {
+  //     return data;
+  //   });
 
-    return result;
-  };
+  //   return result;
+  // };
 
 
   // TODO: create function to fetch the a tenant by id -> add function to data.ts file
