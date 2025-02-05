@@ -193,4 +193,5 @@ UserSchema.set("toJSON", {
 // None
 
 // Compile and export User model
+
 export const User = models.User || model<IUser>("User", UserSchema);

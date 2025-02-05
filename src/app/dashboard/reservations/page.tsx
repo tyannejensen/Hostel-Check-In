@@ -22,40 +22,6 @@ export default async function Page() {
   const bookings = await getBookings();
 
   console.log(bookings);
-  const data = [
-    {
-      name: "John E Doe.",
-      room: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-      status: "paid",
-      statusLabel: "Paid",
-    },
-    {
-      name: "John E Doe.",
-      room: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-      status: "paid",
-      statusLabel: "Paid",
-    },
-    {
-      name: "John E Doe.",
-      room: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-      status: "not-paid",
-      statusLabel: "Not Paid",
-    },
-    {
-      name: "John E Doe.",
-      room: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-      status: "paid",
-      statusLabel: "Paid",
-    },
-  ];
 
   const statusMap: { [key in "paid" | "not-paid" | "pending"]: string } = {
     paid: "Paid",
@@ -67,7 +33,7 @@ export default async function Page() {
     return bookings.map((booking: any) => {
       return {
         name: booking.bookedBy.fullname,
-        room: booking.roomId,
+        room: booking.roomId.roomNumber, // Extract the room number from the roomId object
         checkInDate: booking.checkIn,
         checkOutDate: booking.checkOut,
         status: booking.status,
