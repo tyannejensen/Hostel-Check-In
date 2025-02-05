@@ -111,7 +111,7 @@ export async function getBookingsByTenantId(id: string) {
 //   "deposit": "200.00"
 // }
 
-export async function addBooking(req: NextRequest, data: any) {
+export async function addBookingAndPayment(req: NextRequest, data: any) {
 	// Step 1: Create Session
 	const session = await mongoose.startSession()
 	session.startTransaction()
