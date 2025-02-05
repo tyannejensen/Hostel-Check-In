@@ -18,6 +18,7 @@ import Link from "next/link";
 import { getBookings } from "@/actions/booking.actions";
 import { IBooking } from "@/lib/types/interfaces/booking.interface";
 import { getTenants } from "@/actions/tenant.actions";
+import TenantsTable from "@/components/TenantsTable";
 
 export default async function Page() {
   const tenants = await getTenants();
@@ -30,6 +31,7 @@ export default async function Page() {
   };
 
   function convertTenantIntoTableData(tenants: any) {
+    console.log(tenants);
     return tenants.map((tenant: any) => {
       return {
         name: tenant.fullname,
@@ -39,7 +41,6 @@ export default async function Page() {
       };
     });
   }
-
 
   return (
     <>
@@ -61,28 +62,7 @@ export default async function Page() {
                 </div>
               </div>
             </div>
-            <Table>
-              <TableHeader className="table-row-header">
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Phone #</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Balance Due</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {convertTenantIntoTableData(tenants).map((rowData: any, index: number) => {
-                  return (
-                    <TableRow key={index} className="table-data-row">
-                      <TableCell>{rowData.name}</TableCell>
-                      <TableCell>{rowData.phone}</TableCell>
-                      <TableCell>{rowData.email}</TableCell>
-                      <TableCell>{rowData.balance}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <TenantsTable tenants={convertTenantIntoTableData(tenants)} />
           </div>
         </div>
       </div>

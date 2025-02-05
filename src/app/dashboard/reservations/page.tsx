@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { getBookings } from "@/actions/booking.actions";
 import { IBooking } from "@/lib/types/interfaces/booking.interface";
+import ReservationsTable from "../../components/ReservationsTable";
 
 export default async function Page() {
   const bookings = await getBookings();
@@ -30,8 +31,10 @@ export default async function Page() {
   };
 
   function convertBookingIntoTableData(bookings: any) {
+    console.log(bookings);
     return bookings.map((booking: any) => {
       return {
+        id: booking.id,
         name: booking.bookedBy.fullname,
         room: booking.roomId.roomNumber, // Extract the room number from the roomId object
         checkInDate: booking.checkIn,
@@ -63,38 +66,9 @@ export default async function Page() {
                 </div>
               </div>
             </div>
-            <Table>
-              <TableHeader className="table-row-header">
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Room</TableHead>
-                  <TableHead>Check-In Date</TableHead>
-                  <TableHead>Check-Out Date</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {convertBookingIntoTableData(bookings).map(
-                  (rowData: any, index: number) => {
-                    return (
-                      <TableRow key={index} className="table-data-row">
-                        <TableCell>{rowData.name}</TableCell>
-                        <TableCell>{rowData.room}</TableCell>
-                        <TableCell>{rowData.checkInDate}</TableCell>
-                        <TableCell>{rowData.checkOutDate}</TableCell>
-                        <TableCell className="cell-status-container">
-                          <div
-                            className={rowData.status + "-status cell-status"}
-                          >
-                            {rowData.statusLabel}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  }
-                )}
-              </TableBody>
-            </Table>
+            <ReservationsTable
+              bookings={convertBookingIntoTableData(bookings)}
+            />
           </div>
         </div>
       </div>
