@@ -5,55 +5,19 @@ import { z } from "zod";
 import { cn } from "@/client-utils/index";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Noop, RefCallBack, useForm } from "react-hook-form";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 import "@/styles/global.css";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 
-import { Check, ChevronsUpDown } from "lucide-react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import {
   Select,
   SelectContent,
@@ -61,10 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { roomsData } from "@/lib/utils/test-data";
-import { on } from "events";
-import exp from "constants";
-import { set } from "mongoose";
 
 const paymentOptions = [
   { label: "Credit", value: "credit" },

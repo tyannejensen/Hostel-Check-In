@@ -308,7 +308,7 @@ async function updateUser(admin: IUser, id: string, updates: {}) {
 
 async function updateUserSave(admin: IUser, id: string) {
 	const selectedUser = await User.findOne({ _id: id })
-	selectedUser.lastName = "johnson"
+	selectedUser.lastName = "johnsoon"
 	selectedUser.email = "the.johnson@test.com"
 	selectedUser.paymentMethods.push({
 		isPrimary: false,

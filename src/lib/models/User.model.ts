@@ -135,6 +135,11 @@ const UserSchema = new Schema<IUser>(
 
 // Record document updates in the history array
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
+<<<<<<< HEAD
+UserSchema.pre("findOneAndUpdate", getOldDoc);
+// Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
+UserSchema.post("findOneAndUpdate", logChanges);
+=======
 // UserSchema.pre("findOneAndUpdate", getOldDoc)
 // // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
 // UserSchema.post("findOneAndUpdate", logChanges)
@@ -143,54 +148,59 @@ const UserSchema = new Schema<IUser>(
 // UserSchema.post("findOneAndUpdate", logChanges)
 
 // UserSchema.pre("save", logHistory)
+>>>>>>> main
 
 // Pre-save hook to hash password
 UserSchema.pre<IUser>("save", async function (next) {
-	if (this.isNew || this.isModified("password")) {
-		const saltRounds = 10
-		this.password = await bcrypt.hash(this.password, saltRounds)
-	}
-	next()
-})
+  if (this.isNew || this.isModified("password")) {
+    const saltRounds = 10;
+    this.password = await bcrypt.hash(this.password, saltRounds);
+  }
+  next();
+});
 
 // METHODS
 // Check if the password is correct
 UserSchema.methods.isCorrectPassword = async function (
-	password: string
+  password: string
 ): Promise<boolean> {
-	return bcrypt.compare(password, this.password)
-}
+  return bcrypt.compare(password, this.password);
+};
 
 // GETTERS
 // Convert the 'createdAt' field to MMM DD, YYYY format e.g. Jan 30, 2025
-UserSchema.path("createdAt").get(formatDate)
-UserSchema.path("updatedAt").get(formatDate)
+UserSchema.path("createdAt").get(formatDate);
+UserSchema.path("updatedAt").get(formatDate);
 
 // SETTERS
 // Set toObject options to exclude _id and password fields automatically
 UserSchema.set("toObject", {
-	getters: true,
-	virtuals: true,
-	transform: function (doc, ret) {
-		delete ret._id // Exclude _id field
-		delete ret.__v // Exclude __v (version) field
-		delete ret.password // Exclude password field
-	},
-})
+  getters: true,
+  virtuals: true,
+  transform: function (doc, ret) {
+    delete ret._id; // Exclude _id field
+    delete ret.__v; // Exclude __v (version) field
+    delete ret.password; // Exclude password field
+  },
+});
 
 // Set toJSON options to exclude _id and password fields automatically
 UserSchema.set("toJSON", {
-	virtuals: true,
-	getters: true,
-	transform: function (doc, ret) {
-		delete ret._id // Exclude _id field
-		delete ret.__v // Exclude __v (version) field
-		delete ret.password // Exclude password field
-	},
-})
+  virtuals: true,
+  getters: true,
+  transform: function (doc, ret) {
+    delete ret._id; // Exclude _id field
+    delete ret.__v; // Exclude __v (version) field
+    delete ret.password; // Exclude password field
+  },
+});
 
 // VIRTUALS
 // None
 
+<<<<<<< HEAD
+export const User = models.User || model<IUser>("User", UserSchema);
+=======
 // Compile and export User model
 export const User = models.User || model<IUser>("User", UserSchema)
+>>>>>>> main
