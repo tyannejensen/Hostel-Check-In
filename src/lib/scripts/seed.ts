@@ -307,18 +307,23 @@ async function updateUser(admin: IUser, id: string, updates: {}) {
 }
 
 async function updateUserSave(admin: IUser, id: string) {
+	// Update User to create a history log (using pre-save method)
 	const selectedUser = await User.findOne({ _id: id })
 	selectedUser.lastName = "johnsoon"
 	selectedUser.email = "the.johnson@test.com"
-	selectedUser.paymentMethods.push({
+	selectedUser.updatedBy = admin.id
+	const newPaymentMethod = new PaymentMethod({
+		userId: selectedUser.id,
 		isPrimary: false,
 		method: "credit",
-		cardNumber: "9999",
-		expiration: new Date("2029-08-1"),
+		cardNumberLastFour: "9999",
+		expirationDate: new Date("2029-08-1"),
 		cardBrand: "Discover",
 	})
-	selectedUser.paymentMethods[0].cardNumber = "4321"
-	selectedUser.paymentMethods[0].cardBrand = "Discover"
+	await newPaymentMethod.save()
+	selectedUser.paymentMethods.push(newPaymentMethod._id)
+	// selectedUser.paymentMethods[0].cardNumber = "4321"
+	// selectedUser.paymentMethods[0].cardBrand = "Discover"
 	selectedUser.updatedBy = admin.id
 	await selectedUser.save()
 	console.log("User fullname: ", selectedUser.toObject().fullname)
