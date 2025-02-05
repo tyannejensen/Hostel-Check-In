@@ -8,6 +8,7 @@ import { Separator } from "@radix-ui/react-separator";
 import Image from "next/image";
 import { Button } from "react-day-picker";
 import { DayPickerProvider, DayPicker } from "react-day-picker";
+import { getTenantById } from "@/actions/tenant.actions";
 
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
