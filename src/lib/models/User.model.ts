@@ -135,17 +135,11 @@ const UserSchema = new Schema<IUser>(
 
 // Record document updates in the history array
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
-<<<<<<< HEAD
-UserSchema.pre("findOneAndUpdate", getOldDoc);
-// Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-UserSchema.post("findOneAndUpdate", logChanges);
-=======
 // UserSchema.pre("findOneAndUpdate", getOldDoc)
 // // Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
 // UserSchema.post("findOneAndUpdate", logChanges)
 
 // UserSchema.pre("save", logHistory)
->>>>>>> main
 
 // Pre-save hook to hash password
 UserSchema.pre<IUser>("save", async function (next) {
@@ -195,9 +189,4 @@ UserSchema.set("toJSON", {
 // VIRTUALS
 // None
 
-<<<<<<< HEAD
 export const User = models.User || model<IUser>("User", UserSchema);
-=======
-// Compile and export User model
-export const User = models.User || model<IUser>("User", UserSchema)
->>>>>>> main
