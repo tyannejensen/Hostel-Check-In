@@ -32,13 +32,9 @@ export async function getTenants() {
 export async function getTenantById(id: string) {
   await dbConnect();
 
-  const tenant = await User.findById({ _id: id, role: "tenant" })
-    .populate("firstName", "lastName")
-    .populate("email", "phoneNumbers")
-    .populate("paymentMethods", "createdAt")
-    .populate("tags", "history")
-    .populate("createdBy", "updatedBy")
-    .populate("notes")
+  const tenant = await User.findOne({ _id: id, role: "tenant" })
+    .populate("fullname")
+    .populate("phoneNumbers")
     .populate({
       path: "bookings",
       populate: [
@@ -48,13 +44,21 @@ export async function getTenantById(id: string) {
         },
         {
           path: "notes",
+          populate: {
+            path: "createdBy",
+            select: "firstName lastName",
+          },
           select: "content createdBy createdAt",
+          options: { strictPopulate: false },
         },
       ],
     })
-    .select("_id firstName lastName email phoneNumbers bookings paymentMethods tags createdBy");
+    .select("_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags createdBy");
 
+  if (!tenant) {
+    throw new Error("Tenant not found");
+  }
 
-  const tenantObj = tenant.toObject();
+  const tenantObj = tenant.toObject({ getters: true, virtuals: false });
   return tenantObj;
 }
