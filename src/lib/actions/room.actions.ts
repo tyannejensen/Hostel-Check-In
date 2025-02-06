@@ -4,52 +4,45 @@ import { Room } from "@/models/Room.model"
 //GET DATA
 
 export async function getRooms() {
-    await dbConnect()
+	await dbConnect()
 
-    const rooms = await Room.find()
-    .populate("roomType", "name")
-    .populate("roomNumber", "name")
-    .populate("status", "name")
-    .populate("costPerDay", "name")
-    .populate("deposit", "name")
-    .populate("occupants", "name")
-    
+	const rooms = await Room.find().populate("occupants", "fullname")
 
-    const roomsAsObj = rooms.map((room: any) =>
-        room.toObject({ getters: true, virtuals: false })
-    )
+	const roomsAsObj = rooms.map((room: any) => room.toObject())
 
-    // Ensure final data is fully JSON-serializable
-    return JSON.parse(JSON.stringify(roomsAsObj))
+	// Ensure final data is fully JSON-serializable
+	return roomsAsObj
 }
 
-export async function getRoomById(_id: string) {
-    await dbConnect()
+export async function getRoomById(roomId: string) {
+	await dbConnect()
 
-    const room = await Room.findById(_id)
-    .populate("occupants", "name").select("roomType roomNumber status costPerDay name size occupants")
+	const room = await Room.findById(roomId)
+		.populate("occupants", "fullname")
+		.select("roomType roomNumber status costPerDay deposit name size occupants")
 
-    const roomObj = room.toObject()
-    return roomObj
+	const roomObj = room.toObject()
+	return roomObj
 }
 
-
-//SET DATA  
+//SET DATA
 
 export async function createRoom(data: any) {
-    await dbConnect()
+	await dbConnect()
 
-    const newRoom = new Room(data)
-    const room = await newRoom.save()
-    return room
+	const newRoom = new Room(data)
+	const room = await newRoom.save()
+	return room.toObject()
 }
 
-export async function updateRoom(_id: string, data: any) {
-    await dbConnect()
+export async function updateRoom(roomId: string, data: any) {
+	await dbConnect()
 
-    const room = await Room.findByIdAndUpdate(_id, data, {
-        new: true,
-        runValidators: true,
-    })
-    return room
+	// TODO: replace 'findByIdAndUpdate' with 'find() and save()'
+	// to use the 'pre' and 'post' hooks for history logging
+	const room = await Room.findByIdAndUpdate(roomId, data, {
+		new: true,
+		runValidators: true,
+	})
+	return room.toObject()
 }

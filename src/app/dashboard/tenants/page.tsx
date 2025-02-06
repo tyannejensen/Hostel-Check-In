@@ -22,18 +22,12 @@ import TenantsTable from "@/components/TenantsTable";
 
 export default async function Page() {
   const tenants = await getTenants();
-  console.log(tenants);
-
-  const statusMap: { [key in "paid" | "not-paid" | "pending"]: string } = {
-    paid: "Paid",
-    "not-paid": "Not Paid",
-    pending: "Pending",
-  };
 
   function convertTenantIntoTableData(tenants: any) {
     console.log(tenants);
     return tenants.map((tenant: any) => {
       return {
+        id: tenant.id,
         name: tenant.fullname,
         phone: tenant.phoneNumbers.find((phone: any) => phone.isPrimary).number,
         email: tenant.email,

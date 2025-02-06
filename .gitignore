@@ -132,3 +132,6 @@ dist
 
 # Testing MongoDB
 src/lib/scripts/test.ts
+
+#pnpm lockfile
+pnpm-lock.yaml
