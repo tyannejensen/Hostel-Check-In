@@ -1,7 +1,7 @@
 "use server"
 
-import { createDecipheriv } from "crypto";
-import { headers } from  "next/headers";
+import { createDecipheriv } from "crypto"
+import { headers } from "next/headers"
 import mongoose from "mongoose"
 import { dbConnect } from "@/lib/db"
 import { User } from "@/models/index"
@@ -34,6 +34,7 @@ export async function getTenants() {
 export async function getTenantById(id: string) {
 	await dbConnect()
 
+	// FIXME: Identify why the booking history for 'Alice Smith' is populating with the 'tenant' history on the tenant/{id} page
 	const tenant = await User.findOne({ _id: id, role: "tenant" })
 		.populate("fullname")
 		.populate("phoneNumbers")
@@ -51,18 +52,19 @@ export async function getTenantById(id: string) {
 						select: "firstName lastName",
 					},
 					select: "content createdBy createdAt",
-					options: { strictPopulate: false },
 				},
 				{
 					path: "history",
 					populate: {
 						path: "updatedBy",
 						select: "fullname",
-						populate: {
-							path: "updates",
-							select: "field oldValue newValue",
-							options: { strictPopulate: false },
-						},
+					},
+				},
+				{
+					path: "history",
+					populate: {
+						path: "updates",
+						select: "field oldValue newValue",
 					},
 				},
 			],
@@ -84,9 +86,9 @@ export async function getTenantById(id: string) {
 //save tenant as a user
 
 export async function saveTenant(payload: any) {
-  await dbConnect();
-  const reqHeaders = await headers()
-  const userId = reqHeaders.get("x-user-id")
+	await dbConnect()
+	const reqHeaders = await headers()
+	const userId = reqHeaders.get("x-user-id")
 	await dbConnect()
 
 	const firstName = payload.firstName
@@ -129,19 +131,19 @@ export async function saveTenant(payload: any) {
 			}
 		}
 
-    const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      password,
-      phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
-      address,
-      city,
-      state,
-      zip,
-      role: "tenant",
-      createdBy: userId,
-    });
+		const newUser = new User({
+			firstName,
+			lastName,
+			email,
+			password,
+			phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
+			address,
+			city,
+			state,
+			zip,
+			role: "tenant",
+			createdBy: userId,
+		})
 
 		console.log("Saving new user:", newUser)
 

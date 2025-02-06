@@ -297,7 +297,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 															<div className="-mt-5 pr-5 mb-2">
 																<Skeleton className="h-4 w-[250px]" />
 																<Skeleton className="h-4 w-[200px]" />
-																{`${logs.updatedBy.fullname} updated below data on ${logs.updatedAt}`}
+																{`${logs.updatedBy.fullname} updated the following data on ${logs.updatedAt}`}
 																<ul>
 																	{logs.updates.map(
 																		(log: ILog, index: number) => {
