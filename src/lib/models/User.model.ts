@@ -62,7 +62,6 @@ const UserSchema = new Schema<IUser>(
 		},
 		birthdate: {
 			type: String,
-			required: [true, "Birthdate is required"],
 		},
 		phoneNumbers: [PhoneNumberSchema],
 		role: {
