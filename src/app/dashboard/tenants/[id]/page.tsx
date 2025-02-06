@@ -13,7 +13,6 @@ import { mock } from "node:test"
 import { IBooking, IChangeLog, ILog } from "@/lib/types/interfaces"
 import Link from "next/link"
 
-
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
 
@@ -101,16 +100,20 @@ import Link from "next/link"
 //   (_, i, a) => `v1.2.0-beta.${a.length - i}`
 // )
 
+export const dynamic = "force-dynamic" // force the page to reload data upon navigation
+
 export default async function Page(props: { params: Promise<{ id: string }> }) {
-	const { id } = await props.params;
+	const { id } = await props.params
 	const tenant = await getTenantById(id)
-	console.log(tenant.id)
-	const notes = tenant.bookings.flatMap((booking: IBooking) => booking.notes)
+	// const notes = tenant.bookings.flatMap((booking: IBooking) => booking.notes) // update to support notes on User.
+	const notes = tenant.notes
 	const history = tenant.bookings.flatMap(
 		(booking: IBooking) => booking.history
 	)
 
-	// console.log(notes); for debugging
+	console.log(
+		`The notes for ${tenant.fullname} are below:\n${tenant.notes[0].createdBy}`
+	) // for debugging
 
 	// mockData.reservationHistory = tenant.bookings.map((booking: any) => {
 	//   return {

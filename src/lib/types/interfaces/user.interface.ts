@@ -4,6 +4,7 @@ import {
 	IPhoneNumber,
 	IPaymentMethod,
 	IChangeLog,
+	INote,
 } from "@/interfaces/index"
 import { IRole } from "@/mytypes/index"
 
@@ -24,6 +25,7 @@ export interface IUser extends Document {
 	createdAt?: Date
 	updatedAt?: Date
 	tags: string[]
+	notes: INote[] // reference to Note Subdocument
 	history: IChangeLog[] // reference to ChangeLog Subdocument
 	createdBy?: string // reference to the user (employee) who created the user - uses uuid v4
 	updatedBy?: string // reference to the user (employee) who updated the user - uses uuid v4

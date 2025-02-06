@@ -14,7 +14,7 @@ export async function getTenants() {
 
 	const tenants = await User.find({ role: "tenant" })
 		.select(
-			"_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags createdBy"
+			"_id firstName lastName fullName email phoneNumbers bookings history paymentMethods tags notes createdBy"
 		)
 		.populate({
 			path: "bookings",
@@ -40,6 +40,14 @@ export async function getTenantById(id: string) {
 		.populate("billingAddress")
 		.populate("birthdate")
 		.populate("phoneNumbers")
+		.populate({
+			path: "notes",
+			populate: {
+				path: "createdBy",
+				select: "firstName lastName",
+			},
+			select: "content createdBy createdAt",
+		})
 		.populate({
 			path: "bookings",
 			populate: [
@@ -72,7 +80,7 @@ export async function getTenantById(id: string) {
 			],
 		})
 		.select(
-			"_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags history createdBy"
+			"_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags history notes createdBy"
 		)
 
 	if (!tenant) {
@@ -115,7 +123,7 @@ export async function saveTenant(payload: any) {
 		!addressLineTwo ||
 		!city ||
 		!state ||
-		!postalCode	
+		!postalCode
 	) {
 		return { error: true, message: "Please fill in all fields" }
 	}
@@ -142,19 +150,19 @@ export async function saveTenant(payload: any) {
 			city,
 			state,
 			postalCode,
-		  };
+		}
 
-    const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      password,
-	  birthdate,
-      phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
-      billingAddress,
-      role: "tenant",
-      createdBy: userId,
-    });
+		const newUser = new User({
+			firstName,
+			lastName,
+			email,
+			password,
+			birthdate,
+			phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
+			billingAddress,
+			role: "tenant",
+			createdBy: userId,
+		})
 
 		console.log("Saving new user:", newUser)
 

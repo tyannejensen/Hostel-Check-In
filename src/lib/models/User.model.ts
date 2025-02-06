@@ -6,6 +6,7 @@ import { BillingAddressSchema } from "@/models/BillingAddress.schema" // require
 import { ChangeLogSchema } from "@/models/ChangeLog.schema" // require invidual import to avoid circular dependency
 import { PhoneNumberSchema } from "@/models/PhoneNumber.schema" // require invidual import to avoid circular dependency
 import { formatDate, logChanges } from "@/server-utils/helpers"
+import { NoteSchema } from "@/models/Note.schema"
 
 // User Schema
 const UserSchema = new Schema<IUser>(
@@ -104,6 +105,7 @@ const UserSchema = new Schema<IUser>(
 				},
 			},
 		],
+		notes: [NoteSchema],
 		history: {
 			type: [ChangeLogSchema],
 			default: [],

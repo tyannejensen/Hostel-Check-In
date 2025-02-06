@@ -8,7 +8,7 @@ export const NoteSchema = new Schema<INote>(
 		content: {
 			type: String,
 			required: [true, "Note is required"],
-			minLength: [5, "Note must be at least 5 characters long"],
+			minLength: [2, "Note must be at least 2 characters long"],
 			maxLength: [1000, "Note must not exceed 1000 characters"],
 		},
 		createdBy: {
