@@ -102,7 +102,7 @@ import Link from "next/link"
 // )
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const { id } = await props.params;
+	const { id } = await props.params;
 	const tenant = await getTenantById(id)
 	console.log(tenant.id)
 	const notes = tenant.bookings.flatMap((booking: IBooking) => booking.notes)
@@ -198,17 +198,17 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 												</h2>
 												<div>
 													<p className="pl-[50px] text-[var(--dark-button)]">
-                          {tenant.billingAddress.addressLineOne}
-                          </p>
-                          <p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.billingAddress.addressLineTwo}
+														{tenant.billingAddress.addressLineOne}
+													</p>
+													<p className="pl-[50px] text-[var(--dark-button)]">
+														{tenant.billingAddress.addressLineTwo}
 													</p>
 													<div>
 														<p className="pl-[50px] text-[var(--dark-button)]">
-                            {`${tenant.billingAddress.city}, ${tenant.billingAddress.state}`}
+															{`${tenant.billingAddress.city}, ${tenant.billingAddress.state}`}
 														</p>
 														<p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.billingAddress.postalCode}
+															{tenant.billingAddress.postalCode}
 														</p>
 													</div>
 												</div>
