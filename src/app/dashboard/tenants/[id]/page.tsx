@@ -9,120 +9,137 @@ import Image from "next/image";
 import { Button } from "react-day-picker";
 import { DayPickerProvider, DayPicker } from "react-day-picker";
 import { getTenantById } from "@/actions/tenant.actions";
+import { mock } from "node:test";
 
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
 
 //remove this line after uncommenting the fetch request in the fetchTenants function
-const mockData = {
-  id: "1",
-  name: "John Doe",
-  email: "test@gmail.com",
-  dob: "01/01/1980",
-  phoneNumber: "444-444-4444",
-  address: "1234 Elm St",
-  city: "Springfield",
-  state: "IL",
-  zip: "62704",
-  reservationHistory: [
-    {
-      roomNumber: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-    },
-    {
-      roomNumber: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-    },
-    {
-      roomNumber: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-    },
-    {
-      roomNumber: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-    },
-    {
-      roomNumber: "444",
-      checkInDate: "Jan 01, 2025",
-      checkOutDate: "Jan 15, 2025",
-    },
-  ],
-  transactionHistory: [
-    {
-      paymentHistory: [
-        {
-          date: "01/01/2025",
-          amount: "$250.00",
-          type: "credit",
-        },
-      ],
-      notifications: [
-        {
-          date: "01/01/2025",
-          message: "Payment received",
-          user: "Luke Skywalker",
-        },
-      ],
-    },
-  ],
-  notes: [
-    {
-      comment: "Broke the blinds in room 444. Will need to replace.",
-      user: "Luke Skywalker",
-      date: "01/01/2025",
-    },
-    {
-      comment: "Broke the blinds in room 444. Will need to replace.",
-      user: "Luke Skywalker",
-      date: "01/01/2025",
-    },
-    {
-      comment: "Broke the blinds in room 444. Will need to replace.",
-      user: "Luke Skywalker",
-      date: "01/01/2025",
-    },
-    {
-      comment: "Broke the blinds in room 444. Will need to replace.",
-      user: "Luke Skywalker",
-      date: "01/01/2025",
-    },
-  ],
-};
+// const mockData = {
+//   id: "1",
+//   name: "John Doe",
+//   email: "test@gmail.com",
+//   dob: "01/01/1980",
+//   phoneNumber: "444-444-4444",
+//   address: "1234 Elm St",
+//   city: "Springfield",
+//   state: "IL",
+//   zip: "62704",
+//   reservationHistory: [
+//     {
+//       roomNumber: "444",
+//       checkInDate: "Jan 01, 2025",
+//       checkOutDate: "Jan 15, 2025",
+//     },
+//     {
+//       roomNumber: "444",
+//       checkInDate: "Jan 01, 2025",
+//       checkOutDate: "Jan 15, 2025",
+//     },
+//     {
+//       roomNumber: "444",
+//       checkInDate: "Jan 01, 2025",
+//       checkOutDate: "Jan 15, 2025",
+//     },
+//     {
+//       roomNumber: "444",
+//       checkInDate: "Jan 01, 2025",
+//       checkOutDate: "Jan 15, 2025",
+//     },
+//     {
+//       roomNumber: "444",
+//       checkInDate: "Jan 01, 2025",
+//       checkOutDate: "Jan 15, 2025",
+//     },
+//   ],
+//   transactionHistory: [
+//     {
+//       paymentHistory: [
+//         {
+//           date: "01/01/2025",
+//           amount: "$250.00",
+//           type: "credit",
+//         },
+//       ],
+//       notifications: [
+//         {
+//           date: "01/01/2025",
+//           message: "Payment received",
+//           user: "Luke Skywalker",
+//         },
+//       ],
+//     },
+//   ],
+//   notes: [
+//     {
+//       comment: "Broke the blinds in room 444. Will need to replace.",
+//       user: "Luke Skywalker",
+//       date: "01/01/2025",
+//     },
+//     {
+//       comment: "Broke the blinds in room 444. Will need to replace.",
+//       user: "Luke Skywalker",
+//       date: "01/01/2025",
+//     },
+//     {
+//       comment: "Broke the blinds in room 444. Will need to replace.",
+//       user: "Luke Skywalker",
+//       date: "01/01/2025",
+//     },
+//     {
+//       comment: "Broke the blinds in room 444. Will need to replace.",
+//       user: "Luke Skywalker",
+//       date: "01/01/2025",
+//     },
+//   ],
+// };
 // __________________ This code is to help with the ScrollArea component __________________
 // const tags = Array.from({ length: 50 }).map(
 //   (_, i, a) => `v1.2.0-beta.${a.length - i}`
 // )
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const id = params.id;
+  const { id } = await props.params;
+  // console.log(id); for debugging
+  const tenant = await getTenantById(id);
+  const notes = tenant.bookings.flatMap((booking: any) => booking.notes);
+  // console.log(notes); for debugging
 
-  const fetchTenant = async (): Promise<any> => {
-    let result = null;
-    // TODO: replace with actual fetch request
-    // result = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then((res) => res.json());
-    // mock return data
+  
 
-    // After uncommenting the above code delete this result assignment
-    result = new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(mockData);
-      }, 200);
-    }).then((data) => {
-      return data;
-    });
+  // mockData.reservationHistory = tenant.bookings.map((booking: any) => {
+  //   return {
+  //     roomNumber: booking.roomId.roomNumber,
+  //     checkInDate: booking.checkIn,
+  //     checkOutDate: booking.checkOut,
+  //   };
+  // });
 
-    return result;
-  };
 
-  const tenant = await fetchTenant();
+
+  // const fetchTenant = async (): Promise<any> => {
+  //   let result = null;
+  //   // TODO: replace with actual fetch request
+  //   // result = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then((res) => res.json());
+  //   // mock return data
+
+  //   // After uncommenting the above code delete this result assignment
+  //   result = new Promise((resolve) => {
+  //     setTimeout(() => {
+  //       resolve(mockData);
+  //     }, 200);
+  //   }).then((data) => {
+  //     return data;
+  //   });
+
+  //   return result;
+  // };
+
 
   // TODO: create function to fetch the a tenant by id -> add function to data.ts file
   // const tenant = await getTenantById(id)
+
+
 
   return (
     <>
@@ -133,10 +150,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
             <div className="flex justify-between items-center">
               <div>
                 <h1 className="text-[var(--dark-button)] font-bold">
-                  {tenant.name}
+                  {tenant.fullname}
                 </h1>
                 <p>{tenant.email}</p>
-                <p>{tenant.phoneNumber}</p>
+                <p>{tenant.phoneNumbers.find((phone: any) => phone.isPrimary).number}</p>
               </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
@@ -156,7 +173,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                         </h2>
                         <div>
                           <p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.name}
+                            {tenant.fullname}
                           </p>
                         </div>
                       </div>
@@ -166,7 +183,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                         </h2>
                         <div>
                           <p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.dob}
+                            {tenant.dob || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -203,19 +220,25 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 </CardTitle>
                 <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
                   <CardContent>
-                    {mockData.notes.map((note: any, index: number) => {
+                  {notes && notes.length > 0 ? (
+                      notes.map((notes: any, index: number) => {
                       return (
                         <div className="p-4 w-full mx-20" key={index}>
                           <div className="-ml-[100px] text-[var(--text)] mr-[100px]">
-                            {` "${note.comment}" `}
+                            {` "${notes.content}" `}
                             <div>
-                              <p className="text-wrap text-[var(--dark-button)] text-end text-sm">{`${note.user} - ${note.date}`}</p>
+                              <p className="text-wrap text-[var(--dark-button)] text-end text-sm">{`${notes.createdBy.firstName} ${notes.createdBy.lastName}- ${notes.createdAt}`}</p>
                             </div>
                           </div>
                           <Separator className="my-2" />
                         </div>
                       );
-                    })}
+                    })
+                  ) : (
+                    <div>
+                      <p>No notes found</p>
+                    </div>
+                  )}
                   </CardContent>
                 </ScrollArea>
               </Card>
@@ -231,20 +254,24 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 </CardTitle>
                 <ScrollArea className="h-[200px] bg-[var(--light)] text-[var(--text)] rounded-md border p-4">
                   <CardContent>
-                    {mockData.reservationHistory.map(
-                      (reservation: any, index: number) => {
+                    {tenant.bookings && tenant.bookings.length > 0 ? (
+                      tenant.bookings.map((booking: any, index: number) => {
                         return (
                           <div className="p-1" key={index}>
                             <div>
                               <div className="border rounded-md p-2 -ml-4 -mr-4 text-start text-wrap">
-                                {`${mockData.name} stayed in ${reservation.roomNumber} 
-                              from ${reservation.checkInDate} to ${reservation.checkOutDate}`}
+                              {`${tenant.fullname} stayed in Room #${booking.roomId.roomNumber} 
+                                from ${booking.checkIn} to ${booking.checkOut}`}
                               </div>
                             </div>
                             <Separator className="my-2" />
                           </div>
                         );
-                      }
+                      })
+                    ) : (
+                      <div>
+                        <p>No reservations found</p>
+                      </div>
                     )}
                   </CardContent>
                 </ScrollArea>
@@ -258,8 +285,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 </CardTitle>
                 <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
                   <CardContent>
-                    {mockData.reservationHistory.map(
-                      (reservation: any, index: number) => {
+                  {tenant.bookings && tenant.bookings.length > 0 ? (
+                      tenant.bookings.map((booking: any, index: number) => {
                         return (
                           <div key={index}>
                             <div className="flex flex-wrap items-center border rounded-md space-x-4">
@@ -267,8 +294,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                               <div className="-mt-5 pr-5 mb-2">
                                 <Skeleton className="h-4 w-[250px]" />
                                 <Skeleton className="h-4 w-[200px]" />
-                                {`${mockData.name} stayed in Room #${reservation.roomNumber} 
-                              from ${reservation.checkInDate} to ${reservation.checkOutDate}`}
+                                {`${tenant.fullname} stayed in Room #${booking.roomId.roomNumber} 
+                                from ${booking.checkIn} to ${booking.checkOut}`}
                               </div>
                               <div className="flex flex-wrap absolute right-20">
                                 <Ellipsis />
@@ -276,9 +303,13 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             </div>
                             <Separator className="my-2" />
                           </div>
-                        );
-                      }
-                    )}
+                         );
+                        })
+                      ) : (
+                        <div>
+                          <p>No Transactions Found</p>
+                        </div>
+                      )}
                   </CardContent>
                 </ScrollArea>
               </Card>

@@ -32,13 +32,9 @@ export async function getTenants() {
 export async function getTenantById(id: string) {
 	await dbConnect()
 
-	const tenant = await User.findById({ _id: id, role: "tenant" })
-		.populate("firstName", "lastName")
-		.populate("email", "phoneNumbers")
-		.populate("paymentMethods", "createdAt")
-		.populate("tags", "history")
-		.populate("createdBy", "updatedBy")
-		.populate("notes")
+	const tenant = await User.findOne({ _id: id, role: "tenant" })
+		.populate("fullname")
+		.populate("phoneNumbers")
 		.populate({
 			path: "bookings",
 			populate: [
@@ -48,16 +44,96 @@ export async function getTenantById(id: string) {
 				},
 				{
 					path: "notes",
+					populate: {
+						path: "createdBy",
+						select: "firstName lastName",
+					},
 					select: "content createdBy createdAt",
+					options: { strictPopulate: false },
 				},
 			],
 		})
 		.select(
-			"_id firstName lastName email phoneNumbers bookings paymentMethods tags createdBy"
+			"_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags createdBy"
 		)
 
-	const tenantObj = tenant.toObject()
+	if (!tenant) {
+		throw new Error("Tenant not found")
+	}
+
+	const tenantObj = tenant.toObject({ getters: true, virtuals: false })
 	return tenantObj
 }
 
 // SET DATA
+
+//save tenant as a user
+
+export async function saveTenant(payload: any) {
+	await dbConnect()
+
+	const firstName = payload.firstName
+	const lastName = payload.lastName
+	const email = payload.email
+	const password = payload.password
+	const phoneNumbers = payload.phone
+	const address = payload.address
+	const city = payload.city
+	const state = payload.state
+	const zip = payload.zip
+
+	if (
+		!firstName ||
+		!lastName ||
+		!email ||
+		!password ||
+		!phoneNumbers ||
+		!address ||
+		!city ||
+		!state ||
+		!zip
+	) {
+		return { error: true, message: "Please fill in all fields" }
+	}
+
+	try {
+		// Check if a user with the same email already exists
+		const existingUserByEmail = await User.findOne({ email })
+		if (existingUserByEmail) {
+			return { error: true, message: "Email already in use" }
+		}
+
+		// Check if a user with the same first and last name already exists
+		const existingUserByName = await User.findOne({ firstName, lastName })
+		if (existingUserByName) {
+			return {
+				error: true,
+				message: "User with the same first and last name already exists",
+			}
+		}
+
+		const newUser = new User({
+			firstName,
+			lastName,
+			email,
+			password,
+			phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
+			address,
+			city,
+			state,
+			zip,
+			role: "tenant",
+		})
+
+		console.log("Saving new user:", newUser)
+
+		await newUser.save()
+
+		console.log("User saved successfully")
+
+		return { error: false, message: "Tenant created successfully" }
+	} catch (error) {
+		console.error("Error saving user:", error)
+		return { error: true, message: (error as Error).message }
+	}
+}
