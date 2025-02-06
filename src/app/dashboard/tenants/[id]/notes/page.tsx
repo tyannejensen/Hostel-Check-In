@@ -61,7 +61,9 @@ export default function Page() {
             // Handle successful note creation (e.g., redirect to tenant {id})
         }
     }
-
+    function handleBackClick() {
+        router.push(`/dashboard/tenants/${id}`);
+      }
 
     return (
         <>
@@ -101,6 +103,13 @@ export default function Page() {
                                     >
                                         Submit
                                     </Button>
+                                    <Button
+                    className="mt-[20px] submit-button hover:bg-blue-500 hover:text-white"
+                    type="button"
+                    onClick={handleBackClick}
+                  >
+                    Back to Tenant
+                  </Button>
                                     {success && <p className="text-green-500 ml-4">{success}</p>}
                                     {error && <p className="text-red-500 ml-4">{error}</p>}
                                 </div>
