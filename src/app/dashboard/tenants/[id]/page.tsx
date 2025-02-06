@@ -1,6 +1,6 @@
 import React from "react"
 import "@/styles/global.css"
-import { Pencil, Plus, Ellipsis, Link, UserRoundPlus } from "lucide-react"
+import { Pencil, Plus, Ellipsis, UserRoundPlus } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
@@ -11,6 +11,8 @@ import { DayPickerProvider, DayPicker } from "react-day-picker"
 import { getTenantById } from "@/actions/tenant.actions"
 import { mock } from "node:test"
 import { IBooking, IChangeLog, ILog } from "@/lib/types/interfaces"
+import Link from "next/link"
+
 
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
@@ -102,6 +104,7 @@ import { IBooking, IChangeLog, ILog } from "@/lib/types/interfaces"
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
 	const tenant = await getTenantById(id)
+	console.log(tenant.id)
 	const notes = tenant.bookings.flatMap((booking: IBooking) => booking.notes)
 	const history = tenant.bookings.flatMap(
 		(booking: IBooking) => booking.history
@@ -220,7 +223,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 								<CardTitle className="flex flex-row items-center justify-between">
 									<div className="flex justify-between items-center pb-3 w-full">
 										<p className="font-bold text-[var(--light)]">NOTES</p>
-										<Plus className="text-[var(--light)]" />
+										<Link href={`/dashboard/tenants/${tenant.id}/notes`}>
+											<Plus className="text-[var(--light)] cursor-pointer" />
+										</Link>
 									</div>
 								</CardTitle>
 								<ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">

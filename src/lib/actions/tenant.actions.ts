@@ -91,7 +91,6 @@ export async function saveTenant(payload: any) {
 	await dbConnect()
 	const reqHeaders = await headers()
 	const userId = reqHeaders.get("x-user-id")
-	await dbConnect()
 
 	const firstName = payload.firstName
 	const lastName = payload.lastName
