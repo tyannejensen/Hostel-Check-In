@@ -100,8 +100,7 @@ import { IBooking, IChangeLog, ILog } from "@/lib/types/interfaces"
 // )
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
-	const { id } = await props.params
-	// console.log(id); for debugging
+  const { id } = await props.params;
 	const tenant = await getTenantById(id)
 	const notes = tenant.bookings.flatMap((booking: IBooking) => booking.notes)
 	const history = tenant.bookings.flatMap(
@@ -186,7 +185,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 												</h2>
 												<div>
 													<p className="pl-[50px] text-[var(--dark-button)]">
-														{tenant.dob || "N/A"}
+														{tenant.birthdate || "N/A"}
 													</p>
 												</div>
 											</div>
@@ -196,14 +195,17 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 												</h2>
 												<div>
 													<p className="pl-[50px] text-[var(--dark-button)]">
-														{tenant.address}
+                          {tenant.billingAddress.addressLineOne}
+                          </p>
+                          <p className="pl-[50px] text-[var(--dark-button)]">
+                            {tenant.billingAddress.addressLineTwo}
 													</p>
 													<div>
 														<p className="pl-[50px] text-[var(--dark-button)]">
-															{`${tenant.city}, ${tenant.state}`}
+                            {`${tenant.billingAddress.city}, ${tenant.billingAddress.state}`}
 														</p>
 														<p className="pl-[50px] text-[var(--dark-button)]">
-															{tenant.zip}
+                            {tenant.billingAddress.postalCode}
 														</p>
 													</div>
 												</div>

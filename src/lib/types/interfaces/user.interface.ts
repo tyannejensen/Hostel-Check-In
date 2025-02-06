@@ -16,6 +16,7 @@ export interface IUser extends Document {
 	email: string
 	phoneNumbers: IPhoneNumber[] // reference to PhoneNumber Subdocument
 	password: string
+	birthdate: string
 	role: IRole
 	bookings: ObjectId[] // reference to Booking Schema
 	paymentMethods: IPaymentMethod[] // reference to PaymentMethod Subdocument

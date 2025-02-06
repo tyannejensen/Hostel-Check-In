@@ -60,6 +60,10 @@ const UserSchema = new Schema<IUser>(
 			required: [true, "Password is required"],
 			select: false,
 		},
+		birthdate: {
+			type: String,
+			required: [true, "Birthdate is required"],
+		},
 		phoneNumbers: [PhoneNumberSchema],
 		role: {
 			type: String,
@@ -154,7 +158,7 @@ UserSchema.methods.isCorrectPassword = async function (
 // Convert the 'createdAt' field to MMM DD, YYYY format e.g. Jan 30, 2025
 UserSchema.path("createdAt").get(formatDate)
 UserSchema.path("updatedAt").get(formatDate)
-
+UserSchema.path("birthdate").get(formatDate)
 // SETTERS
 // Set toObject options to exclude _id and password fields automatically
 UserSchema.set("toObject", {
