@@ -21,11 +21,13 @@ import { registerUser } from "@/actions/user.actions"
 import { useSearchParams } from "next/navigation"
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline"
 import { CheckCircleIcon } from "@heroicons/react/24/solid"
+import { Oval } from "react-loader-spinner";
 
 export default function Page() {
     const searchParams = useSearchParams();
     const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard/";
-	const [authErrorMessage, formAction, isPending] = useActionState(
+
+	const [authErrorMessage, formAction, isLoginPending] = useActionState(
 		authenticate,
 		undefined
 	)
@@ -50,6 +52,7 @@ export default function Page() {
             setRegisterSuccessMessage("Registration successful!")
         }
     }
+    
 
 	return (
         <>
@@ -120,7 +123,20 @@ export default function Page() {
                                             className="drop-shadow-lg"
                                             aria-disabled={isRegisterPending}
                                         >
-                                            Submit
+                                            {isRegisterPending ? (
+                                                <Oval
+                                                    height={20}
+                                                    width={20}
+                                                    color="#ffffff"
+                                                    visible={true}
+                                                    ariaLabel="oval-loading"
+                                                    secondaryColor="#ffffff"
+                                                    strokeWidth={2}
+                                                    strokeWidthSecondary={2}
+                                                />
+                                            ) : (
+                                                "Submit"
+                                            )}
                                         </Button>
                                         {registerErrorMessage && (
                                             <>
@@ -181,8 +197,25 @@ export default function Page() {
                                             name="redirectTo"
                                             value={callBackUrl}
                                         />
-                                        <Button id="dark-button" className="drop-shadow-lg">
-                                            Login
+                                        <Button
+                                            id="dark-button"
+                                            className="drop-shadow-lg"
+                                            aria-disabled={isLoginPending}
+                                        >
+                                            {isLoginPending ? (
+                                                <Oval
+                                                    height={20}
+                                                    width={20}
+                                                    color="#ffffff"
+                                                    visible={true}
+                                                    ariaLabel="oval-loading"
+                                                    secondaryColor="#ffffff"
+                                                    strokeWidth={2}
+                                                    strokeWidthSecondary={2}
+                                                />
+                                            ) : (
+                                                "Login"
+                                            )}
                                         </Button>
                                         {authErrorMessage && (
                                             <>
