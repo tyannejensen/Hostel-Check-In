@@ -16,4 +16,6 @@ export interface IPaymentMethod extends Document {
 	bankName?: string
 	checkNumber?: string
 	history: IChangeLog[]
+	createdBy: string // reference to the user (employee) who created the payment method - uses uuid v4
+	updatedBy: string // reference to the user (employee) who last updated the payment method - uses uuid v4
 }

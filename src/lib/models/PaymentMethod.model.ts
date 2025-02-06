@@ -1,11 +1,6 @@
 import { Schema, model, models } from "mongoose"
 import { IPaymentMethod } from "@/interfaces/index"
-import {
-	formatDate,
-	getOldDoc,
-	logChanges,
-	// logHistory,
-} from "@/server-utils/helpers"
+import { formatDate, logChanges } from "@/server-utils/helpers"
 
 // PaymentMethod Schema - subdocument of Booking Schema
 const PaymentMethodSchema = new Schema<IPaymentMethod>(
@@ -63,6 +58,16 @@ const PaymentMethodSchema = new Schema<IPaymentMethod>(
 			minlength: [2, "Bank Name must be at least 2 characters long"],
 			maxlength: [50, "Bank Name must be at most 50 characters long"],
 		},
+		createdBy: {
+			type: String,
+			required: [true, "Created By is required"],
+			ref: "User",
+		},
+		updatedBy: {
+			type: String,
+			required: [true, "Updated By is required"],
+			ref: "User",
+		},
 	},
 	{
 		timestamps: true, // Add createdAt and updatedAt fields
@@ -72,10 +77,8 @@ const PaymentMethodSchema = new Schema<IPaymentMethod>(
 // MIDDLWARE
 
 // Record document updates in the history array
-// Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
-PaymentMethodSchema.pre("findOneAndUpdate", getOldDoc)
-// Capture and save the old Booking document before updating - Part 2 of 2 of logging the booking history
-PaymentMethodSchema.post("findOneAndUpdate", logChanges)
+// Capture and save the old Booking document before updating Payment Method
+PaymentMethodSchema.pre("save", logChanges)
 
 // PaymentMethodSchema.pre("save", logHistory)
 
