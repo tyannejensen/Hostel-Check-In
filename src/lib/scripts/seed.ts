@@ -5,7 +5,7 @@ import dotenv from "dotenv"
 dotenv.config({ path: ".env.local" })
 
 // import mongoose, models, and interfaces
-import mongoose from "mongoose"
+import mongoose, { set } from "mongoose"
 import { dbConnect } from "@/lib/db"
 import { Booking } from "@/models/Booking.model"
 import { Payment } from "@/models/Payment.model"
@@ -94,7 +94,7 @@ async function seedUsers(admin: IUser) {
 	return formatedUsers
 }
 
-async function seedPaymentMethods(users: IUser[]) {
+async function seedPaymentMethods(admin: IUser, users: IUser[]) {
 	try {
 		const newPayments = []
 
@@ -106,12 +106,15 @@ async function seedPaymentMethods(users: IUser[]) {
 			const paymentMethod = await new PaymentMethod({
 				...paymentMethodsData[i],
 				userId: user.id,
+				createdBy: user.id,
+				updatedBy: admin.id,
 			})
 
 			await paymentMethod.save()
 
 			// Step 3: Update User with the Payment Method reference
 			user.paymentMethods.push(paymentMethod._id)
+			user.updatedBy = admin.id
 			await user.save()
 
 			// Step 4: Store the created documents for logging
@@ -181,6 +184,7 @@ async function seedBookingsWithPayments(
 				createdBy: admin.id,
 				roomId: rooms[i].id,
 				depositAmount: rooms[i].deposit,
+				updatedBy: admin.id, // TODO: remove updated by on new documents - add valditor to only throw an error if the document is updated and no udpatedBy is provided.
 			})
 			await booking.save({ session })
 
@@ -205,12 +209,17 @@ async function seedBookingsWithPayments(
 
 			// Step 3: Update Booking with the Payment reference
 			booking.payments.push(payment._id)
+			booking.updatedBy = admin.id
 			await booking.save({ session })
+
+			console.log("admin: ", admin.id)
 
 			// Step 4: Update User with the Booking reference
 			const user = await User.findOne({ _id: users[i].id })
 			user.bookings.push(booking._id)
 			await user.save({ session })
+
+			console.log("user udpated")
 
 			// Step 5: Store the created documents for logging
 			newBookings.push(booking)
@@ -297,15 +306,6 @@ async function updateBookingStatus(
 	) // Log the status change
 }
 
-async function updateUser(admin: IUser, id: string, updates: {}) {
-	const selectedUser = await User.findOneAndUpdate(
-		{ _id: id },
-		{ $set: updates },
-		{ new: true, userId: admin.id }
-	)
-	console.log("User fullname: ", selectedUser.toObject().fullname)
-}
-
 async function updateUserSave(admin: IUser, id: string) {
 	// Update User to create a history log (using pre-save method)
 	const selectedUser = await User.findOne({ _id: id })
@@ -346,7 +346,7 @@ async function seedDatabase() {
 		console.log("Tenants added successfully!\n")
 
 		// Add all payment methods
-		const paymentMethods = await seedPaymentMethods(tenants) // Add all payment methods
+		const paymentMethods = await seedPaymentMethods(admin, tenants) // Add all payment methods
 		console.log("Payment methods added successfully!\n")
 
 		// Add all rooms
@@ -367,8 +367,8 @@ async function seedDatabase() {
 		console.log("Notes added to Bookings successfully!\n")
 
 		// Update Booking status to create a history log
-		await updateBookingStatus(admin, "pending", "paid") // Update Booking status
-		console.log("Booking status updated successfully!\n")
+		// await updateBookingStatus(admin, "pending", "paid") // Update Booking status
+		// console.log("Booking status updated successfully!\n")
 
 		// Update User to create a history log
 		// await updateUser(admin, tenants[2].id, {

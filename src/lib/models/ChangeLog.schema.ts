@@ -26,14 +26,35 @@ export const ChangeLogSchema = new Schema<IChangeLog>(
 	{ versionKey: false, timestamps: false } // Disable versioning (__v) field to prevent Booking Updates from being updated
 )
 
+// MIDDLEWARE
 // Booking Update Pre Save Hook -> Middleware to enforce immutability of notes
 ChangeLogSchema.pre<IChangeLog>("save", function (next) {
-	if (this.isNew) {
+	if (this.isNew || !this.isModified()) {
 		// If the Log is new, allow it to save
 		return next()
 	}
 
 	// Prevent updating the note if it already exists
-	this.invalidate("content", "A ChangeLog cannot be modified after creation")
 	next(new Error("ChangeLogs are immutable once created"))
+})
+
+// SETTERS
+
+ChangeLogSchema.set("toObject", {
+	getters: true,
+	virtuals: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
+	},
+})
+
+// Set toJSON options to exclude _id and password fields automatically
+ChangeLogSchema.set("toJSON", {
+	virtuals: true,
+	getters: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
+	},
 })
