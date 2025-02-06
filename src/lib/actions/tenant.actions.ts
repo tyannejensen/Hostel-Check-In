@@ -55,29 +55,21 @@ export async function getTenantById(id: string) {
 					path: "roomId",
 					select: "roomNumber",
 				},
-				{
-					path: "notes",
-					populate: {
-						path: "createdBy",
-						select: "firstName lastName",
-					},
-					select: "content createdBy createdAt",
-				},
-				{
-					path: "history",
-					populate: {
-						path: "updatedBy",
-						select: "fullname",
-					},
-				},
-				{
-					path: "history",
-					populate: {
-						path: "updates",
-						select: "field oldValue newValue",
-					},
-				},
 			],
+		})
+		.populate({
+			path: "history",
+			populate: {
+				path: "updatedBy",
+				select: "fullname",
+			},
+		})
+		.populate({
+			path: "history",
+			populate: {
+				path: "updates",
+				select: "field oldValue newValue",
+			},
 		})
 		.select(
 			"_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags history notes createdBy"

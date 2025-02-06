@@ -10,139 +10,22 @@ import { Button } from "react-day-picker"
 import { DayPickerProvider, DayPicker } from "react-day-picker"
 import { getTenantById } from "@/actions/tenant.actions"
 import { mock } from "node:test"
-import { IBooking, IChangeLog, ILog } from "@/lib/types/interfaces"
+import { IBooking, IChangeLog, ILog, INote } from "@/lib/types/interfaces"
 import Link from "next/link"
 
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
-
-//remove this line after uncommenting the fetch request in the fetchTenants function
-// const mockData = {
-//   id: "1",
-//   name: "John Doe",
-//   email: "test@gmail.com",
-//   dob: "01/01/1980",
-//   phoneNumber: "444-444-4444",
-//   address: "1234 Elm St",
-//   city: "Springfield",
-//   state: "IL",
-//   zip: "62704",
-//   reservationHistory: [
-//     {
-//       roomNumber: "444",
-//       checkInDate: "Jan 01, 2025",
-//       checkOutDate: "Jan 15, 2025",
-//     },
-//     {
-//       roomNumber: "444",
-//       checkInDate: "Jan 01, 2025",
-//       checkOutDate: "Jan 15, 2025",
-//     },
-//     {
-//       roomNumber: "444",
-//       checkInDate: "Jan 01, 2025",
-//       checkOutDate: "Jan 15, 2025",
-//     },
-//     {
-//       roomNumber: "444",
-//       checkInDate: "Jan 01, 2025",
-//       checkOutDate: "Jan 15, 2025",
-//     },
-//     {
-//       roomNumber: "444",
-//       checkInDate: "Jan 01, 2025",
-//       checkOutDate: "Jan 15, 2025",
-//     },
-//   ],
-//   transactionHistory: [
-//     {
-//       paymentHistory: [
-//         {
-//           date: "01/01/2025",
-//           amount: "$250.00",
-//           type: "credit",
-//         },
-//       ],
-//       notifications: [
-//         {
-//           date: "01/01/2025",
-//           message: "Payment received",
-//           user: "Luke Skywalker",
-//         },
-//       ],
-//     },
-//   ],
-//   notes: [
-//     {
-//       comment: "Broke the blinds in room 444. Will need to replace.",
-//       user: "Luke Skywalker",
-//       date: "01/01/2025",
-//     },
-//     {
-//       comment: "Broke the blinds in room 444. Will need to replace.",
-//       user: "Luke Skywalker",
-//       date: "01/01/2025",
-//     },
-//     {
-//       comment: "Broke the blinds in room 444. Will need to replace.",
-//       user: "Luke Skywalker",
-//       date: "01/01/2025",
-//     },
-//     {
-//       comment: "Broke the blinds in room 444. Will need to replace.",
-//       user: "Luke Skywalker",
-//       date: "01/01/2025",
-//     },
-//   ],
-// };
-// __________________ This code is to help with the ScrollArea component __________________
-// const tags = Array.from({ length: 50 }).map(
-//   (_, i, a) => `v1.2.0-beta.${a.length - i}`
-// )
 
 export const dynamic = "force-dynamic" // force the page to reload data upon navigation
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
 	const { id } = await props.params
 	const tenant = await getTenantById(id)
-	// const notes = tenant.bookings.flatMap((booking: IBooking) => booking.notes) // update to support notes on User.
-	const notes = tenant.notes
-	const history = tenant.bookings.flatMap(
-		(booking: IBooking) => booking.history
+
+	const notes: INote[] = tenant.notes.map((note: INote) => note)
+	const history: IChangeLog[] = await tenant.history.map(
+		(log: IChangeLog) => log
 	)
-
-	console.log(
-		`The notes for ${tenant.fullname} are below:\n${tenant.notes[0].createdBy}`
-	) // for debugging
-
-	// mockData.reservationHistory = tenant.bookings.map((booking: any) => {
-	//   return {
-	//     roomNumber: booking.roomId.roomNumber,
-	//     checkInDate: booking.checkIn,
-	//     checkOutDate: booking.checkOut,
-	//   };
-	// });
-
-	// const fetchTenant = async (): Promise<any> => {
-	//   let result = null;
-	//   // TODO: replace with actual fetch request
-	//   // result = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then((res) => res.json());
-	//   // mock return data
-
-	//   // After uncommenting the above code delete this result assignment
-	//   result = new Promise((resolve) => {
-	//     setTimeout(() => {
-	//       resolve(mockData);
-	//     }, 200);
-	//   }).then((data) => {
-	//     return data;
-	//   });
-
-	//   return result;
-	// };
-
-	// TODO: create function to fetch the a tenant by id -> add function to data.ts file
-	// const tenant = await getTenantById(id)
 
 	return (
 		<>
@@ -317,9 +200,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 																					className={`ms-9 list-disc`}
 																				>
 																					<p>
-																						<b>{log.field}</b> was updated from{" "}
-																						<i>{log.oldValue}</i> to{" "}
-																						<i>{log.newValue}</i>
+																						<b>{String(log.field)}</b> was
+																						updated from{" "}
+																						<i>{String(log.oldValue)}</i> to{" "}
+																						<i>{String(log.newValue)}</i>
 																					</p>
 																				</li>
 																			)
