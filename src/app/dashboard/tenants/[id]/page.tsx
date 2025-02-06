@@ -102,6 +102,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
   // console.log(id); for debugging
   const tenant = await getTenantById(id);
+  console.log(tenant); 
+  console.log(tenant.birthdate);
+  console.log(tenant.billingAddress.addressLineOne);
+  //for debugging
   const notes = tenant.bookings.flatMap((booking: any) => booking.notes);
   // console.log(notes); for debugging
 
@@ -183,7 +187,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                         </h2>
                         <div>
                           <p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.dob || "N/A"}
+                            {tenant.birthdate || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -193,14 +197,17 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                         </h2>
                         <div>
                           <p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.address}
+                            {tenant.billingAddress.addressLineOne}
+                          </p>
+                          <p className="pl-[50px] text-[var(--dark-button)]">
+                            {tenant.billingAddress.addressLineTwo}
                           </p>
                           <div>
                             <p className="pl-[50px] text-[var(--dark-button)]">
-                              {`${tenant.city}, ${tenant.state}`}
+                              {`${tenant.billingAddress.city}, ${tenant.billingAddress.state}`}
                             </p>
                             <p className="pl-[50px] text-[var(--dark-button)]">
-                              {tenant.zip}
+                              {tenant.billingAddress.postalCode}
                             </p>
                           </div>
                         </div>

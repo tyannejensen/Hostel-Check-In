@@ -44,6 +44,7 @@ const formSchema = z.object({
   city: z.string(),
   state: z.string(),
   zip: z.string(),
+  birthdate: z.string(),
   paymentMethodType: z.string(),
   paymentMethod: z.object({
     paymentName: z.string(),
@@ -74,6 +75,7 @@ export default function Page({ userId }: PageProps) {
       lastName: "",
       email: "",
       password: "",
+      birthdate: "",
       phone: "",
       address: "",
       city: "",
@@ -190,6 +192,24 @@ export default function Page({ userId }: PageProps) {
                       <FormControl>
                         <Input
                           type="password"
+                          {...field}
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="birthdate"
+                  render={({ field }) => (
+                    <FormItem className="b-box">
+                      <div className="label-title whitespace-nowrap">Birthdate</div>
+                      <FormControl>
+                        <Input
+                          type="date"
                           {...field}
                           value={field.value || ""}
                           onChange={field.onChange}

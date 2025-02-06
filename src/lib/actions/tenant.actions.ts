@@ -36,6 +36,8 @@ export async function getTenantById(id: string) {
 
 	const tenant = await User.findOne({ _id: id, role: "tenant" })
 		.populate("fullname")
+		.populate("billingAddress")
+		.populate("birthdate")
 		.populate("phoneNumbers")
 		.populate({
 			path: "bookings",
@@ -81,8 +83,9 @@ export async function saveTenant(payload: any) {
 	const lastName = payload.lastName
 	const email = payload.email
 	const password = payload.password
+	const birthdate = payload.birthdate
 	const phoneNumbers = payload.phone
-	const address = payload.address
+	const billingAddress = payload.address
 	const city = payload.city
 	const state = payload.state
 	const zip = payload.zip
@@ -92,8 +95,9 @@ export async function saveTenant(payload: any) {
 		!lastName ||
 		!email ||
 		!password ||
+		!birthdate ||
 		!phoneNumbers ||
-		!address ||
+		!billingAddress ||
 		!city ||
 		!state ||
 		!zip
@@ -122,8 +126,9 @@ export async function saveTenant(payload: any) {
       lastName,
       email,
       password,
+	  birthdate,
       phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
-      address,
+      billingAddress,
       city,
       state,
       zip,
