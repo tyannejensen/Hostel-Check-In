@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import mongoose from "mongoose";
 import { dbConnect } from "@/lib/db";
@@ -11,7 +11,9 @@ export async function getTenants() {
   await dbConnect();
 
   const tenants = await User.find({ role: "tenant" })
-    .select("_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags createdBy")
+    .select(
+      "_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags createdBy"
+    )
     .populate({
       path: "bookings",
       populate: {
@@ -21,15 +23,13 @@ export async function getTenants() {
     })
     .populate("fullname");
 
-  const tenantsAsObj = tenants.map((tenant: any) =>
-    tenant.toObject()
-  );
+  const tenantsAsObj = tenants.map((tenant: any) => tenant.toObject());
 
   // Ensure final data is fully JSON-serializable
   return tenantsAsObj;
 }
 
-export async function getTenantById(id: string) {
+export async function getTenantById(id: string | string[]) {
   await dbConnect();
 
   const tenant = await User.findOne({ _id: id, role: "tenant" })
@@ -53,18 +53,19 @@ export async function getTenantById(id: string) {
         },
       ],
     })
-    .select("_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags createdBy");
+    .select(
+      "_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags createdBy"
+    );
 
   if (!tenant) {
     throw new Error("Tenant not found");
   }
 
-  const tenantObj = tenant.toObject({ getters: true, virtuals: false });
+  const tenantObj = JSON.parse(JSON.stringify(tenant.toObject()));
   return tenantObj;
 }
 
 // SET DATA
-
 
 //save tenant as a user
 
@@ -81,7 +82,17 @@ export async function saveTenant(payload: any) {
   const state = payload.state;
   const zip = payload.zip;
 
-  if (!firstName || !lastName || !email ||!password || !phoneNumbers || !address || !city || !state || !zip) {
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !password ||
+    !phoneNumbers ||
+    !address ||
+    !city ||
+    !state ||
+    !zip
+  ) {
     return { error: true, message: "Please fill in all fields" };
   }
 
@@ -95,7 +106,10 @@ export async function saveTenant(payload: any) {
     // Check if a user with the same first and last name already exists
     const existingUserByName = await User.findOne({ firstName, lastName });
     if (existingUserByName) {
-      return { error: true, message: "User with the same first and last name already exists" };
+      return {
+        error: true,
+        message: "User with the same first and last name already exists",
+      };
     }
 
     const newUser = new User({

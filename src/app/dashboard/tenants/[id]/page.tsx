@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import "@/styles/global.css";
 import { Pencil, Plus, Ellipsis, Link, UserRoundPlus } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,6 +11,8 @@ import { Button } from "react-day-picker";
 import { DayPickerProvider, DayPicker } from "react-day-picker";
 import { getTenantById } from "@/actions/tenant.actions";
 import { mock } from "node:test";
+import { IUser } from "@/lib/types/interfaces";
+import { useParams } from "next/navigation";
 
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
@@ -98,14 +101,138 @@ import { mock } from "node:test";
 //   (_, i, a) => `v1.2.0-beta.${a.length - i}`
 // )
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const { id } = await props.params;
-  // console.log(id); for debugging
-  const tenant = await getTenantById(id);
-  const notes = tenant.bookings.flatMap((booking: any) => booking.notes);
-  // console.log(notes); for debugging
+interface PhoneNumber {
+  countryCode: string;
+  number: string;
+  isMobile: boolean;
+  isPrimary: boolean;
+  _id: string;
+  createdAt: string;
+  updatedAt: string;
+  id: string;
+}
 
-  
+interface Room {
+  roomNumber: string;
+  id: string;
+}
+
+interface Note {
+  content: string;
+  createdBy: {
+    firstName: string;
+    lastName: string;
+    id: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  id: string;
+}
+
+interface Booking {
+  bookedBy: string;
+  createdBy: string;
+  roomId: Room;
+  checkIn: string;
+  checkOut: string;
+  status: string;
+  depositAmount: number;
+  depositReturned: boolean;
+  depositReturnAmount: number;
+  payments: string[];
+  notes: Note[];
+  history: any[];
+  createdAt: string;
+  updatedAt: string;
+  id: string;
+}
+
+interface Tenant {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumbers: PhoneNumber[];
+  bookings: Booking[];
+  paymentMethods: string[];
+  tags: string[];
+  createdBy: string;
+  fullname: string;
+  id: string;
+}
+
+const notes = [
+  {
+    content: "Broke the blinds in room 444. Will need to replace.",
+    createdBy: {
+      firstName: "Luke",
+      lastName: "Skywalker",
+      id: "1",
+    },
+    createdAt: "01/01/2025",
+    updatedAt: "01/01/2025",
+    id: "1",
+  },
+  {
+    content: "Broke the blinds in room 444. Will need to replace.",
+    createdBy: {
+      firstName: "Luke",
+      lastName: "Skywalker",
+      id: "1",
+    },
+    createdAt: "01/01/2025",
+    updatedAt: "01/01/2025",
+    id: "1",
+  },
+  {
+    content: "Broke the blinds in room 444. Will need to replace.",
+    createdBy: {
+      firstName: "Luke",
+      lastName: "Skywalker",
+      id: "1",
+    },
+    createdAt: "01/01/2025",
+    updatedAt: "01/01/2025",
+    id: "1",
+  },
+  {
+    content: "Broke the blinds in room 444. Will need to replace.",
+    createdBy: {
+      firstName: "Luke",
+      lastName: "Skywalker",
+      id: "1",
+    },
+    createdAt: "01/01/2025",
+    updatedAt: "01/01/2025",
+    id: "1",
+  },
+];
+
+export default function Page() {
+  const { id } = useParams();
+  // console.log(id); for debugging
+  // const notes = tenant.bookings.flatMap((booking: any) => booking.notes);
+  const [tenant, setTenant] = useState<Tenant | null>(null);
+
+  useEffect(() => {
+    const fetchTenant = async () => {
+      try {
+        console.log(id);
+        const tenantDetails: any = await getTenantById(id ?? "");
+        console.log(tenantDetails);
+        // Mock data for now
+
+        // Simulate network delay
+        setTenant(tenantDetails);
+      } catch (error: any) {
+        // setError(error.message);
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    fetchTenant();
+  }, [id]);
+  // console.log(notes); for debugging
 
   // mockData.reservationHistory = tenant.bookings.map((booking: any) => {
   //   return {
@@ -114,8 +241,6 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   //     checkOutDate: booking.checkOut,
   //   };
   // });
-
-
 
   // const fetchTenant = async (): Promise<any> => {
   //   let result = null;
@@ -135,11 +260,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   //   return result;
   // };
 
-
   // TODO: create function to fetch the a tenant by id -> add function to data.ts file
   // const tenant = await getTenantById(id)
-
-
 
   return (
     <>
@@ -152,8 +274,11 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 <h1 className="text-[var(--dark-button)] font-bold">
                   {tenant.fullname}
                 </h1>
-                <p>{tenant.email}</p>
-                <p>{tenant.phoneNumbers.find((phone: any) => phone.isPrimary).number}</p>
+                {/* <p>{tenant.email}</p>
+                <p>
+                  {tenant?.phoneNumbers?.find((phone: any) => phone.isPrimary)
+                    ?.number ?? "N/A"}
+                </p> */}
               </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
@@ -169,15 +294,31 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                     <div className="p-1">
                       <div className="flex flex-row pb-4 ">
                         <h2 className="text-[var(--text)] font-bold pr-12">
-                          Name:
+                          Email:
                         </h2>
                         <div>
                           <p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.fullname}
+                            {tenant.email}
                           </p>
                         </div>
                       </div>
-                      <div className="flex flex-row pb-4">
+                    </div>
+                    <div className="p-1">
+                      <div className="flex flex-row pb-4 ">
+                        <h2 className="text-[var(--text)] font-bold pr-12">
+                          Phone:
+                        </h2>
+                        <div>
+                          <div className="pl-[50px] text-[var(--dark-button)]">
+                            <p>
+                              {tenant?.phoneNumbers?.find(
+                                (phone: any) => phone.isPrimary
+                              )?.number ?? "N/A"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      {/* <div className="flex flex-row pb-4">
                         <h2 className="font-bold pr-14 text-[var(--text)]">
                           DOB:
                         </h2>
@@ -186,8 +327,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             {tenant.dob || "N/A"}
                           </p>
                         </div>
-                      </div>
-                      <div className="flex flex-row pb-4">
+                      </div> */}
+                      {/* <div className="flex flex-row pb-4">
                         <h2 className="font-bold text-[var(--text)] pr-8">
                           Address:
                         </h2>
@@ -205,7 +346,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                           </div>
                         </div>
                         <Separator className="my-2" />
-                      </div>
+                      </div> */}
                     </div>
                   </CardContent>
                 </ScrollArea>
@@ -220,25 +361,25 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 </CardTitle>
                 <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
                   <CardContent>
-                  {notes && notes.length > 0 ? (
+                    {notes && notes.length > 0 ? (
                       notes.map((notes: any, index: number) => {
-                      return (
-                        <div className="p-4 w-full mx-20" key={index}>
-                          <div className="-ml-[100px] text-[var(--text)] mr-[100px]">
-                            {` "${notes.content}" `}
-                            <div>
-                              <p className="text-wrap text-[var(--dark-button)] text-end text-sm">{`${notes.createdBy.firstName} ${notes.createdBy.lastName}- ${notes.createdAt}`}</p>
+                        return (
+                          <div className="p-4 w-full mx-20" key={index}>
+                            <div className="-ml-[100px] text-[var(--text)] mr-[100px]">
+                              {` "${notes.content}" `}
+                              <div>
+                                <p className="text-wrap text-[var(--dark-button)] text-end text-sm">{`${notes.createdBy.firstName} ${notes.createdBy.lastName}- ${notes.createdAt}`}</p>
+                              </div>
                             </div>
+                            <Separator className="my-2" />
                           </div>
-                          <Separator className="my-2" />
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div>
-                      <p>No notes found</p>
-                    </div>
-                  )}
+                        );
+                      })
+                    ) : (
+                      <div>
+                        <p>No notes found</p>
+                      </div>
+                    )}
                   </CardContent>
                 </ScrollArea>
               </Card>
@@ -260,7 +401,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                           <div className="p-1" key={index}>
                             <div>
                               <div className="border rounded-md p-2 -ml-4 -mr-4 text-start text-wrap">
-                              {`${tenant.fullname} stayed in Room #${booking.roomId.roomNumber} 
+                                {`${tenant.fullname} stayed in Room #${booking.roomId.roomNumber} 
                                 from ${booking.checkIn} to ${booking.checkOut}`}
                               </div>
                             </div>
@@ -285,7 +426,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 </CardTitle>
                 <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
                   <CardContent>
-                  {tenant.bookings && tenant.bookings.length > 0 ? (
+                    {tenant.bookings && tenant.bookings.length > 0 ? (
                       tenant.bookings.map((booking: any, index: number) => {
                         return (
                           <div key={index}>
@@ -303,13 +444,13 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             </div>
                             <Separator className="my-2" />
                           </div>
-                         );
-                        })
-                      ) : (
-                        <div>
-                          <p>No Transactions Found</p>
-                        </div>
-                      )}
+                        );
+                      })
+                    ) : (
+                      <div>
+                        <p>No Transactions Found</p>
+                      </div>
+                    )}
                   </CardContent>
                 </ScrollArea>
               </Card>

@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import "@/styles/global.css";
 import { Button } from "@/components/ui/button";
@@ -7,27 +6,72 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
 // import { headers } from "next/headers"
-import { addBookingAndPayments } from "@/actions/booking.actions";
+import {
+  addBookingAndPayments,
+  getBookingById,
+} from "@/actions/booking.actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Define the Reservation interface
+interface BookedBy {
+  email: string;
+  fullname: string;
+  id: string;
+}
+
+interface CreatedBy {
+  fullname: string;
+  id: string;
+}
+
+interface Note {
+  id: string;
+  content: string;
+  createdAt: string;
+  createdBy: CreatedBy;
+  updatedAt: string;
+}
+
+interface PaymentMethod {
+  id: string;
+  method: string;
+}
+
+interface Payment {
+  amount: number;
+  id: string;
+  paymentMethod: PaymentMethod[];
+}
+
+interface Room {
+  id: string;
+  roomNumber: string;
+  roomType: string;
+}
+
 interface Reservation {
   id: string;
-  name: string;
-  phone: string;
-  email: string;
-  room: string;
-  checkInDate: string;
-  checkOutDate: string;
-  deposit: string;
+  bookedBy: {
+    email: string;
+    fullname: string;
+    id: string;
+  };
+  checkIn: string;
+  checkOut: string;
+  createdBy: CreatedBy;
+  notes: Note[];
+  payments: Payment[];
   totalCharge: string;
   totalPaymentDue: string;
-  notes: string;
   transactionHistory: { date: string; amount: string; description: string }[];
+  roomId: Room;
 }
 
 export default function Page() {
+  // get book id from url params
+  console.log("booking");
   const { id } = useParams();
+
   const [reservation, setReservation] = useState<Reservation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,30 +79,19 @@ export default function Page() {
   useEffect(() => {
     const fetchReservation = async () => {
       try {
+        const booking: Reservation = await getBookingById(id ?? "");
+        console.log(booking);
         // Mock data for now
-        const mockData: Reservation = {
-          id: "1",
-          name: "John Doe",
-          phone: "123-456-7890",
-          email: "john.doe@example.com",
-          room: "101",
-          checkInDate: "2025-01-01",
-          checkOutDate: "2025-01-15",
-          deposit: "$100",
-          totalCharge: "$500",
-          totalPaymentDue: "$400",
-          notes: "No special requests.",
-          transactionHistory: [
-            { date: "2025-01-01", amount: "$100", description: "Deposit" },
-            {
-              date: "2025-01-10",
-              amount: "$200",
-              description: "Partial Payment",
-            },
-          ],
-        };
+        booking.transactionHistory = [
+          { date: "2025-01-01", amount: "$100", description: "Deposit" },
+          {
+            date: "2025-01-10",
+            amount: "$200",
+            description: "Partial Payment",
+          },
+        ];
         // Simulate network delay
-        setReservation(mockData);
+        setReservation(booking);
       } catch (error: any) {
         setError(error.message);
       } finally {
@@ -105,7 +138,7 @@ export default function Page() {
   return (
     <div className="page">
       <div className="w-full">
-        <h1 className="pt-[10px] pl-[30px] font-bold">DASHBOARD</h1>
+        <h1 className="pt-[10px] pl-[30px] font-bold h-[45.5px]"></h1>
 
         <Card className="min-w-3xs bg-[var(--highlight)] rounded-md border p-4">
           <CardHeader>
@@ -116,9 +149,10 @@ export default function Page() {
           <CardContent>
             <div className="flex justify-between items-center">
               <div>
-                <p className="font-bold text-xl">{reservation.name}</p>
-                <p>{reservation.phone}</p>
-                <p>{reservation.email}</p>
+                <p className="font-bold text-xl">
+                  {reservation.bookedBy.fullname}
+                </p>
+                <p>{reservation.bookedBy.email}</p>
                 <p>Reservation ID: {reservation.id}</p>
               </div>
               <div className="flex space-x-4">
@@ -130,30 +164,32 @@ export default function Page() {
             <div className="flex">
               <div className="w-1/2 p-4 border rounded-md">
                 <p>
-                  <strong>Room:</strong> {reservation.room}
+                  <strong>Room:</strong> {reservation.roomId.roomNumber}
                 </p>
                 <p>
-                  <strong>Check-In Date:</strong> {reservation.checkInDate}
+                  <strong>Check-In Date:</strong> {reservation.checkIn}
                 </p>
                 <p>
-                  <strong>Check-Out Date:</strong> {reservation.checkOutDate}
-                </p>
-                <p>
-                  <strong>Deposit:</strong> {reservation.deposit}
-                </p>
-                <p>
-                  <strong>Total Charge:</strong> {reservation.totalCharge}
-                </p>
-                <p>
-                  <strong>Total Payment Due:</strong>{" "}
-                  {reservation.totalPaymentDue}
+                  <strong>Check-Out Date:</strong> {reservation.checkOut}
                 </p>
               </div>
               <div className="w-1/2 p-4 border rounded-md ml-4">
                 <p>
                   <strong>Notes:</strong>
                 </p>
-                <p>{reservation.notes}</p>
+                <div>
+                  <div>
+                    {reservation.notes.map((note, index) => (
+                      <div key={index}>
+                        <p>{note.content}</p>
+                        <p>
+                          {note.createdBy.fullname} at {note.createdAt}
+                        </p>
+                        {index < reservation.notes.length - 1 && <hr />}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
             <Separator className="my-4" />

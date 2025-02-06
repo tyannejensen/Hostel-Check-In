@@ -32,7 +32,7 @@ export default async function Page() {
 
   function convertBookingIntoTableData(bookings: any) {
     console.log(bookings);
-    return bookings.map((booking: any) => {
+    return bookings.reverse().map((booking: any) => {
       return {
         id: booking.id,
         name: booking.bookedBy.fullname,
