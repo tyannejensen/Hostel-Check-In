@@ -15,8 +15,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { getBookings } from "@/actions/booking.actions";
-import { IBooking } from "@/lib/types/interfaces/booking.interface";
 import { getTenants } from "@/actions/tenant.actions";
 import TenantsTable from "@/components/TenantsTable";
 
@@ -25,7 +23,7 @@ export default async function Page() {
 
   function convertTenantIntoTableData(tenants: any) {
     console.log(tenants);
-    return tenants.map((tenant: any) => {
+    return tenants.reverse().map((tenant: any) => {
       return {
         id: tenant.id,
         name: tenant.fullname,
@@ -40,7 +38,7 @@ export default async function Page() {
     <>
       <div className="page">
         <div className="w-full">
-          <h1 className="pt-[10px] pl-[30px] font-bold">DASHBOARD</h1>
+          <h1 className="pt-[10px] pl-[30px] font-bold h-[47.5px]"></h1>
 
           <div className="rounded-xl table-container border bg-card text-card-foreground shadow">
             <div className="button-container align-middle content-center">

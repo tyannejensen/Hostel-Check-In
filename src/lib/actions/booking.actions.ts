@@ -27,7 +27,7 @@ export async function getBookings() {
         select: "fullname",
       },
     })
-    .select("_id bookedBy createdBy roomId checkIn checkOut status");
+    .select("_id bookedBy createdBy roomId checkIn checkOut history status");
 
   const bookingsAsObj = bookings.map((booking: any) => booking.toObject());
 
@@ -57,7 +57,7 @@ export async function getBookingById(id: string) {
         select: "fullname",
       },
     })
-    .select("_id bookedBy createdBy roomId checkIn checkOut status");
+    .select("_id bookedBy createdBy roomId checkIn checkOut status history");
 
   const bookingObj = booking.toObject();
   return bookingObj;
@@ -85,7 +85,7 @@ export async function getBookingsByTenantId(id: string) {
         select: "fullname",
       },
     })
-    .select("_id bookedBy createdBy roomId checkIn checkOut status");
+    .select("_id bookedBy createdBy roomId checkIn checkOut status history");
 
   const tenantBookingsObjs = tenantBookings.map((booking) =>
     booking.toObject()

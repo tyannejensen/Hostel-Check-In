@@ -1,5 +1,7 @@
 "use server";
 
+import { createDecipheriv } from "crypto";
+import { headers } from "next/headers";
 import mongoose from "mongoose";
 import { dbConnect } from "@/lib/db";
 import { User } from "@/models/index";
@@ -29,7 +31,7 @@ export async function getTenants() {
   return tenantsAsObj;
 }
 
-export async function getTenantById(id: string | string[]) {
+export async function getTenantById(id: string) {
   await dbConnect();
 
   const tenant = await User.findOne({ _id: id, role: "tenant" })
@@ -51,10 +53,22 @@ export async function getTenantById(id: string | string[]) {
           select: "content createdBy createdAt",
           options: { strictPopulate: false },
         },
+        {
+          path: "history",
+          populate: {
+            path: "updatedBy",
+            select: "fullname",
+            populate: {
+              path: "updates",
+              select: "field oldValue newValue",
+              options: { strictPopulate: false },
+            },
+          },
+        },
       ],
     })
     .select(
-      "_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags createdBy"
+      "_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags history createdBy"
     );
 
   if (!tenant) {
@@ -70,6 +84,9 @@ export async function getTenantById(id: string | string[]) {
 //save tenant as a user
 
 export async function saveTenant(payload: any) {
+  await dbConnect();
+  const reqHeaders = await headers();
+  const userId = reqHeaders.get("x-user-id");
   await dbConnect();
 
   const firstName = payload.firstName;
@@ -123,6 +140,7 @@ export async function saveTenant(payload: any) {
       state,
       zip,
       role: "tenant",
+      createdBy: userId,
     });
 
     console.log("Saving new user:", newUser);

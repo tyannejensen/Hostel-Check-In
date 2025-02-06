@@ -1,6 +1,7 @@
 import { Schema } from "mongoose"
 import { IChangeLog, ILog } from "@/interfaces/index"
 import { LogSchema } from "@/models/Log.schema"
+import { formatDate } from "@/server-utils/helpers"
 
 // Change Log Schema - subdocument of Booking Schema
 export const ChangeLogSchema = new Schema<IChangeLog>(
@@ -15,7 +16,7 @@ export const ChangeLogSchema = new Schema<IChangeLog>(
 		},
 		updatedAt: {
 			type: Date,
-			default: Date.now,
+			default: new Date(),
 		},
 		updatedBy: {
 			ref: "User",
@@ -26,14 +27,38 @@ export const ChangeLogSchema = new Schema<IChangeLog>(
 	{ versionKey: false, timestamps: false } // Disable versioning (__v) field to prevent Booking Updates from being updated
 )
 
+// MIDDLEWARE
 // Booking Update Pre Save Hook -> Middleware to enforce immutability of notes
 ChangeLogSchema.pre<IChangeLog>("save", function (next) {
-	if (this.isNew) {
+	if (this.isNew || !this.isModified()) {
 		// If the Log is new, allow it to save
 		return next()
 	}
 
 	// Prevent updating the note if it already exists
-	this.invalidate("content", "A ChangeLog cannot be modified after creation")
 	next(new Error("ChangeLogs are immutable once created"))
+})
+
+// GETTERS
+ChangeLogSchema.path("updatedAt").get(formatDate)
+
+// SETTERS
+
+ChangeLogSchema.set("toObject", {
+	getters: true,
+	virtuals: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
+	},
+})
+
+// Set toJSON options to exclude _id and password fields automatically
+ChangeLogSchema.set("toJSON", {
+	virtuals: true,
+	getters: true,
+	transform: function (doc, ret) {
+		delete ret._id // Exclude _id field
+		delete ret.__v // Exclude __v (version) field
+	},
 })

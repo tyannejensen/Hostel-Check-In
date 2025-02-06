@@ -5,6 +5,7 @@ import "@/styles/global.css";
 
 import TenantCreateForm from "@/components/TenantCreateForm";
 import { saveTenant } from "@/actions/tenant.actions";
+import { redirect } from "next/navigation";
 
 interface PhoneNumber {
   countryCode: string;
@@ -36,11 +37,12 @@ export default async function Page() {
     // Save the tenant to the database
     const response = await saveTenant(values);
     console.log(response);
-    // if (response.error) {
-    //   redirect("/dashboard/tenants/create");
-    // } else {
-    //   // Handle successful tenant creation (e.g., redirect to tenant list)
-    // }
+    if (response.error) {
+      throw new Error(response.message);
+    } else {
+      redirect("/dashboard/tenants");
+      // Handle successful tenant creation (e.g., redirect to tenant list)
+    }
   }
 
   return (
