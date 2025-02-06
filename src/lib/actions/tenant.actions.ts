@@ -1,5 +1,7 @@
 "use server"
 
+import { createDecipheriv } from "crypto";
+import { headers } from  "next/headers";
 import mongoose from "mongoose"
 import { dbConnect } from "@/lib/db"
 import { User } from "@/models/index"
@@ -82,6 +84,9 @@ export async function getTenantById(id: string) {
 //save tenant as a user
 
 export async function saveTenant(payload: any) {
+  await dbConnect();
+  const reqHeaders = await headers()
+  const userId = reqHeaders.get("x-user-id")
 	await dbConnect()
 
 	const firstName = payload.firstName
@@ -124,18 +129,19 @@ export async function saveTenant(payload: any) {
 			}
 		}
 
-		const newUser = new User({
-			firstName,
-			lastName,
-			email,
-			password,
-			phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
-			address,
-			city,
-			state,
-			zip,
-			role: "tenant",
-		})
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
+      address,
+      city,
+      state,
+      zip,
+      role: "tenant",
+      createdBy: userId,
+    });
 
 		console.log("Saving new user:", newUser)
 
