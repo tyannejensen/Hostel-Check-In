@@ -1,203 +1,185 @@
 // For Mongoose Model Pre and Post Hook Functions
-import { Query, Document, Model } from "mongoose"
+import mongoose, { Document, Model } from "mongoose"
 import { ObjectId } from "mongodb"
-import { _doc } from "@/interfaces/_doc.interface"
-import { IRoom } from "../types/interfaces/room.interface"
-import { IUser } from "../types/interfaces/user.interface"
-import { IBooking } from "../types/interfaces/booking.interface"
+import { IRoom } from "@/interfaces/room.interface"
+import { IUser } from "@/interfaces/user.interface"
+import { IBooking } from "@/interfaces/booking.interface"
+import { IPaymentMethod } from "@/interfaces/payment-method.interface"
 
 // Functions to help with logging changes to documents
 
-// Middleware to get the old document before updating
-export async function getOldDoc(
-	this: Query<any, any>,
-	next: (err?: any) => void
-	// Callback to move to the next middleware
-) {
-	// Fetch the document manually before updating
-	const oldDoc = await this.model.findOne(this.getQuery())
-	// Save the old document to the options object
-	this.setOptions({ _oldDoc: oldDoc })
-
-	next()
-}
-
 // Middleware to log changes to the document history
 export async function logChanges(
-	this: Query<any, any>,
-	doc: any,
+	this: Document & {
+		history: { updates: any[]; updatedAt: Date; updatedBy: string }[]
+		updatedBy: string
+		createdBy: string
+	},
 	next: (err?: any) => void
 ) {
-	// Log function name and middleware name
-	console.log("pre-middleware-findOneAndUpdate: logChanges()")
-	// If the document was updated, log the changes
-	if (this.getOptions()._oldDoc && doc) {
-		const oldDoc = this.getOptions()._oldDoc.toObject()
-		const newDoc = doc.toObject()
-		const changes = []
-
-		// Log if old and dnew docs were modified
-
-		// Fields to ignore when logging changes
-		const blockedFields = new Set(["history", "payments", "notes"])
-
-		// Compare the current document with the old document
-		for (const key in newDoc) {
-			// Skip the history field
-			if (blockedFields.has(key)) continue
-
-			// If the field is an Array, loop through and compare the objects in the array
-			if (newDoc[key] instanceof Array) {
-				console.log(
-					`Array: key: ${key}, value: ${newDoc[key]}, typeOf: ${typeof newDoc[
-						key
-					]}`
-				)
-				// if OldArray not equal to newArray
-				// else OldArray equal to newArray
-
-				if (newDoc[key][0] instanceof ObjectId) {
-				} else if (typeof newDoc[key] === "object") {
-				}
-
-				newDoc[key].forEach((item: any, index: number) => {})
-				continue
-			} else if (newDoc[key] instanceof ObjectId) {
-				console.log(
-					`MongoDB ObjectId: key: ${key}, value: ${
-						newDoc[key]
-					}, typeOf: ${typeof newDoc[key]}`
-				)
-				if (oldDoc[key].toString() !== newDoc[key].toString()) {
-					changes.push({
-						field: key,
-						oldValue: oldDoc[key],
-						newValue: doc[key],
-					})
-				}
-				continue
-			} else if (typeof newDoc[key] === "object") {
-				console.log(
-					`Normal Object: key: ${key}, value: ${
-						newDoc[key]
-					}, typeOf: ${typeof newDoc[key]}`
-				)
-				// const newDocSubObject = doc[key].toString()
-				// const oldDocSubObject = oldDoc[key].toString()
-				// for (const subKey in newDocSubObject) {
-				// 	if (oldDocSubObject[subKey] !== newDocSubObject[subKey]) {
-				// 		changes.push({
-				// 			field: `${key}.${subKey}`,
-				// 			oldValue: oldDocSubObject[subKey],
-				// 			newValue: newDocSubObject[subKey],
-				// 		})
-				// 	}
-				// }
-				continue
-			} else if (oldDoc[key] !== newDoc[key]) {
-				console.log(
-					`Yes change to ${key}, value: ${doc[key]}, typeOf: ${typeof doc[key]}`
-				)
-				changes.push({
-					field: key,
-					oldValue: oldDoc[key],
-					newValue: doc[key],
-				})
-			}
-		}
-
-		// If there are no changes, move to the next middleware
-		if (changes.length === 0) {
+	try {
+		// Do not check for changes if the document is new
+		if (this.isNew || this.$session()) {
+			console.log("Session present")
 			return next()
 		}
 
-		console.log("Changes: ", changes)
+		// log the model the document is from
+		console.log(
+			`Model: ${(this.constructor as typeof mongoose.Model).modelName}`
+		)
+		console.log(`this: ${this._id}`)
 
-		// If there are changes, add them to the history array
-		doc.history.push({
-			updates: changes,
-			updatedBy: this.getOptions().userId,
-		})
+		// GET old and new docs
+		const newDoc = this // 'this' refers to the new document (after modifications)
+		const newDocObj = newDoc.toObject() // used to loop through only the plain document fields
+		const thisModel = this.constructor as Model<
+			IUser | IBooking | IRoom | IPaymentMethod
+		> // Get the model of the current document
+		const oldDoc = await thisModel.findById(this._id).lean() // Fetch the old document
 
-		await doc.save()
-		next()
-	}
-}
+		if (!oldDoc) {
+			return next("Old document not found")
+		}
 
-export async function logHistory(this: Document, next: (err?: any) => void) {
-	// Do not check for changes if the document is new
-	if (this.isNew) {
-		return next()
-	}
+		// Exit middleware if no changes are detected
+		if (!newDoc.isModified()) return next({ error: "No changes detected" })
 
-	if (this.$session()) {
-		// If the session exists, it means the save is part of a transaction → skip middleware
-		console.log("Session exists")
-		return next()
-	}
+		const fieldsToIgnore = new Set([
+			"history",
+			"createdAt",
+			"updatedAt",
+			"id",
+			"createdBy",
+		]) // Fields to ignore when logging changes
+		const changes: { field: string; oldValue: any; newValue: any }[] = [] // Array to store updated fields
 
-	// GET old and new docs
-	const newDoc = this // 'this' refers to the new document (after modifications)
-	const newDocObj = newDoc.toObject() // used to loop through only the plain document fields
-	const thisModel = this.constructor as Model<IUser | IBooking | IRoom> // Get the model of the current document
-	const oldDoc = await thisModel.findById(this._id) // Fetch the old document
+		for (const key in newDocObj) {
+			// Skip specific fields in 'fieldsToIgnore' set
+			if (fieldsToIgnore.has(key)) continue
 
-	if (!oldDoc) {
-		return next(
-			`No previous version found for the document with the ID: ${this._id}`
-		) // Exit early if the document isn't found
-	}
+			// Is field modified?
+			if (newDoc.isModified(key)) {
+				// Is the field is an object?
+				if (newDocObj[key] instanceof Object) {
+					// Log the type of field
+					console.log(`${key} is an object`)
 
-	// Exit middleware if no changes are detected
-	if (!newDoc.isModified()) return next({ error: "No changes detected" })
+					// Is the field is an Array && ObjectId (MongoDB ObjectId)?
+					if (
+						newDocObj[key] instanceof Array &&
+						newDocObj[key][0] instanceof ObjectId
+					) {
+						console.log(`${key} is an Array of MongoDB ObjectIds`)
+						// Check if the array elements have been modified
+						for (let i = 0; i < newDocObj[key].length; i++) {
+							if (newDoc.isModified(`${key}.${i}`)) {
+								// Log the updated field
+								console.log(`${key}.${i} is modified`)
 
-	const fieldsToIgnore = new Set(["history", "createdAt", "updatedAt"]) // Fields to ignore when logging changes
-	const changes: { field: string; oldValue: any; newValue: any }[] = [] // Array to store updated fields
+								console.log(`newDocObj[key][i]: ${newDocObj[key][i]}`)
 
-	for (const key in newDocObj) {
-		// Skip specific fields in 'fieldsToIgnore' set
-		if (fieldsToIgnore.has(key)) continue
-
-		if (newDoc.isModified(key)) {
-			console.log(`${key} is modified: ${newDoc.isModified(key)}`)
-
-			// If the field is an array, compare the array elements
-			if (Array.isArray(newDocObj[key])) {
-				console.log(`${key} is modified: ${newDoc.isModified(key)}`)
-				// Is the array of type ObjectId?
-				if (newDocObj[key][0] instanceof ObjectId) {
-					// Check if the array elements have been modified
-					for (let i = 0; i < newDocObj[key].length; i++) {
-						if (newDoc.isModified(`${key}.${i}`)) {
-							changes.push({
-								field: `${key}.${i}`,
-								oldValue: (oldDoc as typeof newDocObj)[key][i],
-								newValue: newDocObj[key][i],
-							})
-						}
-					}
-
-					// Is the array of type object?
-				} else if (typeof newDocObj[key][0] === "object") {
-					// Check if the array elements have been modified
-					for (let i = 0; i < newDocObj[key].length; i++) {
-						for (const subKey in newDocObj[key][i]) {
-							if (newDoc.isModified(`${key}.${i}.${subKey}`)) {
 								changes.push({
-									field: `${key}.${i}.${subKey}`,
-									oldValue: (oldDoc as typeof newDocObj)[key][i][subKey],
-									newValue: newDocObj[key][i][subKey],
+									field: `${key}.${i}`,
+									oldValue: (oldDoc as typeof newDocObj)[key][i] || "N/A",
+									newValue: newDocObj[key][i],
 								})
 							}
 						}
+						continue
 					}
+
+					// Is the field is an Array && Object?
+					if (
+						newDocObj[key] instanceof Array &&
+						typeof newDocObj[key][0] === "object"
+					) {
+						console.log(`${key} is an Array of Objects`)
+						// Check if the array elements have been modified
+						for (let i = 0; i < newDocObj[key].length; i++) {
+							for (const subKey in newDocObj[key][i]) {
+								if (newDoc.isModified(`${key}.${i}.${subKey}`)) {
+									// Log the updated field
+									console.log(`${key}.${i}.${subKey} is modified`)
+
+									// console.log(`${subKey}: ${newDocObj[key][i][subKey]}`)
+									if (fieldsToIgnore.has(subKey)) continue
+
+									let _oldValue
+									if (!(oldDoc as typeof newDocObj)[key][i]?.subKey) {
+										_oldValue = "N/A"
+									} else {
+										_oldValue = (oldDoc as typeof newDocObj)[key][i][subKey]
+									}
+
+									changes.push({
+										field: `${key}.${i}.${subKey}`,
+										oldValue: _oldValue,
+										newValue: newDocObj[key][i][subKey],
+									})
+								}
+							}
+						}
+						continue
+					}
+
+					// Is the field is an ObjectId (MongoDB ObjectId)?
+					if (newDocObj[key] instanceof ObjectId) {
+						// Log the type of field
+						console.log(`${newDocObj[key]} is a MongoDB ObjectId`)
+
+						changes.push({
+							field: key,
+							oldValue: (oldDoc as typeof newDocObj)[key] || "N/A",
+							newValue: newDocObj[key],
+						})
+					}
+
+					// Move to the next field
+					continue
 				}
 
-				// Is the array empty? If yes, compare the prev and new array and log the changes
+				// Is the field is a string, number, boolean, or date?
+				if (
+					typeof newDocObj[key] === "string" ||
+					typeof newDocObj[key] === "number" ||
+					typeof newDocObj[key] === "boolean" ||
+					newDocObj[key] instanceof Date
+				) {
+					console.log(`${newDocObj[key]} is of type ${typeof newDocObj[key]}`)
+
+					// Log the updated field
+					changes.push({
+						field: key,
+						oldValue: (oldDoc as typeof newDocObj)[key] || "N/A",
+						newValue: newDocObj[key],
+					})
+					continue
+				} else {
+					console.log(
+						`Type not captured: ${newDocObj[key]} is of type ${typeof newDocObj[
+							key
+						]}`
+					)
+				}
 			}
 		}
+
+		// Log the changes to the console
+		console.log(`Updated fields: ${JSON.stringify(changes)}\n`)
+		console.log(`UpdatedBy: ${this}`)
+		// Add the changes to the document's history
+		this?.history.push({
+			updates: changes,
+			updatedAt: new Date(),
+			updatedBy: this.updatedBy || this.createdBy,
+		})
+
+		console.log(`History: ${this?.history}`) // debugging
+	} catch (error) {
+		console.error("Error in logChanges middleware:", error)
+		next(error)
 	}
-	// console.log(`Updated fields: ${changes}`)
 }
 
 // Setter function to format dates for createdAt and updatedAt fields

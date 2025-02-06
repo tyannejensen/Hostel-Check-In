@@ -18,20 +18,16 @@ import Link from "next/link";
 import { getBookings } from "@/actions/booking.actions";
 import { IBooking } from "@/lib/types/interfaces/booking.interface";
 import { getTenants } from "@/actions/tenant.actions";
+import TenantsTable from "@/components/TenantsTable";
 
 export default async function Page() {
   const tenants = await getTenants();
-  console.log(tenants);
-
-  const statusMap: { [key in "paid" | "not-paid" | "pending"]: string } = {
-    paid: "Paid",
-    "not-paid": "Not Paid",
-    pending: "Pending",
-  };
 
   function convertTenantIntoTableData(tenants: any) {
+    console.log(tenants);
     return tenants.map((tenant: any) => {
       return {
+        id: tenant.id,
         name: tenant.fullname,
         phone: tenant.phoneNumbers.find((phone: any) => phone.isPrimary).number,
         email: tenant.email,
@@ -39,7 +35,6 @@ export default async function Page() {
       };
     });
   }
-
 
   return (
     <>
@@ -61,28 +56,7 @@ export default async function Page() {
                 </div>
               </div>
             </div>
-            <Table>
-              <TableHeader className="table-row-header">
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Phone #</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Balance Due</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {convertTenantIntoTableData(tenants).map((rowData: any, index: number) => {
-                  return (
-                    <TableRow key={index} className="table-data-row">
-                      <TableCell>{rowData.name}</TableCell>
-                      <TableCell>{rowData.phone}</TableCell>
-                      <TableCell>{rowData.email}</TableCell>
-                      <TableCell>{rowData.balance}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <TenantsTable tenants={convertTenantIntoTableData(tenants)} />
           </div>
         </div>
       </div>

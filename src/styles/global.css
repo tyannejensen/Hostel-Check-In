@@ -314,6 +314,9 @@ h3 {
   background-color: var(--dark-button);
   color: var(--light) !important;
 }
+.table-data-row {
+  cursor: pointer;
+}
 /* --------------------------- TENANT OVERVIEW --------------------------- */
 .dark-circle {
   background-color: var(--dark-button);

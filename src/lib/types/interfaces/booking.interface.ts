@@ -7,7 +7,7 @@ export interface IBooking extends Document {
 	_id: ObjectId
 	bookedBy: string // reference to the user (tenant) who made the booking - uses uuid v4
 	createdBy: string // reference to the user (employee) who created the booking - uses uuid v4
-	roomId: ObjectId
+	roomId: ObjectId // reference to the room document
 	checkIn: Date
 	checkOut: Date
 	status: IBookingStatus
@@ -19,4 +19,5 @@ export interface IBooking extends Document {
 	totalPayment?: number
 	notes?: INote[]
 	history?: IChangeLog[]
+	updatedBy: string // reference to the user (employee) who last updated the booking - uses uuid v4
 }

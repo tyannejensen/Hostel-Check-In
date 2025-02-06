@@ -72,6 +72,7 @@ roomSchema.set("toJSON", {
 	getters: true,
 	transform: (doc, ret) => {
 		delete ret._id
+		delete ret.__v
 		return ret
 	},
 })
@@ -81,6 +82,7 @@ roomSchema.set("toObject", {
 	getters: true,
 	transform: (doc, ret) => {
 		delete ret._id
+		delete ret.__v
 		return ret
 	},
 })

@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Noop, RefCallBack, useForm } from "react-hook-form";
 import "@/styles/global.css";
 import { Button } from "@/components/ui/button";
+import { saveTenant } from "@/actions/tenant.actions";
+
 
 import {
   Form,
@@ -36,11 +38,14 @@ const formSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   email: z.string().email(),
+  password: z.string().min(6, "Password must be at least 6 characters"), 
   phone: z.string(),
-  address: z.string(),
+  addressLineOne: z.string(),
+  addressLineTwo: z.string(),
   city: z.string(),
   state: z.string(),
   zip: z.string(),
+  birthdate: z.string(),
   paymentMethodType: z.string(),
   paymentMethod: z.object({
     paymentName: z.string(),
@@ -48,13 +53,21 @@ const formSchema = z.object({
     method: z.string(),
     cardHolderName: z.string(),
     cardNumber: z.string(),
-    expirationDate: z.date(),
+    expirationDate: z.string(),
     cvv: z.string(),
-  }),
+    routingNumber: z.string().optional(),
+    accountNumber: z.string().optional(),
+    bankName: z.string().optional(),
+  }).optional(),
 });
+interface PageProps {
+  userId: string;
+}
 
-export default function Page() {
+export default function Page({ userId }: PageProps) {
   const [paymentMethodType, setPaymentMethodType] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [success, setSuccess] = React.useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,17 +75,30 @@ export default function Page() {
       firstName: "",
       lastName: "",
       email: "",
+      password: "",
+      birthdate: "",
       phone: "",
-      address: "",
+      addressLineOne: "",
+      addressLineTwo: "",
       city: "",
       state: "",
       zip: "",
     },
   });
 
-  function handleFormSubmit(form: any) {
-    const values = form.getValues();
+  async function handleFormSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+    // Save the tenant to the database
+    const response = await saveTenant({ ...values, userId });
+    if (response.error) {
+      setError(response.message);
+      setSuccess("");
+    } else {
+      setError("");
+      setSuccess("Tenant Created Successfully");
+      form.reset();
+      // Handle successful tenant creation (e.g., redirect to tenant list)
+    }
   }
 
   function handlePaymentMethodSelected(value: string, field: any) {
@@ -161,6 +187,42 @@ export default function Page() {
                 />
                 <FormField
                   control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="b-box">
+                      <div className="label-title whitespace-nowrap">Password</div>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          {...field}
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="birthdate"
+                  render={({ field }) => (
+                    <FormItem className="b-box">
+                      <div className="label-title whitespace-nowrap">Birthdate</div>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="phone"
                   render={({ field }) => (
                     <FormItem className="b-box">
@@ -178,11 +240,30 @@ export default function Page() {
                 />
                 <FormField
                   control={form.control}
-                  name="address"
+                  name="addressLineOne"
                   render={({ field }) => (
                     <FormItem className="b-box">
                       <div className="label-title whitespace-nowrap">
-                        Address
+                        Address Line 1
+                      </div>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="addressLineTwo"
+                  render={({ field }) => (
+                    <FormItem className="b-box">
+                      <div className="label-title whitespace-nowrap">
+                        Address Line 2
                       </div>
                       <FormControl>
                         <Input
@@ -442,10 +523,11 @@ export default function Page() {
                   <Button
                     className="mt-[20px] submit-button"
                     type="button"
-                    onClick={() => handleFormSubmit(form)}
+                    onClick={form.handleSubmit(handleFormSubmit)}
                   >
                     Submit
                   </Button>
+                  {success && <p className="text-green-500 ml-4">{success}</p>}
                 </div>
               </form>
             </Form>
