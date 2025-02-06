@@ -1,7 +1,7 @@
 "use server"
 
-import { createDecipheriv } from "crypto";
-import { headers } from  "next/headers";
+import { createDecipheriv } from "crypto"
+import { headers } from "next/headers"
 import mongoose from "mongoose"
 import { dbConnect } from "@/lib/db"
 import { User } from "@/models/index"
@@ -34,6 +34,7 @@ export async function getTenants() {
 export async function getTenantById(id: string) {
 	await dbConnect()
 
+	// FIXME: Identify why the booking history for 'Alice Smith' is populating with the 'tenant' history on the tenant/{id} page
 	const tenant = await User.findOne({ _id: id, role: "tenant" })
 		.populate("fullname")
 		.populate("billingAddress")
@@ -53,7 +54,20 @@ export async function getTenantById(id: string) {
 						select: "firstName lastName",
 					},
 					select: "content createdBy createdAt",
-					options: { strictPopulate: false },
+				},
+				{
+					path: "history",
+					populate: {
+						path: "updatedBy",
+						select: "fullname",
+					},
+				},
+				{
+					path: "history",
+					populate: {
+						path: "updates",
+						select: "field oldValue newValue",
+					},
 				},
 			],
 		})
@@ -65,7 +79,7 @@ export async function getTenantById(id: string) {
 		throw new Error("Tenant not found")
 	}
 
-	const tenantObj = tenant.toObject({ getters: true, virtuals: false })
+	const tenantObj = tenant.toObject()
 	return tenantObj
 }
 
@@ -74,9 +88,9 @@ export async function getTenantById(id: string) {
 //save tenant as a user
 
 export async function saveTenant(payload: any) {
-  await dbConnect();
-  const reqHeaders = await headers()
-  const userId = reqHeaders.get("x-user-id")
+	await dbConnect()
+	const reqHeaders = await headers()
+	const userId = reqHeaders.get("x-user-id")
 	await dbConnect()
 
 	const firstName = payload.firstName

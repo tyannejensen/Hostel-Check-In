@@ -13,6 +13,7 @@ export async function logChanges(
 	this: Document & {
 		history: { updates: any[]; updatedAt: Date; updatedBy: string }[]
 		updatedBy: string
+		createdBy: string
 	},
 	next: (err?: any) => void
 ) {
@@ -44,7 +45,13 @@ export async function logChanges(
 		// Exit middleware if no changes are detected
 		if (!newDoc.isModified()) return next({ error: "No changes detected" })
 
-		const fieldsToIgnore = new Set(["history", "createdAt", "updatedAt"]) // Fields to ignore when logging changes
+		const fieldsToIgnore = new Set([
+			"history",
+			"createdAt",
+			"updatedAt",
+			"id",
+			"createdBy",
+		]) // Fields to ignore when logging changes
 		const changes: { field: string; oldValue: any; newValue: any }[] = [] // Array to store updated fields
 
 		for (const key in newDocObj) {
@@ -95,7 +102,8 @@ export async function logChanges(
 									// Log the updated field
 									console.log(`${key}.${i}.${subKey} is modified`)
 
-									console.log(`${subKey}: ${newDocObj[key][i][subKey]}`)
+									// console.log(`${subKey}: ${newDocObj[key][i][subKey]}`)
+									if (fieldsToIgnore.has(subKey)) continue
 
 									let _oldValue
 									if (!(oldDoc as typeof newDocObj)[key][i]?.subKey) {
@@ -159,11 +167,12 @@ export async function logChanges(
 
 		// Log the changes to the console
 		console.log(`Updated fields: ${JSON.stringify(changes)}\n`)
+		console.log(`UpdatedBy: ${this}`)
 		// Add the changes to the document's history
 		this?.history.push({
 			updates: changes,
 			updatedAt: new Date(),
-			updatedBy: this.updatedBy,
+			updatedBy: this.updatedBy || this.createdBy,
 		})
 
 		console.log(`History: ${this?.history}`) // debugging
