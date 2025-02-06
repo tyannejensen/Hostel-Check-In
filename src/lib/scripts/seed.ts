@@ -319,11 +319,13 @@ async function updateUserSave(admin: IUser, id: string) {
 		cardNumberLastFour: "9999",
 		expirationDate: new Date("2029-08-1"),
 		cardBrand: "Discover",
+		createdBy: admin.id,
+		updatedBy: admin.id,
 	})
 	await newPaymentMethod.save()
 	selectedUser.paymentMethods.push(newPaymentMethod._id)
-	// selectedUser.paymentMethods[0].cardNumber = "4321"
-	// selectedUser.paymentMethods[0].cardBrand = "Discover"
+	selectedUser.paymentMethods[0].cardNumber = "4321"
+	selectedUser.paymentMethods[0].cardBrand = "Discover"
 	selectedUser.updatedBy = admin.id
 	await selectedUser.save()
 	console.log("User fullname: ", selectedUser.toObject().fullname)
@@ -367,19 +369,12 @@ async function seedDatabase() {
 		console.log("Notes added to Bookings successfully!\n")
 
 		// Update Booking status to create a history log
-		// await updateBookingStatus(admin, "pending", "paid") // Update Booking status
-		// console.log("Booking status updated successfully!\n")
-
-		// Update User to create a history log
-		// await updateUser(admin, tenants[2].id, {
-		// 	// Update User
-		// 	lastName: "johnson",
-		// 	email: "the.johnson@test.com",
-		// })
+		await updateBookingStatus(admin, "pending", "paid") // Update Booking status
+		console.log("Booking status updated successfully!\n")
 
 		// Update User to create a history log (using pre-save method)
-		// await updateUserSave(admin, tenants[2].id)
-		// console.log("User updated successfully!\n")
+		await updateUserSave(admin, tenants[2].id)
+		console.log("User updated successfully!\n")
 
 		console.log("Database seeded successfully!")
 

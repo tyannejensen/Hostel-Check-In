@@ -54,7 +54,7 @@ export async function getTenantById(id: string) {
 			],
 		})
 		.select(
-			"_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags createdBy"
+			"_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags history createdBy"
 		)
 
 	if (!tenant) {
