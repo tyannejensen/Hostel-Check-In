@@ -22,14 +22,14 @@ export const NoteSchema = new Schema<INote>(
 
 // MIDDLEWARE
 // Notes Pre Save Hook -> Middleware to enforce immutability of notes
-NoteSchema.pre("save", function (next) {
-	if (this.isNew) return next() // If the note is new, allow it to save
-	if (!this.isModified()) return next() // If the note is not modified, allow it to save
+// NoteSchema.pre("save", function (next) {
+// 	if (this.isNew) return next() // If the note is new, allow it to save
+// 	if (!this.isModified()) return next() // If the note is not modified, allow it to save
 
-	// Prevent updating the note if it already exists
-	this.invalidate("content", "Notes cannot be modified after creation")
-	next(new Error("Notes are immutable once created"))
-})
+// 	// Prevent updating the note if it already exists
+// 	this.invalidate("content", "Notes cannot be modified after creation")
+// 	next(new Error("Notes are immutable once created"))
+// })
 
 // GETTERS
 // Convert the 'createdAt' and 'updatedAt' fields to MMM DD, YYYY format e.g. Jan 30, 2025
