@@ -9,6 +9,7 @@ import "@/styles/global.css";
 import { Button } from "@/components/ui/button";
 import { saveTenant } from "@/actions/tenant.actions";
 
+
 import {
   Form,
   FormControl,
@@ -57,8 +58,11 @@ const formSchema = z.object({
     bankName: z.string().optional(),
   }).optional(),
 });
+interface PageProps {
+  userId: string;
+}
 
-export default function Page() {
+export default function Page({ userId }: PageProps) {
   const [paymentMethodType, setPaymentMethodType] = React.useState("");
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
@@ -80,9 +84,8 @@ export default function Page() {
 
   async function handleFormSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
-
     // Save the tenant to the database
-    const response = await saveTenant(values);
+    const response = await saveTenant({ ...values, userId });
     if (response.error) {
       setError(response.message);
       setSuccess("");

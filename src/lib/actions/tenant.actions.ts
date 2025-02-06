@@ -1,9 +1,9 @@
 "use server"
 
-import mongoose from "mongoose";
 import { dbConnect } from "@/lib/db";
 import { User } from "@/models/index";
-import path from "path";
+import { createDecipheriv } from "crypto";
+import { headers } from  "next/headers";
 
 // GET DATA
 
@@ -70,6 +70,8 @@ export async function getTenantById(id: string) {
 
 export async function saveTenant(payload: any) {
   await dbConnect();
+  const reqHeaders = await headers()
+  const userId = reqHeaders.get("x-user-id")
 
   const firstName = payload.firstName;
   const lastName = payload.lastName;
@@ -109,6 +111,7 @@ export async function saveTenant(payload: any) {
       state,
       zip,
       role: "tenant",
+      createdBy: userId,
     });
 
     console.log("Saving new user:", newUser);
