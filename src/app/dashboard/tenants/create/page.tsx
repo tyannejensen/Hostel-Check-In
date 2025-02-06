@@ -40,7 +40,8 @@ const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6, "Password must be at least 6 characters"), 
   phone: z.string(),
-  address: z.string(),
+  addressLineOne: z.string(),
+  addressLineTwo: z.string(),
   city: z.string(),
   state: z.string(),
   zip: z.string(),
@@ -77,7 +78,8 @@ export default function Page({ userId }: PageProps) {
       password: "",
       birthdate: "",
       phone: "",
-      address: "",
+      addressLineOne: "",
+      addressLineTwo: "",
       city: "",
       state: "",
       zip: "",
@@ -238,11 +240,30 @@ export default function Page({ userId }: PageProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="address"
+                  name="addressLineOne"
                   render={({ field }) => (
                     <FormItem className="b-box">
                       <div className="label-title whitespace-nowrap">
-                        Address
+                        Address Line 1
+                      </div>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="addressLineTwo"
+                  render={({ field }) => (
+                    <FormItem className="b-box">
+                      <div className="label-title whitespace-nowrap">
+                        Address Line 2
                       </div>
                       <FormControl>
                         <Input

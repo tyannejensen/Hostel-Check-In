@@ -99,10 +99,11 @@ export async function saveTenant(payload: any) {
 	const password = payload.password
 	const birthdate = payload.birthdate
 	const phoneNumbers = payload.phone
-	const billingAddress = payload.address
+	const addressLineOne = payload.addressLineOne
+	const addressLineTwo = payload.addressLineTwo
 	const city = payload.city
 	const state = payload.state
-	const zip = payload.zip
+	const postalCode = payload.zip
 
 	if (
 		!firstName ||
@@ -111,10 +112,11 @@ export async function saveTenant(payload: any) {
 		!password ||
 		!birthdate ||
 		!phoneNumbers ||
-		!billingAddress ||
+		!addressLineOne ||
+		!addressLineTwo ||
 		!city ||
 		!state ||
-		!zip
+		!postalCode	
 	) {
 		return { error: true, message: "Please fill in all fields" }
 	}
@@ -135,6 +137,14 @@ export async function saveTenant(payload: any) {
 			}
 		}
 
+		const billingAddress = {
+			addressLineOne,
+			addressLineTwo,
+			city,
+			state,
+			postalCode,
+		  };
+
     const newUser = new User({
       firstName,
       lastName,
@@ -143,9 +153,6 @@ export async function saveTenant(payload: any) {
 	  birthdate,
       phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
       billingAddress,
-      city,
-      state,
-      zip,
       role: "tenant",
       createdBy: userId,
     });
