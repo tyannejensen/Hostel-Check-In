@@ -51,6 +51,18 @@ export async function getTenantById(id: string) {
 					select: "content createdBy createdAt",
 					options: { strictPopulate: false },
 				},
+				{
+					path: "history",
+					populate: {
+						path: "updatedBy",
+						select: "fullname",
+						populate: {
+							path: "updates",
+							select: "field oldValue newValue",
+							options: { strictPopulate: false },
+						},
+					},
+				},
 			],
 		})
 		.select(
@@ -61,7 +73,7 @@ export async function getTenantById(id: string) {
 		throw new Error("Tenant not found")
 	}
 
-	const tenantObj = tenant.toObject({ getters: true, virtuals: false })
+	const tenantObj = tenant.toObject()
 	return tenantObj
 }
 

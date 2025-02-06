@@ -296,11 +296,10 @@ async function updateBookingStatus(
 	oldStatus: string,
 	newStatus: string
 ) {
-	const selectedBooking = await Booking.findOneAndUpdate(
-		{ status: oldStatus },
-		{ $set: { status: newStatus } },
-		{ new: true, userId: admin.id }
-	)
+	const selectedBooking = await Booking.findOne({ status: oldStatus })
+	selectedBooking.status = newStatus
+	selectedBooking.updatedBy = admin.id
+	await selectedBooking.save()
 	console.log(
 		`Old Status: ${oldStatus}, New Status: ${selectedBooking.toObject().status}`
 	) // Log the status change

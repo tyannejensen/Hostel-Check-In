@@ -13,6 +13,7 @@ export async function logChanges(
 	this: Document & {
 		history: { updates: any[]; updatedAt: Date; updatedBy: string }[]
 		updatedBy: string
+		createdBy: string
 	},
 	next: (err?: any) => void
 ) {
@@ -159,11 +160,12 @@ export async function logChanges(
 
 		// Log the changes to the console
 		console.log(`Updated fields: ${JSON.stringify(changes)}\n`)
+		console.log(`UpdatedBy: ${this}`)
 		// Add the changes to the document's history
 		this?.history.push({
 			updates: changes,
 			updatedAt: new Date(),
-			updatedBy: this.updatedBy,
+			updatedBy: this.updatedBy || this.createdBy,
 		})
 
 		console.log(`History: ${this?.history}`) // debugging

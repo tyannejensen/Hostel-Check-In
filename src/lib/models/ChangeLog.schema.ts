@@ -1,6 +1,7 @@
 import { Schema } from "mongoose"
 import { IChangeLog, ILog } from "@/interfaces/index"
 import { LogSchema } from "@/models/Log.schema"
+import { formatDate } from "@/server-utils/helpers"
 
 // Change Log Schema - subdocument of Booking Schema
 export const ChangeLogSchema = new Schema<IChangeLog>(
@@ -15,7 +16,7 @@ export const ChangeLogSchema = new Schema<IChangeLog>(
 		},
 		updatedAt: {
 			type: Date,
-			default: Date.now,
+			default: new Date(),
 		},
 		updatedBy: {
 			ref: "User",
@@ -37,6 +38,9 @@ ChangeLogSchema.pre<IChangeLog>("save", function (next) {
 	// Prevent updating the note if it already exists
 	next(new Error("ChangeLogs are immutable once created"))
 })
+
+// GETTERS
+ChangeLogSchema.path("updatedAt").get(formatDate)
 
 // SETTERS
 
