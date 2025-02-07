@@ -32,7 +32,6 @@ export default function Page() {
 		undefined
 	)
 
-	const [errorMessage, setErrorMessage] = useState("")
     const [registerErrorMessage, setRegisterErrorMessage] = useState("")
 	const [registerSuccessMessage, setRegisterSuccessMessage] = useState("")
     const [isRegisterPending, setIsRegisterPending] = useState(false)

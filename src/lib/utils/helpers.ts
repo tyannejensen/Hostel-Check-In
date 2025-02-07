@@ -178,7 +178,7 @@ export async function logChanges(
 		console.log(`History: ${this?.history}`) // debugging
 	} catch (error) {
 		console.error("Error in logChanges middleware:", error)
-		next(error)
+		next(error as mongoose.CallbackError)
 	}
 }
 

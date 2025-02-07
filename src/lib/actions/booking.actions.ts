@@ -2,7 +2,17 @@
 
 import mongoose from "mongoose";
 import { dbConnect } from "@/lib/db";
-import { Booking, Payment, PaymentMethod, User } from "@/models/index";
+import { Booking, Payment, PaymentMethod } from "@/models/index";
+
+// Define a type for the booking data
+interface BookingData {
+  name: { value: string };
+  room: { value: string };
+  dateRange: { from: string; to: string };
+  status: string;
+  deposit: number;
+  total: number;
+}
 
 // GET DATA
 export async function getBookings() {
@@ -29,7 +39,9 @@ export async function getBookings() {
     })
     .select("_id bookedBy createdBy roomId checkIn checkOut history status");
 
-  const bookingsAsObj = bookings.map((booking: any) => booking.toObject());
+  const bookingsAsObj = bookings.map((booking: mongoose.Document) =>
+    booking.toObject()
+  );
 
   // Ensure final data is fully JSON-serializable
   return bookingsAsObj;
@@ -59,7 +71,7 @@ export async function getBookingById(id: string | string[]) {
     })
     .select("_id bookedBy createdBy roomId checkIn checkOut status history");
 
-  const bookingObj = booking.toObject();
+  const bookingObj = booking?.toObject();
   return bookingObj;
 }
 
@@ -87,14 +99,14 @@ export async function getBookingsByTenantId(id: string) {
     })
     .select("_id bookedBy createdBy roomId checkIn checkOut status history");
 
-  const tenantBookingsObjs = tenantBookings.map((booking) =>
+  const tenantBookingsObjs = tenantBookings.map((booking: mongoose.Document) =>
     booking.toObject()
   );
   return tenantBookingsObjs;
 }
 
 // SET DATA
-export async function addBookingAndPayment(data: any, userId: string) {
+export async function addBookingAndPayment(data: BookingData, userId: string) {
   // Connect to the database
   await dbConnect();
 
@@ -115,7 +127,7 @@ export async function addBookingAndPayment(data: any, userId: string) {
     });
     await booking.save({ session });
 
-    // Step 3: Get a Paymebt Method to use with the Payment
+    // Step 3: Get a Payment Method to use with the Payment
     const paymentMethod = await PaymentMethod.findOne({
       userId: data.name.value,
     }).session(session);
@@ -132,7 +144,7 @@ export async function addBookingAndPayment(data: any, userId: string) {
       amount: Number(data.total),
       paidBy: data.name.value,
       createdBy: userId,
-      paymentMethod: paymentMethod._id,
+      paymentMethod: paymentMethod?._id,
     });
     await payment.save({ session });
 
