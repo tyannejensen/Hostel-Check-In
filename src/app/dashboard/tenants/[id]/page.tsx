@@ -8,12 +8,12 @@ import { Separator } from "@radix-ui/react-separator";
 import Image from "next/image";
 import { Button } from "react-day-picker";
 import { DayPickerProvider, DayPicker } from "react-day-picker";
-import { getTenantById } from "@/actions/tenant.actions";
+import { getTenantById, deleteTenant } from "@/actions/tenant.actions";
 import { mock } from "node:test";
 import { IBooking, IChangeLog, ILog, INote } from "@/lib/types/interfaces";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import TenantHeader from "@/components/TenantHeader";
+import { redirect } from "next/navigation";
 
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
@@ -29,13 +29,15 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     (log: IChangeLog) => log
   );
 
-  function navigateToEdit() {
-    // navigate to edit page
-    redirect(`/dashboard/tenants/${id}/edit`);
-  }
-
-  function deleteTenant() {
+  async function handleDeleteTenant(id: any) {
+    "use server";
     // delete the tenant
+    try {
+      await deleteTenant(id);
+    } catch (error) {
+      console.error(error);
+    }
+    redirect("/dashboard/tenants");
   }
 
   return (
@@ -44,7 +46,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         // if tenant exists show the tenant details
         <div className="text-[var(--text)] p-[30px]">
           <div className="rounded-md border bg-card text-card-foreground shadow p-6">
-            <TenantHeader tenant={tenant} />
+            <TenantHeader
+              handleDeleteTenant={handleDeleteTenant}
+              tenant={tenant}
+            />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
               <Card className="bg-[var(--highlight)] rounded-md border p-4">
                 <CardTitle className="flex flex-row items-center justify-between">
