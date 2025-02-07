@@ -188,7 +188,31 @@ UserSchema.methods.isCorrectPassword = async function (
 UserSchema.path("createdAt").get(formatDate)
 UserSchema.path("updatedAt").get(formatDate)
 UserSchema.path("birthdate").get(formatDate)
+
 // SETTERS
+
+// Set the 'fullname" field to the concatenation of the updated 'firstName' field and the current 'lastName' field
+UserSchema.path("firstName").set(function (this: IUser, firstName: string) {
+	const [_, lastName] = this.fullname.split(" ")
+	this.fullname = firstName + " " + lastName
+	return firstName
+})
+
+// Set the 'fullname" field to the concatenation of the updated 'lastName' field and the current 'firstName' field
+UserSchema.path("lastName").set(function (this: IUser, lastName: string) {
+	const [firstName, _] = this.fullname.split(" ")
+	this.fullname = firstName + " " + lastName
+	return lastName
+})
+
+// Set the 'firstName' and 'lastName' fields to the split of the updated 'fullname' field
+UserSchema.path("fullname").set(function (this: IUser, fullname: string) {
+	const [firstName, lastName] = this.fullname.split(" ")
+	this.firstName = firstName
+	this.lastName = lastName
+	return fullname
+})
+
 // Set toObject options to exclude _id and password fields automatically
 UserSchema.set("toObject", {
 	getters: true,
