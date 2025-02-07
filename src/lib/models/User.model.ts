@@ -60,7 +60,7 @@ const UserSchema = new Schema<IUser>(
 		},
 		password: {
 			type: String,
-			required: [true, "Password is required"],
+			required: false, // TODO: Create validation to require when role=employee not when role=tenant.
 			select: false,
 		},
 		birthdate: {
@@ -168,11 +168,12 @@ UserSchema.pre(
 
 // Pre-save hook to hash password
 UserSchema.pre<IUser>("save", async function (next) {
+	if (!this.password) return next()
 	if (this.isNew || this.isModified("password")) {
 		const saltRounds = 10
 		this.password = await bcrypt.hash(this.password, saltRounds)
 	}
-	next()
+	return next()
 })
 
 // METHODS

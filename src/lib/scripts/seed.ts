@@ -211,14 +211,10 @@ async function seedBookingsWithPayments(
 			booking.updatedBy = admin.id
 			await booking.save({ session })
 
-			console.log("admin: ", admin.id)
-
 			// Step 4: Update User with the Booking reference
 			const user = await User.findOne({ _id: users[i].id })
 			user.bookings.push(booking._id)
 			await user.save({ session })
-
-			console.log("user udpated")
 
 			// Step 5: Store the created documents for logging
 			newBookings.push(booking)
@@ -370,6 +366,7 @@ async function seedDatabase() {
 		console.log("User updated successfully!\n")
 
 		console.log("Database seeded successfully!")
+		console.log("WOOT WOOT!")
 
 		process.exit(0)
 	} catch (error) {

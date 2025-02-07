@@ -21,15 +21,10 @@ export async function logChanges(
 	try {
 		// Do not check for changes if the document is new
 		if (this.isNew || this.$session()) {
-			console.log("Session present")
 			return next()
 		}
 
 		// log the model the document is from
-		console.log(
-			`Model: ${(this.constructor as typeof mongoose.Model).modelName}`
-		)
-		console.log(`this: ${this._id}`)
 
 		const newDoc = this as IBooking | IUser | IPaymentMethod // 'this' refers to the new document (after modifications)
 		const newDocObj = newDoc.toObject() // used to loop through only the plain document fields
@@ -63,21 +58,16 @@ export async function logChanges(
 				// Is the field is an object?
 				if (newDocObj[key] instanceof Object) {
 					// Log the type of field
-					console.log(`${key} is an object`)
 
 					// Is the field is an Array && ObjectId (MongoDB ObjectId)?
 					if (
 						newDocObj[key] instanceof Array &&
 						newDocObj[key][0] instanceof ObjectId
 					) {
-						console.log(`${key} is an Array of MongoDB ObjectIds`)
 						// Check if the array elements have been modified
 						for (let i = 0; i < newDocObj[key].length; i++) {
 							if (newDoc.isModified(`${key}.${i}`)) {
 								// Log the updated field
-								console.log(`${key}.${i} is modified`)
-
-								console.log(`newDocObj[key][i]: ${newDocObj[key][i]}`)
 
 								changes.push({
 									field: `${key}.${i}`,
@@ -94,15 +84,12 @@ export async function logChanges(
 						newDocObj[key] instanceof Array &&
 						typeof newDocObj[key][0] === "object"
 					) {
-						console.log(`${key} is an Array of Objects`)
 						// Check if the array elements have been modified
 						for (let i = 0; i < newDocObj[key].length; i++) {
 							for (const subKey in newDocObj[key][i]) {
 								if (newDoc.isModified(`${key}.${i}.${subKey}`)) {
 									// Log the updated field
-									console.log(`${key}.${i}.${subKey} is modified`)
 
-									// console.log(`${subKey}: ${newDocObj[key][i][subKey]}`)
 									if (fieldsToIgnore.has(subKey)) continue
 
 									let _oldValue
@@ -126,7 +113,6 @@ export async function logChanges(
 					// Is the field is an ObjectId (MongoDB ObjectId)?
 					if (newDocObj[key] instanceof ObjectId) {
 						// Log the type of field
-						console.log(`${newDocObj[key]} is a MongoDB ObjectId`)
 
 						changes.push({
 							field: key,
@@ -146,8 +132,6 @@ export async function logChanges(
 					typeof newDocObj[key] === "boolean" ||
 					newDocObj[key] instanceof Date
 				) {
-					console.log(`${newDocObj[key]} is of type ${typeof newDocObj[key]}`)
-
 					// Log the updated field
 					changes.push({
 						field: key,
@@ -166,16 +150,12 @@ export async function logChanges(
 		}
 
 		// Log the changes to the console
-		console.log(`Updated fields: ${JSON.stringify(changes)}\n`)
-		console.log(`UpdatedBy: ${this}`)
 		// Add the changes to the document's history
 		this?.history.push({
 			updates: changes,
 			updatedAt: new Date(),
 			updatedBy: this.updatedBy || this.createdBy,
 		})
-
-		console.log(`History: ${this?.history}`) // debugging
 	} catch (error) {
 		console.error("Error in logChanges middleware:", error)
 		next(error as mongoose.CallbackError)
@@ -195,9 +175,7 @@ export function formatDate(v: Date): string {
 // Function to check if a string is a valid MongoDB ObjectId
 export function isStrictValidObjectId(value: string): boolean {
 	const isValid = ObjectId.isValid(value)
-	console.log(`isValid: ${isValid}`)
 
 	const isStrict = new ObjectId(value).toString() === value
-	console.log(`isStrict: ${isStrict}`)
 	return isValid && isStrict
 }
