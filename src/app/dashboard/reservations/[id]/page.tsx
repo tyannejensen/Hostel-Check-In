@@ -26,6 +26,17 @@ interface Reservation {
   transactionHistory: { date: string; amount: string; description: string }[];
 }
 
+//corrected table?
+// export interface IReservation {
+//   id: string;
+//   name: string;
+//   room: string;
+//   checkInDate: string;
+//   checkOutDate: string;
+//   status: string;
+//   statusLabel: string;
+// }
+
 export default function Page() {
   const { id } = useParams();
   const [reservation, setReservation] = useState<Reservation | null>(null);
