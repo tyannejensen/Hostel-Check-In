@@ -102,6 +102,10 @@ export default function Page() {
     fetchReservation();
   }, [id]);
 
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   const handleAddBookingAndPayment = async () => {
     try {
       // const reqHeaders = await headers()
@@ -196,14 +200,15 @@ export default function Page() {
             <div>
               <h2 className="text-xl font-bold">Transaction History</h2>
               <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
-                {reservation.transactionHistory.map((transaction, index) => (
+                {reservation.payments.map((payment, index) => (
                   <div
                     key={index}
                     className="flex justify-between items-center border-b py-2"
                   >
-                    <p>{transaction.date}</p>
-                    <p>{transaction.amount}</p>
-                    <p>{transaction.description}</p>
+                    <p>
+                      {capitalizeFirstLetter(payment.paymentMethod[0].method)}
+                    </p>
+                    <p>{payment.amount}</p>
                   </div>
                 ))}
               </ScrollArea>

@@ -49,12 +49,16 @@ const formSchema = z.object({
   //     .optional(),
 });
 
-interface TenantCreateFormProps {
+interface TenantForm {
   handleOnSubmit: (values: z.infer<typeof formSchema>) => void;
+  title?: string;
+  defaultValues: any;
 }
 
-const TenantCreateForm: React.FC<TenantCreateFormProps> = ({
+const TenantForm: React.FC<TenantForm> = ({
   handleOnSubmit,
+  title,
+  defaultValues,
 }) => {
   const [paymentMethodType, setPaymentMethodType] = React.useState("");
   const [error, setError] = React.useState("");
@@ -62,7 +66,7 @@ const TenantCreateForm: React.FC<TenantCreateFormProps> = ({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: defaultValues || {
       firstName: "",
       lastName: "",
       email: "",
@@ -98,7 +102,7 @@ const TenantCreateForm: React.FC<TenantCreateFormProps> = ({
     <>
       <div className="page">
         <div className="w-[80rem]">
-          <h1 className="pt-[10px] pl-[30px] font-bold">ADD TENANT</h1>
+          <h1 className="pt-[10px] pl-[30px] font-bold">{title}</h1>
           <div className=" rounded-xl table-container border bg-card text-card-foreground shadow">
             {/* Form Start */}
             <Form {...form}>
@@ -463,4 +467,4 @@ const TenantCreateForm: React.FC<TenantCreateFormProps> = ({
   );
 };
 
-export default TenantCreateForm;
+export default TenantForm;

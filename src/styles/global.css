@@ -317,6 +317,13 @@ h3 {
 .table-data-row {
   cursor: pointer;
 }
+.edit {
+  cursor: pointer;
+}
+.trash {
+  color: red !important;
+  cursor: pointer;
+}
 /* --------------------------- TENANT OVERVIEW --------------------------- */
 .dark-circle {
   background-color: var(--dark-button);

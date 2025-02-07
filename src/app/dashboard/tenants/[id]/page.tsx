@@ -1,7 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import "@/styles/global.css";
-import { Pencil, Plus, Ellipsis, Link, UserRoundPlus } from "lucide-react";
+import {
+  Pencil,
+  Plus,
+  Ellipsis,
+  Link,
+  UserRoundPlus,
+  Trash2,
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
@@ -12,7 +19,7 @@ import { DayPickerProvider, DayPicker } from "react-day-picker";
 import { getTenantById } from "@/actions/tenant.actions";
 import { mock } from "node:test";
 import { IUser } from "@/lib/types/interfaces";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
@@ -232,6 +239,18 @@ export default function Page() {
 
     fetchTenant();
   }, [id]);
+
+  const router = useRouter();
+
+  function navigateToEdit() {
+    // navigate to edit page
+    router.push(`/dashboard/tenants/${id}/edit`);
+  }
+
+  function deleteTenant() {
+    console.log("delete tenant");
+  }
+
   // console.log(notes); for debugging
 
   // mockData.reservationHistory = tenant.bookings.map((booking: any) => {
@@ -270,10 +289,22 @@ export default function Page() {
         <div className="text-[var(--text)] p-[30px]">
           <div className="rounded-md border bg-card text-card-foreground shadow p-6">
             <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-[var(--dark-button)] font-bold">
-                  {tenant.fullname}
-                </h1>
+              <div className="flex justify-between w-full">
+                <div className="flex justify-start gap-[30px]">
+                  <h1 className="text-[var(--dark-button)] font-bold">
+                    {tenant.fullname}
+                  </h1>
+                  <Pencil
+                    onClick={navigateToEdit}
+                    className="text-[var(--text)] edit"
+                  />
+                </div>
+                <div>
+                  <Trash2
+                    className="text-[var(--text)] trash"
+                    onClick={deleteTenant}
+                  />
+                </div>
                 {/* <p>{tenant.email}</p>
                 <p>
                   {tenant?.phoneNumbers?.find((phone: any) => phone.isPrimary)
@@ -286,7 +317,7 @@ export default function Page() {
                 <CardTitle className="flex flex-row items-center justify-between">
                   <div className="flex justify-between items-center pb-3 w-full">
                     <p className="font-bold text-[var(--text)]">DETAILS</p>
-                    <Pencil className="text-[var(--text)]" />
+                    {/* <Pencil className="text-[var(--text)]" /> */}
                   </div>
                 </CardTitle>
                 <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">

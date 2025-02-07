@@ -4,8 +4,8 @@ import React from "react";
 import "@/styles/global.css";
 
 import TenantForm from "@/components/TenantForm";
-import { saveTenant } from "@/actions/tenant.actions";
-import { redirect } from "next/navigation";
+import { getTenantById, saveTenant } from "@/actions/tenant.actions";
+import { notFound, redirect, useParams } from "next/navigation";
 
 interface PhoneNumber {
   countryCode: string;
@@ -18,7 +18,23 @@ interface PhoneNumber {
   id?: string;
 }
 
-export default async function Page() {
+export default async function Page({ params }: any) {
+  const { id } = await params;
+  const tenant = await getTenantById(id);
+
+  const formValues = {
+    firstName: "John",
+    lastName: "Doe",
+    email: "etc@gmail.com",
+    phone: "1234567890",
+    address: "123 Main St",
+    city: "Anytown",
+    state: "NY",
+    zip: "12345",
+  };
+
+  console.log(tenant);
+
   function formatPhoneNumber(phoneNumber: string): PhoneNumber {
     return {
       countryCode: phoneNumber.slice(0, 3),
@@ -47,7 +63,15 @@ export default async function Page() {
 
   return (
     <>
-      <TenantForm title="ADD TENANT" handleOnSubmit={handleFormSubmit} />
+      {tenant ? (
+        <TenantForm
+          title={"UPDATE TENANT"}
+          defaultValues={tenant}
+          handleOnSubmit={handleFormSubmit}
+        />
+      ) : (
+        notFound()
+      )}
     </>
   );
 }
