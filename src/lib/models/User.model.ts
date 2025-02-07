@@ -1,4 +1,4 @@
-import { Schema, model, models } from "mongoose"
+import { CallbackError, Schema, model, models } from "mongoose"
 import { v4 as uuidv4 } from "uuid"
 import bcrypt from "bcrypt"
 import { IUser, IBillingAddress } from "@/interfaces/index"
@@ -7,6 +7,8 @@ import { ChangeLogSchema } from "@/models/ChangeLog.schema" // require invidual 
 import { PhoneNumberSchema } from "@/models/PhoneNumber.schema" // require invidual import to avoid circular dependency
 import { formatDate, logChanges } from "@/server-utils/helpers"
 import { NoteSchema } from "@/models/Note.schema"
+import { Booking } from "@/models/Booking.model"
+import { PaymentMethod } from "./PaymentMethod.model"
 
 // User Schema
 const UserSchema = new Schema<IUser>(
@@ -137,6 +139,32 @@ const UserSchema = new Schema<IUser>(
 // Record document updates in the history array
 // Capture and save the old Booking document before updating - Part 1 of 2 of logging the booking history
 UserSchema.pre("save", logChanges)
+
+// Delete all related bookings, payment methods, and notes before deleting the user
+UserSchema.pre(
+	"deleteOne",
+	{ document: true, query: false },
+	async function (next) {
+		try {
+			// Populate related references before deletion
+			await this.populate(["bookings", "paymentMethods", "notes"])
+
+			// Delete all related bookings
+			if (this.bookings.length > 0) {
+				await Booking.deleteMany({ _id: { $in: this.bookings } })
+			}
+
+			// Delete all related payment methods
+			if (this.paymentMethods.length > 0) {
+				await PaymentMethod.deleteMany({ _id: { $in: this.paymentMethods } })
+			}
+
+			next()
+		} catch (error) {
+			next(error as CallbackError)
+		}
+	}
+)
 
 // Pre-save hook to hash password
 UserSchema.pre<IUser>("save", async function (next) {
