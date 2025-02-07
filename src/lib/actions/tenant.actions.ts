@@ -1,63 +1,250 @@
+"use server";
+
+import { headers } from "next/headers";
 import { dbConnect } from "@/lib/db";
-import { Room } from "@/models/Room.model";
-import type { Document } from "mongoose";
+import { User } from "@/models/index";
+import { IUser } from "@/interfaces/index";
+import { IState } from "@/mytypes/index";
 
-// Define a type for the room data
-interface RoomData {
-  roomType: string;
-  roomNumber: number;
-  status: string;
-  costPerDay: number;
-  deposit: number;
-  name: string;
-  size: string;
-  occupants?: string[];
-}
+// GET DATA
 
-//GET DATA
-
-export async function getRooms() {
+export async function getTenants() {
   await dbConnect();
 
-  const rooms = await Room.find().populate("occupants", "fullname");
+  const tenants = await User.find({ role: "tenant" })
+    .select(
+      "_id firstName lastName fullName email phoneNumbers bookings history paymentMethods tags notes createdBy"
+    )
+    .populate({
+      path: "bookings",
+      populate: {
+        path: "roomId",
+        select: "roomNumber",
+      },
+    })
+    .populate("fullname");
 
-  const roomsAsObj = rooms.map((room: Document) => room.toObject());
+  const tenantsAsObj = tenants.map((tenant: IUser) => tenant.toObject());
 
   // Ensure final data is fully JSON-serializable
-  return roomsAsObj;
+  return tenantsAsObj;
 }
 
-export async function getRoomById(roomId: string) {
+export async function getTenantById(id: string) {
   await dbConnect();
 
-  const room = await Room.findById(roomId)
-    .populate("occupants", "fullname")
+  // FIXME: Identify why the booking history for 'Alice Smith' is populating with the 'tenant' history on the tenant/{id} page
+  const tenant = await User.findOne({ _id: id, role: "tenant" })
+    .populate("fullname")
+    .populate("billingAddress")
+    .populate("birthdate")
+    .populate("phoneNumbers")
+    .populate({
+      path: "notes",
+      populate: {
+        path: "createdBy",
+        select: "firstName lastName",
+      },
+      select: "content createdBy createdAt",
+    })
+    .populate({
+      path: "bookings",
+      populate: [
+        {
+          path: "roomId",
+          select: "roomNumber",
+        },
+      ],
+    })
+    .populate({
+      path: "history",
+      populate: {
+        path: "updatedBy",
+        select: "fullname",
+      },
+    })
+    .populate({
+      path: "history",
+      populate: {
+        path: "updates",
+        select: "field oldValue newValue",
+      },
+    })
     .select(
-      "roomType roomNumber status costPerDay deposit name size occupants"
+      "_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags history notes createdBy"
     );
 
-  const roomObj = room?.toObject();
-  return roomObj;
+  if (!tenant) {
+    throw new Error("Tenant not found");
+  }
+
+  const tenantObj = JSON.parse(JSON.stringify(tenant.toObject()));
+  return tenantObj;
 }
 
-//SET DATA
+// SET DATA
 
-export async function createRoom(data: RoomData) {
-  await dbConnect();
+// Save tenant as a user
 
-  const newRoom = new Room(data);
-  const room = await newRoom.save();
-  return room.toObject();
+interface ITenantPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  birthdate: Date;
+  phone: string;
+  addressLineOne: string;
+  addressLineTwo: string;
+  city: string;
+  state: IState;
+  zip: string;
+  tenantId?: string;
 }
 
-export async function updateRoom(roomId: string, data: RoomData) {
+export async function saveTenant(payload: ITenantPayload) {
   await dbConnect();
+  const reqHeaders = await headers();
+  const userId = reqHeaders.get("x-user-id");
 
-  // TODO: replace 'findByIdAndUpdate' with 'find() and save()'
-  // to use the 'pre' and 'post' hooks for history logging
-  const room = await Room.findByIdAndUpdate(roomId, data, {
-    new: true,
-    runValidators: true,
-  });
-  return room?.toObject();
+  const firstName = payload.firstName;
+  const lastName = payload.lastName;
+  const email = payload.email;
+  const password = payload.password;
+  const birthdate = payload.birthdate;
+  const phoneNumbers = payload.phone;
+  const addressLineOne = payload.addressLineOne;
+  const addressLineTwo = payload.addressLineTwo;
+  const city = payload.city;
+  const state = payload.state;
+  const postalCode = payload.zip;
+
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !password ||
+    !birthdate ||
+    !phoneNumbers ||
+    !addressLineOne ||
+    !addressLineTwo ||
+    !city ||
+    !state ||
+    !postalCode
+  ) {
+    return { error: true, message: "Please fill in all fields" };
+  }
+
+  try {
+    // Check if a user with the same email already exists
+    const existingUserByEmail = await User.findOne({ email });
+    if (existingUserByEmail) {
+      return { error: true, message: "Email already in use" };
+    }
+
+    // Check if a user with the same first and last name already exists
+    const existingUserByName = await User.findOne({ firstName, lastName });
+    if (existingUserByName) {
+      return {
+        error: true,
+        message: "User with the same first and last name already exists",
+      };
+    }
+
+    const billingAddress = {
+      addressLineOne,
+      addressLineTwo,
+      city,
+      state,
+      postalCode,
+    };
+
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      password,
+      birthdate,
+      phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
+      billingAddress,
+      role: "tenant",
+      createdBy: userId,
+    });
+
+    await newUser.save();
+
+    return { error: false, message: "Tenant created successfully" };
+  } catch (error) {
+    console.error("Error saving user:", error);
+    return { error: true, message: (error as Error).message };
+  }
+}
+
+export async function updateTenant(payload: ITenantPayload) {
+  await dbConnect();
+  const reqHeaders = await headers();
+  const employeeId = reqHeaders.get("x-user-id");
+
+  const firstName = payload.firstName;
+  const lastName = payload.lastName;
+  const email = payload.email;
+  const password = payload.password;
+  const birthdate = payload.birthdate;
+  const phone = payload.phone;
+  const addressLineOne = payload.addressLineOne;
+  const addressLineTwo = payload.addressLineTwo;
+  const city = payload.city;
+  const state = payload.state;
+  const zip = payload.zip;
+  const tenantId = payload.tenantId;
+
+  if (
+    !firstName &&
+    !lastName &&
+    !email &&
+    !password &&
+    !birthdate &&
+    !phone &&
+    !addressLineOne &&
+    !addressLineTwo &&
+    !city &&
+    !state &&
+    !zip
+  ) {
+    return { error: true, message: "Please provide at least one update." };
+  }
+
+  try {
+    const tenant = await User.findById(tenantId);
+
+    if (!tenant) {
+      return { error: true, message: "Tenant not found" };
+    }
+
+    if (firstName) tenant.firstName = firstName;
+    if (lastName) tenant.lastName = lastName;
+    if (email) tenant.email = email;
+    if (birthdate) tenant.birthdate = birthdate;
+    if (phone) tenant.phoneNumbers = [{ number: phone, isPrimary: true }];
+    if (addressLineOne || addressLineTwo || state || zip) {
+      tenant.billingAddress = {
+        addressLineOne: addressLineOne
+          ? addressLineOne
+          : tenant.billingAddress.addressLineOne,
+        addressLineTwo: addressLineTwo
+          ? addressLineTwo
+          : tenant.billingAddress.addressLineTwo,
+        city: city ? city : tenant.billingAddress.city,
+        state: state ? state : tenant.billingAddress.state,
+        postalCode: zip ? zip : tenant.billingAddress.postalCode,
+      };
+    }
+    tenant.updatedBy = employeeId;
+
+    await tenant.save();
+
+    return { error: false, message: "Tenant updated successfully" };
+  } catch (error) {
+    console.error("Error updating tenant:", error);
+    return { error: true, message: (error as Error).message };
+  }
 }
