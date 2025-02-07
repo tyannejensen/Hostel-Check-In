@@ -168,3 +168,74 @@ export async function saveTenant(payload: any) {
 		return { error: true, message: (error as Error).message }
 	}
 }
+
+export async function updateTenant(payload: any) {
+	await dbConnect()
+	const reqHeaders = await headers()
+	const employeeId = reqHeaders.get("x-user-id")
+
+	const firstName = payload.firstName
+	const lastName = payload.lastName
+	const email = payload.email
+	const password = payload.password
+	const birthdate = payload.birthdate
+	const phoneNumbers = payload.phone
+	const addressLineOne = payload.addressLineOne
+	const addressLineTwo = payload.addressLineTwo
+	const city = payload.city
+	const state = payload.state
+	const postalCode = payload.zip
+	const tenantId = payload.tenantId
+
+	if (
+		!firstName &&
+		!lastName &&
+		!email &&
+		!password &&
+		!birthdate &&
+		!phoneNumbers &&
+		!addressLineOne &&
+		!addressLineTwo &&
+		!city &&
+		!state &&
+		!postalCode
+	) {
+		return { error: true, message: "Please provide at least one update." }
+	}
+
+	try {
+		const tenant = await User.findById(tenantId)
+
+		if (!tenant) {
+			return { error: true, message: "Tenant not found" }
+		}
+
+		if (firstName) tenant.firstName = firstName
+		if (lastName) tenant.lastName = lastName
+		if (email) tenant.email = email
+		if (birthdate) tenant.birthdate = birthdate
+		if (birthdate)
+			tenant.phoneNumbers = [{ number: phoneNumbers, isPrimary: true }]
+		if (addressLineOne || addressLineTwo || state || postalCode) {
+			tenant.billingAddress = {
+				addressLineOne: addressLineOne
+					? addressLineOne
+					: tenant.billingAddress.addressLineOne,
+				addressLineTwo: addressLineTwo
+					? addressLineTwo
+					: tenant.billingAddress.addressLineTwo,
+				city: city ? city : tenant.billingAddress.city,
+				state: state ? state : tenant.billingAddress.state,
+				postalCode: postalCode ? postalCode : tenant.billingAddress.postalCode,
+			}
+		}
+		tenant.updatedBy = employeeId
+
+		await tenant.save()
+
+		return { error: false, message: "Tenant updated successfully" }
+	} catch (error) {
+		console.error("Error updating tenant:", error)
+		return { error: true, message: (error as Error).message }
+	}
+}
