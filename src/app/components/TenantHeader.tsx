@@ -2,7 +2,7 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const TenantHeader = ({ tenant }: any) => {
+const TenantHeader = ({ tenant, handleDeleteTenant }: any) => {
   const router = useRouter();
 
   function navigateToEdit() {
@@ -14,6 +14,7 @@ const TenantHeader = ({ tenant }: any) => {
 
   function deleteTenant() {
     // delete the tenant
+    handleDeleteTenant(tenant.id);
   }
 
   return (
