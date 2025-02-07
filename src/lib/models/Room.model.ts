@@ -40,6 +40,7 @@ export const roomSchema = new Schema<IRoom>(
 			set: (v: number) => v * 100, // Convert deposit amount to dollars
 		},
 		name: {
+			// TODO: update to roomName on interface, model, and in use on the front-end.
 			type: String,
 			required: false,
 		},

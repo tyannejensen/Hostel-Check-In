@@ -9,7 +9,7 @@ export interface IRoom extends Document {
 	status: IRoomStatus
 	costPerDay: number
 	deposit: number
-	name?: string
+	name?: string // TODO: update to roomName on interface, model, and in use on the front-end.
 	size: number
 	occupants: string[] // reference to the tenent(s) who are staying in the room - uses uuid v4
 }
