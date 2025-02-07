@@ -5,10 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
 // import { headers } from "next/headers"
-import {
-  addBookingAndPayments,
-  getBookingById,
-} from "@/actions/booking.actions";
+import { getBookingById } from "@/actions/booking.actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ReservationDetailProps {}
@@ -33,7 +30,7 @@ const ReservationDetail: React.FC<ReservationDetailProps> = () => {
 
   const { id } = useParams();
   // const booking = await getBookingById(id ?? "");
-  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [reservation, setReservation] = useState<Reservation | null>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,6 +80,15 @@ const ReservationDetail: React.FC<ReservationDetailProps> = () => {
     return <div>{error}</div>;
   }
 
+  function handleAddBookingAndPayment(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void {
+    event.preventDefault();
+    // Implement the logic for handling booking and payment here
+    console.log("Check-out button clicked");
+    // You can add more logic here to handle the check-out process
+    // For example, you might want to update the reservation status, process payment, etc.
+  }
   return (
     <div className="page">
       <div className="w-full">
@@ -95,64 +101,73 @@ const ReservationDetail: React.FC<ReservationDetailProps> = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-bold text-xl">{reservation.name}</p>
-                <p>{reservation.phone}</p>
-                <p>{reservation.email}</p>
-                <p>Reservation ID: {reservation.id}</p>
-              </div>
-              <div className="flex space-x-4">
-                <Button onClick={handleAddBookingAndPayment}>Check-out</Button>
-                <Button>Extend Stay</Button>
-              </div>
-            </div>
-            <Separator className="my-4" />
-            <div className="flex">
-              <div className="w-1/2 p-4 border rounded-md">
-                <p>
-                  <strong>Room:</strong> {reservation.room}
-                </p>
-                <p>
-                  <strong>Check-In Date:</strong> {reservation.checkInDate}
-                </p>
-                <p>
-                  <strong>Check-Out Date:</strong> {reservation.checkOutDate}
-                </p>
-                <p>
-                  <strong>Deposit:</strong> {reservation.deposit}
-                </p>
-                <p>
-                  <strong>Total Charge:</strong> {reservation.totalCharge}
-                </p>
-                <p>
-                  <strong>Total Payment Due:</strong>{" "}
-                  {reservation.totalPaymentDue}
-                </p>
-              </div>
-              <div className="w-1/2 p-4 border rounded-md ml-4">
-                <p>
-                  <strong>Notes:</strong>
-                </p>
-                <p>{reservation.notes}</p>
-              </div>
-            </div>
-            <Separator className="my-4" />
-            <div>
-              <h2 className="text-xl font-bold">Transaction History</h2>
-              <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
-                {reservation.transactionHistory.map((transaction, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center border-b py-2"
-                  >
-                    <p>{transaction.date}</p>
-                    <p>{transaction.amount}</p>
-                    <p>{transaction.description}</p>
+            {reservation && (
+              <>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-bold text-xl">{reservation.name}</p>
+                    <p>{reservation.phone}</p>
+                    <p>{reservation.email}</p>
+                    <p>Reservation ID: {reservation.id}</p>
                   </div>
-                ))}
-              </ScrollArea>
-            </div>
+                  <div className="flex space-x-4">
+                    <Button onClick={handleAddBookingAndPayment}>
+                      Check-out
+                    </Button>
+                    <Button>Extend Stay</Button>
+                  </div>
+                </div>
+                <Separator className="my-4" />
+                <div className="flex">
+                  <div className="w-1/2 p-4 border rounded-md">
+                    <p>
+                      <strong>Room:</strong> {reservation.room}
+                    </p>
+                    <p>
+                      <strong>Check-In Date:</strong> {reservation.checkInDate}
+                    </p>
+                    <p>
+                      <strong>Check-Out Date:</strong>{" "}
+                      {reservation.checkOutDate}
+                    </p>
+                    <p>
+                      <strong>Deposit:</strong> {reservation.deposit}
+                    </p>
+                    <p>
+                      <strong>Total Charge:</strong> {reservation.totalCharge}
+                    </p>
+                    <p>
+                      <strong>Total Payment Due:</strong>{" "}
+                      {reservation.totalPaymentDue}
+                    </p>
+                  </div>
+                  <div className="w-1/2 p-4 border rounded-md ml-4">
+                    <p>
+                      <strong>Notes:</strong>
+                    </p>
+                    <p>{reservation.notes}</p>
+                  </div>
+                </div>
+                <Separator className="my-4" />
+                <div>
+                  <h2 className="text-xl font-bold">Transaction History</h2>
+                  <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
+                    {reservation.transactionHistory.map(
+                      (transaction, index) => (
+                        <div
+                          key={index}
+                          className="flex justify-between items-center border-b py-2"
+                        >
+                          <p>{transaction.date}</p>
+                          <p>{transaction.amount}</p>
+                          <p>{transaction.description}</p>
+                        </div>
+                      )
+                    )}
+                  </ScrollArea>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
