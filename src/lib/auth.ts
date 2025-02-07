@@ -1,5 +1,16 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      userId?: string;
+    };
+  }
+}
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import { dbConnect } from "@/lib/db"; // Ensure this path is correct
@@ -33,7 +44,9 @@ export const { auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
-      async authorize(credentials: Record<string, string> | undefined) {
+      async authorize(
+        credentials: Partial<Record<string, unknown>> | undefined
+      ) {
         const parsedCredentials = z
           .object({ email: z.string().email(), password: z.string().min(6) })
           .safeParse(credentials);
@@ -53,16 +66,20 @@ export const { auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: AdapterUser | IUser }) {
+    async jwt({ token, user, account, profile, isNewUser }) {
       // Add userId to the token if it exists
       if (user) {
-        token.userId = (user as IUser).id;
+        token.userId = (user as any).id; // cast if needed
       }
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }) {
       // Add userId to the session
-      session.user.userId = token.userId;
+      if (session) {
+        if (session.user) {
+          session.user.userId = token.userId as string | undefined;
+        }
+      }
       return session;
     },
   },

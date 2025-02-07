@@ -6,10 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
 // import { headers } from "next/headers"
-import {
-  addBookingAndPayments,
-  getBookingById,
-} from "@/actions/booking.actions";
+import { getBookingById } from "@/actions/booking.actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Define the Reservation interface
