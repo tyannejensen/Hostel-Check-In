@@ -5,13 +5,12 @@ import dotenv from "dotenv"
 dotenv.config({ path: ".env.local" })
 
 // import mongoose, models, and interfaces
-import mongoose, { set } from "mongoose"
+import mongoose from "mongoose"
 import { dbConnect } from "@/lib/db"
 import { Booking } from "@/models/Booking.model"
 import { Payment } from "@/models/Payment.model"
 import { Room } from "@/models/Room.model"
 import { User } from "@/models/User.model"
-import { IBooking } from "@/interfaces/booking.interface"
 import { IRoom } from "@/interfaces/room.interface"
 import { IUser } from "@/interfaces/user.interface"
 import { IPaymentMethod } from "@/interfaces/payment-method.interface"
@@ -257,7 +256,7 @@ async function seedBookingsWithPayments(
 			"depositAmount",
 			"payments",
 		])
-		return formatedBookings
+		// return formatedBookings
 	} catch (error) {
 		await session.abortTransaction()
 		session.endSession()
@@ -355,12 +354,7 @@ async function seedDatabase() {
 		console.log("Rooms added successfully!\n")
 
 		// Add all bookings and link to the tenants
-		const bookings = await seedBookingsWithPayments(
-			admin,
-			tenants,
-			paymentMethods,
-			rooms
-		) // Add all bookings
+		await seedBookingsWithPayments(admin, tenants, paymentMethods, rooms) // Add all bookings
 		console.log("Bookings and Payments added successfully!\n")
 
 		// Add all notes and link to the bookings
