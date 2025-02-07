@@ -1,47 +1,47 @@
-"use server"
-import { dbConnect } from "@/lib/db"
-import { Booking, User } from "@/models/index"
-import { headers } from "next/headers"
+"use server";
+import { dbConnect } from "@/lib/db";
+import { User } from "@/models/index";
+import { headers } from "next/headers";
 
-export async function saveNote(payload: any) {
-	await dbConnect()
-	const reqHeaders = await headers()
-	const userId = reqHeaders.get("x-user-id")
+// Define a type for the payload
+interface NotePayload {
+  newNote: string;
+  userId: string;
+}
 
+export async function saveNote(payload: NotePayload) {
+  await dbConnect();
+  const reqHeaders = await headers();
+  const userId = reqHeaders.get("x-user-id");
 
-	const newNote = payload.newNote
-	const userIdFromUrl = payload.userId
+  const { newNote, userId: userIdFromUrl } = payload;
 
+  if (!newNote) {
+    return { error: true, message: "Please write a note" };
+  }
 
-	if (!newNote) {
-		return { error: true, message: "Please write a note" }
-	}
+  try {
+    // Find the user by ID
+    const user = await User.findById(userIdFromUrl);
 
-	try {
-		// Find the user by ID
-		const user = await User.findById(userIdFromUrl)
+    if (!user) {
+      return { error: true, message: "User not found" };
+    }
 
-		if (!user) {
-			return { error: true, message: "User not found" }
-		}
+    const note = {
+      content: newNote,
+      createdBy: userId,
+      createdAt: new Date(),
+    };
 
-		// Get the booking ID from the user's bookings
-		const bookingId = user.bookings[0]._id // Assuming the user has at least one booking
+    // Add the new note to the existing notes array
+    user.notes.push(note);
 
-		const note = {
-			content: newNote,
-			createdBy: userId,
-			createdAt: new Date(),
-		}
+    await user.save();
 
-		// Add the new note to the existing notes array
-		user.notes.push(note)
-
-		await user.save()
-
-		return { error: false, message: "Note Created Successfully" }
-	} catch (error) {
-		console.error("Error adding note to booking:", error)
-		return { error: true, message: (error as Error).message }
-	}
+    return { error: false, message: "Note Created Successfully" };
+  } catch (error) {
+    console.error("Error adding note to booking:", error);
+    return { error: true, message: (error as Error).message };
+  }
 }
