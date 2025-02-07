@@ -1,26 +1,16 @@
 # [Hostel Check-in](https://hostel-check-in-tau.vercel.app/login)
 
+## Walkthrough video
+video walkthrough: https://drive.google.com/file/d/1yJ1B2DEhv8R5dskspjL5q7Qee4fnK7m7/view?usp=sharing
+
+### Deployed site: https://hostel-check-in-tau.vercel.app/
+
 
 
 ## Description
 Hostel Check-In System is a Next.js + TypeScript application designed to help hostel managers efficiently track check-ins, check-outs, and tenant transactions. The system enables secure user authentication, records tenant details, manages payments, and monitors room availability in real-time. With a polished, interactive UI and a backend powered by Node.js, Express, and MongoDB, this project streamlines hostel operations while ensuring data security through JWT authentication. The application is designed for easy deployment using Vercel and Render for seamless cloud hosting.
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Table of Contents
-0. [Data](#data)
-1. [Description](#description)
-2. [Table of Contents](#table-of-contents)
-3. [Usage](#usage)
-4. [Installation](#installation)
-5. [Demonstration](#demonstration)
-6. [Technologies Employed](#technologies-employed)
-7. [Future Development](#future-development)
-8. [Contributing](#contributing)
-9. [Credits](#credits)
-10. [Tests](#tests)
-11. [Questions](#questions)
-12. [License](#license)
 
 ## Usage
 ### User Story
