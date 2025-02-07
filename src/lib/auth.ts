@@ -80,6 +80,7 @@ export const { auth, signIn, signOut } = NextAuth({
           session.user.userId = token.userId as string | undefined;
         }
       }
+
       return session;
     },
   },

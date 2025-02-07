@@ -2,7 +2,11 @@ import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+    secureCookie: true,
+  });
 
   // Allow the seed page to be accessed without authentication
   if (req.nextUrl.pathname.startsWith("/seed")) {
