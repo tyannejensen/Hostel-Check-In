@@ -15,7 +15,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // If token exists, add userId to the request headers
-  console.log("things", token, token?.userId);
+  console.log("things", token, token?.userId, process.env.AUTH_SECRET);
   if (token && token.userId) {
     const response = NextResponse.next();
     response.headers.set("x-user-id", String(token.userId));
