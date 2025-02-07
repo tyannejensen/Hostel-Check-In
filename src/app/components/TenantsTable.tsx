@@ -16,7 +16,7 @@ interface TenantsTableProps {
 
 export default function TenantsTable({ tenants }: TenantsTableProps) {
   const router = useRouter();
-  function handleNavigateToReservationByID(id: string) {
+  function handleNavigateToReservationById(id: string) {
     router.push(`/dashboard/tenants/${id}`);
   }
 
@@ -36,7 +36,7 @@ export default function TenantsTable({ tenants }: TenantsTableProps) {
             <TableRow
               key={index}
               className="table-data-row"
-              onClick={() => handleNavigateToReservationByID(rowData.id)}
+              onClick={() => handleNavigateToReservationById(rowData.id)}
             >
               <TableCell>{rowData.name}</TableCell>
               <TableCell>{rowData.phone}</TableCell>

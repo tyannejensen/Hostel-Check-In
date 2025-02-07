@@ -4,18 +4,14 @@ import { Booking, User } from "@/models/index"
 import { headers } from "next/headers"
 
 export async function saveNote(payload: any) {
-	console.log("Payload received:", payload)
 	await dbConnect()
 	const reqHeaders = await headers()
 	const userId = reqHeaders.get("x-user-id")
 
-	console.log("Logged in user:", userId)
 
 	const newNote = payload.newNote
 	const userIdFromUrl = payload.userId
 
-	console.log("New note:", newNote)
-	console.log("User ID from URL:", userIdFromUrl)
 
 	if (!newNote) {
 		return { error: true, message: "Please write a note" }
@@ -24,7 +20,6 @@ export async function saveNote(payload: any) {
 	try {
 		// Find the user by ID
 		const user = await User.findById(userIdFromUrl)
-		console.log("User found:", user)
 
 		if (!user) {
 			return { error: true, message: "User not found" }
@@ -44,7 +39,6 @@ export async function saveNote(payload: any) {
 
 		await user.save()
 
-		console.log("Note saved successfully")
 		return { error: false, message: "Note Created Successfully" }
 	} catch (error) {
 		console.error("Error adding note to booking:", error)
