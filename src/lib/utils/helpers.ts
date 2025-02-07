@@ -5,17 +5,18 @@ import { IRoom } from "@/interfaces/room.interface"
 import { IUser } from "@/interfaces/user.interface"
 import { IBooking } from "@/interfaces/booking.interface"
 import { IPaymentMethod } from "@/interfaces/payment-method.interface"
+import { ILog } from "../types/interfaces"
 
 // Functions to help with logging changes to documents
 
 // Middleware to log changes to the document history
 export async function logChanges(
 	this: Document & {
-		history: { updates: any[]; updatedAt: Date; updatedBy: string }[]
+		history: { updates: Partial<ILog>[]; updatedAt: Date; updatedBy: string }[]
 		updatedBy: string
 		createdBy: string
 	},
-	next: (err?: any) => void
+	next: mongoose.CallbackWithoutResultAndOptionalError
 ) {
 	try {
 		// Do not check for changes if the document is new
@@ -30,8 +31,7 @@ export async function logChanges(
 		)
 		console.log(`this: ${this._id}`)
 
-		// GET old and new docs
-		const newDoc = this // 'this' refers to the new document (after modifications)
+		const newDoc = this as IBooking | IUser | IPaymentMethod // 'this' refers to the new document (after modifications)
 		const newDocObj = newDoc.toObject() // used to loop through only the plain document fields
 		const thisModel = this.constructor as Model<
 			IUser | IBooking | IRoom | IPaymentMethod
@@ -39,11 +39,11 @@ export async function logChanges(
 		const oldDoc = await thisModel.findById(this._id).lean() // Fetch the old document
 
 		if (!oldDoc) {
-			return next("Old document not found")
+			return next(new Error("Old document not found"))
 		}
 
 		// Exit middleware if no changes are detected
-		if (!newDoc.isModified()) return next({ error: "No changes detected" })
+		if (!newDoc.isModified()) return next(new Error("No changes detected"))
 
 		const fieldsToIgnore = new Set([
 			"history",
@@ -52,7 +52,7 @@ export async function logChanges(
 			"id",
 			"createdBy",
 		]) // Fields to ignore when logging changes
-		const changes: { field: string; oldValue: any; newValue: any }[] = [] // Array to store updated fields
+		const changes: Partial<ILog>[] = [] // Array to store updated fields
 
 		for (const key in newDocObj) {
 			// Skip specific fields in 'fieldsToIgnore' set
