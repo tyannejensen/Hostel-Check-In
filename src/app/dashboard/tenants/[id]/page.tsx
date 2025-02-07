@@ -61,7 +61,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                         </h2>
                         <div>
                           <p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.fullname}
+                            {tenant.firstName} {tenant.lastName}
                           </p>
                         </div>
                       </div>
@@ -153,7 +153,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                           <div className="p-1" key={index}>
                             <div>
                               <div className="border rounded-md p-2 -ml-4 -mr-4 text-start text-wrap">
-                                {`${tenant.fullname} stayed in Room #${booking.roomId.roomNumber} 
+                                {`${tenant.firstName} ${tenant.lastName} stayed in Room #${booking.roomId.roomNumber} 
                                 from ${booking.checkIn} to ${booking.checkOut}`}
                               </div>
                             </div>

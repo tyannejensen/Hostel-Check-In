@@ -4,7 +4,11 @@ import React from "react";
 import "@/styles/global.css";
 
 import TenantForm from "@/components/TenantForm";
-import { getTenantById, saveTenant } from "@/actions/tenant.actions";
+import {
+  getTenantById,
+  saveTenant,
+  updateTenant,
+} from "@/actions/tenant.actions";
 import { notFound, redirect, useParams } from "next/navigation";
 
 interface PhoneNumber {
@@ -26,7 +30,7 @@ export default async function Page({ params }: any) {
     firstName: tenant.firstName,
     lastName: tenant.lastName,
     email: tenant.email,
-    phone: tenant.phone,
+    phone: tenant.phoneNumbers[0].number,
     addressLineOne: tenant.billingAddress.addressLineOne,
     addressLineTwo: tenant.billingAddress.addressLineTwo,
     birthdate: new Date(tenant.birthdate).toISOString().split("T")[0], // yyyy-MM-dd format
@@ -49,12 +53,13 @@ export default async function Page({ params }: any) {
 
     // values.phone = formatPhoneNumber(values.phone);
     values.password = "password";
+    values.tenantId = tenant.id;
     // Save the tenant to the database
-    const response = await saveTenant(values);
+    const response = await updateTenant(values);
     if (response.error) {
       throw new Error(response.message);
     } else {
-      redirect("/dashboard/tenants");
+      redirect(`/dashboard/tenants/${tenant.id}`);
       // Handle successful tenant creation (e.g., redirect to tenant list)
     }
   }

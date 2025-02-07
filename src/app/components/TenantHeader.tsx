@@ -21,7 +21,7 @@ const TenantHeader = ({ tenant }: any) => {
       <div className="flex justify-between gap-4 w-full">
         <div className="flex justify-start gap-[30px]">
           <h1 className="text-[var(--dark-button)] font-bold">
-            {tenant.fullname}
+            {tenant.firstName} {tenant.lastName}
           </h1>
           <Pencil
             onClick={navigateToEdit}
