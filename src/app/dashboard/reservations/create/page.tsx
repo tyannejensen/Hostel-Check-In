@@ -495,3 +495,198 @@ export default function Page() {
     </>
   );
 }
+
+
+// Possible corrections to code:
+  // Remove unused variables and imports.
+  // Replace any types with specific types.
+  // Fix the missing dependency warning for the useEffect.
+//   "use client";
+
+// import React, { useEffect, useState } from "react";
+// import { useForm, Controller } from "react-hook-form";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import { z } from "zod";
+// import { Button } from "@/components/ui/button";
+// import {
+//   Card,
+//   CardContent,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card";
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "@/components/ui/table";
+// import { Separator } from "@/components/ui/separator";
+// import { ScrollArea } from "@/components/ui/scroll-area";
+// import { useRouter } from "next/navigation";
+// import { IRoom } from "@/lib/types/interfaces/room.interface";
+// import { getRooms } from "@/actions/room.actions";
+
+// const schema = z.object({
+//   name: z.string().min(1, "Name is required"),
+//   room: z.string().min(1, "Room is required"),
+//   checkInDate: z.string().min(1, "Check-In Date is required"),
+//   checkOutDate: z.string().min(1, "Check-Out Date is required"),
+//   deposit: z.string().min(1, "Deposit is required"),
+//   totalCharge: z.string().min(1, "Total Charge is required"),
+//   totalPaymentDue: z.string().min(1, "Total Payment Due is required"),
+// });
+
+// type FormData = z.infer<typeof schema>;
+
+// export default function Page() {
+//   const router = useRouter();
+//   const [rooms, setRooms] = useState<IRoom[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
+
+//   const {
+//     control,
+//     handleSubmit,
+//     setValue,
+//     formState: { errors },
+//   } = useForm<FormData>({
+//     resolver: zodResolver(schema),
+//   });
+
+//   useEffect(() => {
+//     const fetchRooms = async () => {
+//       try {
+//         const roomsData = await getRooms();
+//         setRooms(roomsData);
+//       } catch (error: any) {
+//         setError(error.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchRooms();
+//   }, []);
+
+//   const onSubmit = async (data: FormData) => {
+//     try {
+//       // Handle form submission
+//       console.log(data);
+//       // Redirect or show success message
+//     } catch (error) {
+//       console.error("Error submitting form:", error);
+//     }
+//   };
+
+//   if (loading) {
+//     return <div>Loading...</div>;
+//   }
+
+//   if (error) {
+//     return (
+//       <div>
+//         <h1>Error</h1>
+//         <p>{error}</p>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="page">
+//       <div className="w-[80rem]">
+//         <h1 className="pt-[10px] pl-[30px] font-bold">CREATE RESERVATION</h1>
+//         <div className="rounded-xl table-container border bg-card text-card-foreground shadow">
+//           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+//             <Card>
+//               <CardHeader>
+//                 <CardTitle>Reservation Details</CardTitle>
+//               </CardHeader>
+//               <CardContent>
+//                 <Controller
+//                   name="name"
+//                   control={control}
+//                   render={({ field }) => (
+//                     <div className="b-box">
+//                       <label className="label-title">Name</label>
+//                       <input {...field} className="input" />
+//                       {errors.name && <p>{errors.name.message}</p>}
+//                     </div>
+//                   )}
+//                 />
+//                 <Controller
+//                   name="room"
+//                   control={control}
+//                   render={({ field }) => (
+//                     <div className="b-box">
+//                       <label className="label-title">Room</label>
+//                       <input {...field} className="input" />
+//                       {errors.room && <p>{errors.room.message}</p>}
+//                     </div>
+//                   )}
+//                 />
+//                 <Controller
+//                   name="checkInDate"
+//                   control={control}
+//                   render={({ field }) => (
+//                     <div className="b-box">
+//                       <label className="label-title">Check-In Date</label>
+//                       <input type="date" {...field} className="input" />
+//                       {errors.checkInDate && <p>{errors.checkInDate.message}</p>}
+//                     </div>
+//                   )}
+//                 />
+//                 <Controller
+//                   name="checkOutDate"
+//                   control={control}
+//                   render={({ field }) => (
+//                     <div className="b-box">
+//                       <label className="label-title">Check-Out Date</label>
+//                       <input type="date" {...field} className="input" />
+//                       {errors.checkOutDate && <p>{errors.checkOutDate.message}</p>}
+//                     </div>
+//                   )}
+//                 />
+//                 <Controller
+//                   name="deposit"
+//                   control={control}
+//                   render={({ field }) => (
+//                     <div className="b-box">
+//                       <label className="label-title">Deposit</label>
+//                       <input {...field} className="input" />
+//                       {errors.deposit && <p>{errors.deposit.message}</p>}
+//                     </div>
+//                   )}
+//                 />
+//                 <Controller
+//                   name="totalCharge"
+//                   control={control}
+//                   render={({ field }) => (
+//                     <div className="b-box">
+//                       <label className="label-title">Total Charge</label>
+//                       <input {...field} className="input" />
+//                       {errors.totalCharge && <p>{errors.totalCharge.message}</p>}
+//                     </div>
+//                   )}
+//                 />
+//                 <Controller
+//                   name="totalPaymentDue"
+//                   control={control}
+//                   render={({ field }) => (
+//                     <div className="b-box">
+//                       <label className="label-title">Total Payment Due</label>
+//                       <input {...field} className="input" />
+//                       {errors.totalPaymentDue && <p>{errors.totalPaymentDue.message}</p>}
+//                     </div>
+//                   )}
+//                 />
+//                 <Button type="submit">Submit</Button>
+//               </CardContent>
+//             </Card>
+//           </form>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
