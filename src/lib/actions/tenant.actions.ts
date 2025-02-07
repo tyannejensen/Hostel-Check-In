@@ -1,11 +1,24 @@
 "use server";
 
-import { createDecipheriv } from "crypto";
 import { headers } from "next/headers";
-import mongoose from "mongoose";
 import { dbConnect } from "@/lib/db";
 import { User } from "@/models/index";
-import path from "path";
+
+// Define types for payloads
+interface TenantPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  birthdate: string;
+  phone: string;
+  addressLineOne: string;
+  addressLineTwo: string;
+  city: string;
+  state: string;
+  zip: string;
+  tenantId?: string;
+}
 
 // GET DATA
 
@@ -25,7 +38,7 @@ export async function getTenants() {
     })
     .populate("fullname");
 
-  const tenantsAsObj = tenants.map((tenant: any) => tenant.toObject());
+  const tenantsAsObj = tenants.map((tenant) => tenant.toObject());
 
   // Ensure final data is fully JSON-serializable
   return tenantsAsObj;
@@ -85,24 +98,25 @@ export async function getTenantById(id: string) {
 
 // SET DATA
 
-//save tenant as a user
-
-export async function saveTenant(payload: any) {
+// Save tenant as a user
+export async function saveTenant(payload: TenantPayload) {
   await dbConnect();
   const reqHeaders = await headers();
   const userId = reqHeaders.get("x-user-id");
 
-  const firstName = payload.firstName;
-  const lastName = payload.lastName;
-  const email = payload.email;
-  const password = payload.password;
-  const birthdate = payload.birthdate;
-  const phoneNumbers = payload.phone;
-  const addressLineOne = payload.addressLineOne;
-  const addressLineTwo = payload.addressLineTwo;
-  const city = payload.city;
-  const state = payload.state;
-  const postalCode = payload.zip;
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    birthdate,
+    phone,
+    addressLineOne,
+    addressLineTwo,
+    city,
+    state,
+    zip,
+  } = payload;
 
   if (
     !firstName ||
@@ -110,12 +124,12 @@ export async function saveTenant(payload: any) {
     !email ||
     !password ||
     !birthdate ||
-    !phoneNumbers ||
+    !phone ||
     !addressLineOne ||
     !addressLineTwo ||
     !city ||
     !state ||
-    !postalCode
+    !zip
   ) {
     return { error: true, message: "Please fill in all fields" };
   }
@@ -141,7 +155,7 @@ export async function saveTenant(payload: any) {
       addressLineTwo,
       city,
       state,
-      postalCode,
+      postalCode: zip,
     };
 
     const newUser = new User({
@@ -150,7 +164,7 @@ export async function saveTenant(payload: any) {
       email,
       password,
       birthdate,
-      phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
+      phoneNumbers: [{ number: phone, isPrimary: true }],
       billingAddress,
       role: "tenant",
       createdBy: userId,
@@ -165,73 +179,75 @@ export async function saveTenant(payload: any) {
   }
 }
 
-export async function updateTenant(payload: any) {
-	await dbConnect()
-	const reqHeaders = await headers()
-	const employeeId = reqHeaders.get("x-user-id")
+export async function updateTenant(payload: TenantPayload) {
+  await dbConnect();
+  const reqHeaders = await headers();
+  const employeeId = reqHeaders.get("x-user-id");
 
-	const firstName = payload.firstName
-	const lastName = payload.lastName
-	const email = payload.email
-	const password = payload.password
-	const birthdate = payload.birthdate
-	const phoneNumbers = payload.phone
-	const addressLineOne = payload.addressLineOne
-	const addressLineTwo = payload.addressLineTwo
-	const city = payload.city
-	const state = payload.state
-	const postalCode = payload.zip
-	const tenantId = payload.tenantId
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    birthdate,
+    phone,
+    addressLineOne,
+    addressLineTwo,
+    city,
+    state,
+    zip,
+    tenantId,
+  } = payload;
 
-	if (
-		!firstName &&
-		!lastName &&
-		!email &&
-		!password &&
-		!birthdate &&
-		!phoneNumbers &&
-		!addressLineOne &&
-		!addressLineTwo &&
-		!city &&
-		!state &&
-		!postalCode
-	) {
-		return { error: true, message: "Please provide at least one update." }
-	}
+  if (
+    !firstName &&
+    !lastName &&
+    !email &&
+    !password &&
+    !birthdate &&
+    !phone &&
+    !addressLineOne &&
+    !addressLineTwo &&
+    !city &&
+    !state &&
+    !zip
+  ) {
+    return { error: true, message: "Please provide at least one update." };
+  }
 
-	try {
-		const tenant = await User.findById(tenantId)
+  try {
+    const tenant = await User.findById(tenantId);
 
-		if (!tenant) {
-			return { error: true, message: "Tenant not found" }
-		}
+    if (!tenant) {
+      return { error: true, message: "Tenant not found" };
+    }
 
-		if (firstName) tenant.firstName = firstName
-		if (lastName) tenant.lastName = lastName
-		if (email) tenant.email = email
-		if (birthdate) tenant.birthdate = birthdate
-		if (birthdate)
-			tenant.phoneNumbers = [{ number: phoneNumbers, isPrimary: true }]
-		if (addressLineOne || addressLineTwo || state || postalCode) {
-			tenant.billingAddress = {
-				addressLineOne: addressLineOne
-					? addressLineOne
-					: tenant.billingAddress.addressLineOne,
-				addressLineTwo: addressLineTwo
-					? addressLineTwo
-					: tenant.billingAddress.addressLineTwo,
-				city: city ? city : tenant.billingAddress.city,
-				state: state ? state : tenant.billingAddress.state,
-				postalCode: postalCode ? postalCode : tenant.billingAddress.postalCode,
-			}
-		}
-		tenant.updatedBy = employeeId
+    if (firstName) tenant.firstName = firstName;
+    if (lastName) tenant.lastName = lastName;
+    if (email) tenant.email = email;
+    if (birthdate) tenant.birthdate = birthdate;
+    if (phone)
+      tenant.phoneNumbers = [{ number: phone, isPrimary: true }];
+    if (addressLineOne || addressLineTwo || state || zip) {
+      tenant.billingAddress = {
+        addressLineOne: addressLineOne
+          ? addressLineOne
+          : tenant.billingAddress.addressLineOne,
+        addressLineTwo: addressLineTwo
+          ? addressLineTwo
+          : tenant.billingAddress.addressLineTwo,
+        city: city ? city : tenant.billingAddress.city,
+        state: state ? state : tenant.billingAddress.state,
+        postalCode: zip ? zip : tenant.billingAddress.postalCode,
+      };
+    }
+    tenant.updatedBy = employeeId;
 
-		await tenant.save()
+    await tenant.save();
 
-		return { error: false, message: "Tenant updated successfully" }
-	} catch (error) {
-		console.error("Error updating tenant:", error)
-		return { error: true, message: (error as Error).message }
-	}
+    return { error: false, message: "Tenant updated successfully" };
+  } catch (error) {
+    console.error("Error updating tenant:", error);
+    return { error: true, message: (error as Error).message };
+  }
 }
