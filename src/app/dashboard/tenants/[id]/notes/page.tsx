@@ -28,8 +28,6 @@ export default function Page() {
 	const router = useRouter()
 	const { id } = useParams()
 
-	console.log("User ID:", id)
-
 	const [error, setError] = React.useState("")
 	const [success, setSuccess] = React.useState("")
 
@@ -41,7 +39,7 @@ export default function Page() {
 	})
 
 	async function handleFormSubmit(values: z.infer<typeof formSchema>) {
-		console.log(values)
+
 		// Save the note to the database
 		const response = await saveNote({
 			newNote: values.content,

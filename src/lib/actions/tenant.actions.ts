@@ -156,11 +156,7 @@ export async function saveTenant(payload: any) {
 			createdBy: userId,
 		})
 
-		console.log("Saving new user:", newUser)
-
 		await newUser.save()
-
-		console.log("User saved successfully")
 
 		return { error: false, message: "Tenant created successfully" }
 	} catch (error) {

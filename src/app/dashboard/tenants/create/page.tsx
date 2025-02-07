@@ -87,7 +87,7 @@ export default function Page({ userId }: PageProps) {
   });
 
   async function handleFormSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+
     // Save the tenant to the database
     const response = await saveTenant({ ...values, userId });
     if (response.error) {
@@ -112,7 +112,7 @@ export default function Page({ userId }: PageProps) {
       cvv: "",
     };
     setPaymentMethodType(value);
-    console.log(value);
+
     field.onChange(value);
     form.setValue("paymentMethod", paymentMethod);
     form.setValue("paymentMethodType", value);
