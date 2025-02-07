@@ -22,8 +22,6 @@ import ReservationsTable from "../../components/ReservationsTable";
 export default async function Page() {
   const bookings = await getBookings();
 
-  console.log(bookings);
-
   const statusMap: { [key in "paid" | "not-paid" | "pending"]: string } = {
     paid: "Paid",
     "not-paid": "Not Paid",
@@ -31,8 +29,7 @@ export default async function Page() {
   };
 
   function convertBookingIntoTableData(bookings: any) {
-    console.log(bookings);
-    return bookings.reverse().map((booking: any) => {
+    return bookings.map((booking: any) => {
       return {
         id: booking.id,
         name: booking.bookedBy.fullname,
@@ -50,7 +47,7 @@ export default async function Page() {
     <>
       <div className="page">
         <div className="w-full">
-          <h1 className="pt-[10px] pl-[30px] font-bold h-[47.5px]"></h1>
+          <h1 className="pt-[10px] pl-[30px] font-bold">DASHBOARD</h1>
 
           <div className="rounded-xl table-container border bg-card text-card-foreground shadow">
             <div className="button-container align-middle content-center">

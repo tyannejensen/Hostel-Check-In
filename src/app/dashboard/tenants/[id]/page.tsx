@@ -1,14 +1,6 @@
-"use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "@/styles/global.css";
-import {
-  Pencil,
-  Plus,
-  Ellipsis,
-  Link,
-  UserRoundPlus,
-  Trash2,
-} from "lucide-react";
+import { Pencil, Plus, Ellipsis, UserRoundPlus, Trash2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
@@ -18,269 +10,33 @@ import { Button } from "react-day-picker";
 import { DayPickerProvider, DayPicker } from "react-day-picker";
 import { getTenantById } from "@/actions/tenant.actions";
 import { mock } from "node:test";
-import { IUser } from "@/lib/types/interfaces";
-import { useParams, useRouter } from "next/navigation";
+import { IBooking, IChangeLog, ILog, INote } from "@/lib/types/interfaces";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import TenantHeader from "@/components/TenantHeader";
 
 // TODO: determine how to show an 'view' and 'edit' in the url e.g. /tenants/1/view or /tenants/1/edit
 // TODO: how can we have the edit and view pages be the same but the URL change upon state change?
 
-//remove this line after uncommenting the fetch request in the fetchTenants function
-// const mockData = {
-//   id: "1",
-//   name: "John Doe",
-//   email: "test@gmail.com",
-//   dob: "01/01/1980",
-//   phoneNumber: "444-444-4444",
-//   address: "1234 Elm St",
-//   city: "Springfield",
-//   state: "IL",
-//   zip: "62704",
-//   reservationHistory: [
-//     {
-//       roomNumber: "444",
-//       checkInDate: "Jan 01, 2025",
-//       checkOutDate: "Jan 15, 2025",
-//     },
-//     {
-//       roomNumber: "444",
-//       checkInDate: "Jan 01, 2025",
-//       checkOutDate: "Jan 15, 2025",
-//     },
-//     {
-//       roomNumber: "444",
-//       checkInDate: "Jan 01, 2025",
-//       checkOutDate: "Jan 15, 2025",
-//     },
-//     {
-//       roomNumber: "444",
-//       checkInDate: "Jan 01, 2025",
-//       checkOutDate: "Jan 15, 2025",
-//     },
-//     {
-//       roomNumber: "444",
-//       checkInDate: "Jan 01, 2025",
-//       checkOutDate: "Jan 15, 2025",
-//     },
-//   ],
-//   transactionHistory: [
-//     {
-//       paymentHistory: [
-//         {
-//           date: "01/01/2025",
-//           amount: "$250.00",
-//           type: "credit",
-//         },
-//       ],
-//       notifications: [
-//         {
-//           date: "01/01/2025",
-//           message: "Payment received",
-//           user: "Luke Skywalker",
-//         },
-//       ],
-//     },
-//   ],
-//   notes: [
-//     {
-//       comment: "Broke the blinds in room 444. Will need to replace.",
-//       user: "Luke Skywalker",
-//       date: "01/01/2025",
-//     },
-//     {
-//       comment: "Broke the blinds in room 444. Will need to replace.",
-//       user: "Luke Skywalker",
-//       date: "01/01/2025",
-//     },
-//     {
-//       comment: "Broke the blinds in room 444. Will need to replace.",
-//       user: "Luke Skywalker",
-//       date: "01/01/2025",
-//     },
-//     {
-//       comment: "Broke the blinds in room 444. Will need to replace.",
-//       user: "Luke Skywalker",
-//       date: "01/01/2025",
-//     },
-//   ],
-// };
-// __________________ This code is to help with the ScrollArea component __________________
-// const tags = Array.from({ length: 50 }).map(
-//   (_, i, a) => `v1.2.0-beta.${a.length - i}`
-// )
+export const dynamic = "force-dynamic"; // force the page to reload data upon navigation
 
-interface PhoneNumber {
-  countryCode: string;
-  number: string;
-  isMobile: boolean;
-  isPrimary: boolean;
-  _id: string;
-  createdAt: string;
-  updatedAt: string;
-  id: string;
-}
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+  const { id } = await props.params;
+  const tenant = await getTenantById(id);
 
-interface Room {
-  roomNumber: string;
-  id: string;
-}
-
-interface Note {
-  content: string;
-  createdBy: {
-    firstName: string;
-    lastName: string;
-    id: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-  id: string;
-}
-
-interface Booking {
-  bookedBy: string;
-  createdBy: string;
-  roomId: Room;
-  checkIn: string;
-  checkOut: string;
-  status: string;
-  depositAmount: number;
-  depositReturned: boolean;
-  depositReturnAmount: number;
-  payments: string[];
-  notes: Note[];
-  history: any[];
-  createdAt: string;
-  updatedAt: string;
-  id: string;
-}
-
-interface Tenant {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumbers: PhoneNumber[];
-  bookings: Booking[];
-  paymentMethods: string[];
-  tags: string[];
-  createdBy: string;
-  fullname: string;
-  id: string;
-}
-
-const notes = [
-  {
-    content: "Broke the blinds in room 444. Will need to replace.",
-    createdBy: {
-      firstName: "Luke",
-      lastName: "Skywalker",
-      id: "1",
-    },
-    createdAt: "01/01/2025",
-    updatedAt: "01/01/2025",
-    id: "1",
-  },
-  {
-    content: "Broke the blinds in room 444. Will need to replace.",
-    createdBy: {
-      firstName: "Luke",
-      lastName: "Skywalker",
-      id: "1",
-    },
-    createdAt: "01/01/2025",
-    updatedAt: "01/01/2025",
-    id: "1",
-  },
-  {
-    content: "Broke the blinds in room 444. Will need to replace.",
-    createdBy: {
-      firstName: "Luke",
-      lastName: "Skywalker",
-      id: "1",
-    },
-    createdAt: "01/01/2025",
-    updatedAt: "01/01/2025",
-    id: "1",
-  },
-  {
-    content: "Broke the blinds in room 444. Will need to replace.",
-    createdBy: {
-      firstName: "Luke",
-      lastName: "Skywalker",
-      id: "1",
-    },
-    createdAt: "01/01/2025",
-    updatedAt: "01/01/2025",
-    id: "1",
-  },
-];
-
-export default function Page() {
-  const { id } = useParams();
-  // console.log(id); for debugging
-  // const notes = tenant.bookings.flatMap((booking: any) => booking.notes);
-  const [tenant, setTenant] = useState<Tenant | null>(null);
-
-  useEffect(() => {
-    const fetchTenant = async () => {
-      try {
-        console.log(id);
-        const tenantDetails: any = await getTenantById(id ?? "");
-        console.log(tenantDetails);
-        // Mock data for now
-
-        // Simulate network delay
-        setTenant(tenantDetails);
-      } catch (error: any) {
-        // setError(error.message);
-      } finally {
-        // setLoading(false);
-      }
-    };
-
-    fetchTenant();
-  }, [id]);
-
-  const router = useRouter();
+  const notes: INote[] = tenant.notes.map((note: INote) => note);
+  const history: IChangeLog[] = await tenant.history.map(
+    (log: IChangeLog) => log
+  );
 
   function navigateToEdit() {
     // navigate to edit page
-    router.push(`/dashboard/tenants/${id}/edit`);
+    redirect(`/dashboard/tenants/${id}/edit`);
   }
 
   function deleteTenant() {
-    console.log("delete tenant");
+    // delete the tenant
   }
-
-  // console.log(notes); for debugging
-
-  // mockData.reservationHistory = tenant.bookings.map((booking: any) => {
-  //   return {
-  //     roomNumber: booking.roomId.roomNumber,
-  //     checkInDate: booking.checkIn,
-  //     checkOutDate: booking.checkOut,
-  //   };
-  // });
-
-  // const fetchTenant = async (): Promise<any> => {
-  //   let result = null;
-  //   // TODO: replace with actual fetch request
-  //   // result = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then((res) => res.json());
-  //   // mock return data
-
-  //   // After uncommenting the above code delete this result assignment
-  //   result = new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       resolve(mockData);
-  //     }, 200);
-  //   }).then((data) => {
-  //     return data;
-  //   });
-
-  //   return result;
-  // };
-
-  // TODO: create function to fetch the a tenant by id -> add function to data.ts file
-  // const tenant = await getTenantById(id)
 
   return (
     <>
@@ -288,36 +44,12 @@ export default function Page() {
         // if tenant exists show the tenant details
         <div className="text-[var(--text)] p-[30px]">
           <div className="rounded-md border bg-card text-card-foreground shadow p-6">
-            <div className="flex justify-between items-center">
-              <div className="flex justify-between w-full">
-                <div className="flex justify-start gap-[30px]">
-                  <h1 className="text-[var(--dark-button)] font-bold">
-                    {tenant.fullname}
-                  </h1>
-                  <Pencil
-                    onClick={navigateToEdit}
-                    className="text-[var(--text)] edit"
-                  />
-                </div>
-                <div>
-                  <Trash2
-                    className="text-[var(--text)] trash"
-                    onClick={deleteTenant}
-                  />
-                </div>
-                {/* <p>{tenant.email}</p>
-                <p>
-                  {tenant?.phoneNumbers?.find((phone: any) => phone.isPrimary)
-                    ?.number ?? "N/A"}
-                </p> */}
-              </div>
-            </div>
+            <TenantHeader tenant={tenant} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
               <Card className="bg-[var(--highlight)] rounded-md border p-4">
                 <CardTitle className="flex flex-row items-center justify-between">
                   <div className="flex justify-between items-center pb-3 w-full">
                     <p className="font-bold text-[var(--text)]">DETAILS</p>
-                    {/* <Pencil className="text-[var(--text)]" /> */}
                   </div>
                 </CardTitle>
                 <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
@@ -325,59 +57,46 @@ export default function Page() {
                     <div className="p-1">
                       <div className="flex flex-row pb-4 ">
                         <h2 className="text-[var(--text)] font-bold pr-12">
-                          Email:
+                          Name:
                         </h2>
                         <div>
                           <p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.email}
+                            {tenant.fullname}
                           </p>
                         </div>
                       </div>
-                    </div>
-                    <div className="p-1">
-                      <div className="flex flex-row pb-4 ">
-                        <h2 className="text-[var(--text)] font-bold pr-12">
-                          Phone:
-                        </h2>
-                        <div>
-                          <div className="pl-[50px] text-[var(--dark-button)]">
-                            <p>
-                              {tenant?.phoneNumbers?.find(
-                                (phone: any) => phone.isPrimary
-                              )?.number ?? "N/A"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      {/* <div className="flex flex-row pb-4">
+                      <div className="flex flex-row pb-4">
                         <h2 className="font-bold pr-14 text-[var(--text)]">
                           DOB:
                         </h2>
                         <div>
                           <p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.dob || "N/A"}
+                            {tenant.birthdate || "N/A"}
                           </p>
                         </div>
-                      </div> */}
-                      {/* <div className="flex flex-row pb-4">
+                      </div>
+                      <div className="flex flex-row pb-4">
                         <h2 className="font-bold text-[var(--text)] pr-8">
                           Address:
                         </h2>
                         <div>
                           <p className="pl-[50px] text-[var(--dark-button)]">
-                            {tenant.address}
+                            {tenant.billingAddress.addressLineOne}
+                          </p>
+                          <p className="pl-[50px] text-[var(--dark-button)]">
+                            {tenant.billingAddress.addressLineTwo}
                           </p>
                           <div>
                             <p className="pl-[50px] text-[var(--dark-button)]">
-                              {`${tenant.city}, ${tenant.state}`}
+                              {`${tenant.billingAddress.city}, ${tenant.billingAddress.state}`}
                             </p>
                             <p className="pl-[50px] text-[var(--dark-button)]">
-                              {tenant.zip}
+                              {tenant.billingAddress.postalCode}
                             </p>
                           </div>
                         </div>
                         <Separator className="my-2" />
-                      </div> */}
+                      </div>
                     </div>
                   </CardContent>
                 </ScrollArea>
@@ -387,7 +106,9 @@ export default function Page() {
                 <CardTitle className="flex flex-row items-center justify-between">
                   <div className="flex justify-between items-center pb-3 w-full">
                     <p className="font-bold text-[var(--light)]">NOTES</p>
-                    <Plus className="text-[var(--light)]" />
+                    <Link href={`/dashboard/tenants/${tenant.id}/notes`}>
+                      <Plus className="text-[var(--light)] cursor-pointer" />
+                    </Link>
                   </div>
                 </CardTitle>
                 <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
@@ -457,8 +178,8 @@ export default function Page() {
                 </CardTitle>
                 <ScrollArea className="h-[200px] bg-[var(--light)] rounded-md border p-4">
                   <CardContent>
-                    {tenant.bookings && tenant.bookings.length > 0 ? (
-                      tenant.bookings.map((booking: any, index: number) => {
+                    {history && history.length > 0 ? (
+                      history.map((logs: any, index: number) => {
                         return (
                           <div key={index}>
                             <div className="flex flex-wrap items-center border rounded-md space-x-4">
@@ -466,8 +187,26 @@ export default function Page() {
                               <div className="-mt-5 pr-5 mb-2">
                                 <Skeleton className="h-4 w-[250px]" />
                                 <Skeleton className="h-4 w-[200px]" />
-                                {`${tenant.fullname} stayed in Room #${booking.roomId.roomNumber} 
-                                from ${booking.checkIn} to ${booking.checkOut}`}
+                                {`${logs.updatedBy.fullname} updated the following data on ${logs.updatedAt}`}
+                                <ul>
+                                  {logs.updates.map(
+                                    (log: ILog, index: number) => {
+                                      return (
+                                        <li
+                                          key={index}
+                                          className={`ms-9 list-disc`}
+                                        >
+                                          <p>
+                                            <b>{String(log.field)}</b> was
+                                            updated from{" "}
+                                            <i>{String(log.oldValue)}</i> to{" "}
+                                            <i>{String(log.newValue)}</i>
+                                          </p>
+                                        </li>
+                                      );
+                                    }
+                                  )}
+                                </ul>
                               </div>
                               <div className="flex flex-wrap absolute right-20">
                                 <Ellipsis />

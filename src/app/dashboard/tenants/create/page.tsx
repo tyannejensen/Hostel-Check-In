@@ -31,12 +31,11 @@ export default async function Page() {
   async function handleFormSubmit(values: any) {
     "use server";
 
-    console.log(values);
     // values.phone = formatPhoneNumber(values.phone);
     values.password = "password";
     // Save the tenant to the database
+    console.log(values);
     const response = await saveTenant(values);
-    console.log(response);
     if (response.error) {
       throw new Error(response.message);
     } else {

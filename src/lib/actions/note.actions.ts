@@ -1,33 +1,47 @@
-import { dbConnect } from "@/lib/db";
-import { Booking } from "@/models/index";
+"use server"
+import { dbConnect } from "@/lib/db"
+import { Booking, User } from "@/models/index"
+import { headers } from "next/headers"
 
-interface SaveNoteParams {
-  bookingId: string;
-  note: string;
-  userId: string;
-}
+export async function saveNote(payload: any) {
+	await dbConnect()
+	const reqHeaders = await headers()
+	const userId = reqHeaders.get("x-user-id")
 
-export async function saveNote({ bookingId, note, userId }: SaveNoteParams) {
-  await dbConnect();
 
-  try {
-    const booking = await Booking.findById(bookingId).populate("notes.createdBy", "fullname email").exec();
+	const newNote = payload.newNote
+	const userIdFromUrl = payload.userId
 
-    if (!booking) {
-      return { error: true, message: "Booking not found" };
-    }
 
-    booking.notes.push({
-      note,
-      createdBy: userId,
-      createdAt: new Date(),
-    });
+	if (!newNote) {
+		return { error: true, message: "Please write a note" }
+	}
 
-    await booking.save();
+	try {
+		// Find the user by ID
+		const user = await User.findById(userIdFromUrl)
 
-    return { error: false, message: "Note added successfully" };
-  } catch (error) {
-    console.error("Error adding note to booking:", error);
-    return { error: true, message: (error as Error).message };
-  }
+		if (!user) {
+			return { error: true, message: "User not found" }
+		}
+
+		// Get the booking ID from the user's bookings
+		const bookingId = user.bookings[0]._id // Assuming the user has at least one booking
+
+		const note = {
+			content: newNote,
+			createdBy: userId,
+			createdAt: new Date(),
+		}
+
+		// Add the new note to the existing notes array
+		user.notes.push(note)
+
+		await user.save()
+
+		return { error: false, message: "Note Created Successfully" }
+	} catch (error) {
+		console.error("Error adding note to booking:", error)
+		return { error: true, message: (error as Error).message }
+	}
 }

@@ -33,14 +33,12 @@ const ReservationDetail: React.FC<ReservationDetailProps> = () => {
 
   const { id } = useParams();
   // const booking = await getBookingById(id ?? "");
-  // console.log(booking);
   const [reservation, setReservation] = useState<Reservation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const booking = getBookingById(id ?? "");
-    console.log(booking);
     const fetchReservation = async () => {
       try {
         // Mock data for now

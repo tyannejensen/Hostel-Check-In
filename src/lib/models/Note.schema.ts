@@ -8,7 +8,7 @@ export const NoteSchema = new Schema<INote>(
 		content: {
 			type: String,
 			required: [true, "Note is required"],
-			minLength: [5, "Note must be at least 5 characters long"],
+			minLength: [2, "Note must be at least 2 characters long"],
 			maxLength: [1000, "Note must not exceed 1000 characters"],
 		},
 		createdBy: {
@@ -22,14 +22,14 @@ export const NoteSchema = new Schema<INote>(
 
 // MIDDLEWARE
 // Notes Pre Save Hook -> Middleware to enforce immutability of notes
-NoteSchema.pre("save", function (next) {
-	if (this.isNew) return next() // If the note is new, allow it to save
-	if (!this.isModified()) return next() // If the note is not modified, allow it to save
+// NoteSchema.pre("save", function (next) {
+// 	if (this.isNew) return next() // If the note is new, allow it to save
+// 	if (!this.isModified()) return next() // If the note is not modified, allow it to save
 
-	// Prevent updating the note if it already exists
-	this.invalidate("content", "Notes cannot be modified after creation")
-	next(new Error("Notes are immutable once created"))
-})
+// 	// Prevent updating the note if it already exists
+// 	this.invalidate("content", "Notes cannot be modified after creation")
+// 	next(new Error("Notes are immutable once created"))
+// })
 
 // GETTERS
 // Convert the 'createdAt' and 'updatedAt' fields to MMM DD, YYYY format e.g. Jan 30, 2025

@@ -14,7 +14,7 @@ export async function getTenants() {
 
   const tenants = await User.find({ role: "tenant" })
     .select(
-      "_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags createdBy"
+      "_id firstName lastName fullName email phoneNumbers bookings history paymentMethods tags notes createdBy"
     )
     .populate({
       path: "bookings",
@@ -34,9 +34,20 @@ export async function getTenants() {
 export async function getTenantById(id: string) {
   await dbConnect();
 
+  // FIXME: Identify why the booking history for 'Alice Smith' is populating with the 'tenant' history on the tenant/{id} page
   const tenant = await User.findOne({ _id: id, role: "tenant" })
     .populate("fullname")
+    .populate("billingAddress")
+    .populate("birthdate")
     .populate("phoneNumbers")
+    .populate({
+      path: "notes",
+      populate: {
+        path: "createdBy",
+        select: "firstName lastName",
+      },
+      select: "content createdBy createdAt",
+    })
     .populate({
       path: "bookings",
       populate: [
@@ -44,31 +55,24 @@ export async function getTenantById(id: string) {
           path: "roomId",
           select: "roomNumber",
         },
-        {
-          path: "notes",
-          populate: {
-            path: "createdBy",
-            select: "firstName lastName",
-          },
-          select: "content createdBy createdAt",
-          options: { strictPopulate: false },
-        },
-        {
-          path: "history",
-          populate: {
-            path: "updatedBy",
-            select: "fullname",
-            populate: {
-              path: "updates",
-              select: "field oldValue newValue",
-              options: { strictPopulate: false },
-            },
-          },
-        },
       ],
     })
+    .populate({
+      path: "history",
+      populate: {
+        path: "updatedBy",
+        select: "fullname",
+      },
+    })
+    .populate({
+      path: "history",
+      populate: {
+        path: "updates",
+        select: "field oldValue newValue",
+      },
+    })
     .select(
-      "_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags history createdBy"
+      "_id firstName lastName fullName email phoneNumbers bookings paymentMethods tags history notes createdBy"
     );
 
   if (!tenant) {
@@ -87,28 +91,31 @@ export async function saveTenant(payload: any) {
   await dbConnect();
   const reqHeaders = await headers();
   const userId = reqHeaders.get("x-user-id");
-  await dbConnect();
 
   const firstName = payload.firstName;
   const lastName = payload.lastName;
   const email = payload.email;
   const password = payload.password;
+  const birthdate = payload.birthdate;
   const phoneNumbers = payload.phone;
-  const address = payload.address;
+  const addressLineOne = payload.addressLineOne;
+  const addressLineTwo = payload.addressLineTwo;
   const city = payload.city;
   const state = payload.state;
-  const zip = payload.zip;
+  const postalCode = payload.zip;
 
   if (
     !firstName ||
     !lastName ||
     !email ||
     !password ||
+    !birthdate ||
     !phoneNumbers ||
-    !address ||
+    !addressLineOne ||
+    !addressLineTwo ||
     !city ||
     !state ||
-    !zip
+    !postalCode
   ) {
     return { error: true, message: "Please fill in all fields" };
   }
@@ -129,25 +136,27 @@ export async function saveTenant(payload: any) {
       };
     }
 
+    const billingAddress = {
+      addressLineOne,
+      addressLineTwo,
+      city,
+      state,
+      postalCode,
+    };
+
     const newUser = new User({
       firstName,
       lastName,
       email,
       password,
+      birthdate,
       phoneNumbers: [{ number: phoneNumbers, isPrimary: true }],
-      address,
-      city,
-      state,
-      zip,
+      billingAddress,
       role: "tenant",
       createdBy: userId,
     });
 
-    console.log("Saving new user:", newUser);
-
     await newUser.save();
-
-    console.log("User saved successfully");
 
     return { error: false, message: "Tenant created successfully" };
   } catch (error) {

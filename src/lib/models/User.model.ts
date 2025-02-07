@@ -6,6 +6,7 @@ import { BillingAddressSchema } from "@/models/BillingAddress.schema" // require
 import { ChangeLogSchema } from "@/models/ChangeLog.schema" // require invidual import to avoid circular dependency
 import { PhoneNumberSchema } from "@/models/PhoneNumber.schema" // require invidual import to avoid circular dependency
 import { formatDate, logChanges } from "@/server-utils/helpers"
+import { NoteSchema } from "@/models/Note.schema"
 
 // User Schema
 const UserSchema = new Schema<IUser>(
@@ -60,6 +61,9 @@ const UserSchema = new Schema<IUser>(
 			required: [true, "Password is required"],
 			select: false,
 		},
+		birthdate: {
+			type: String,
+		},
 		phoneNumbers: [PhoneNumberSchema],
 		role: {
 			type: String,
@@ -101,6 +105,7 @@ const UserSchema = new Schema<IUser>(
 				},
 			},
 		],
+		notes: [NoteSchema],
 		history: {
 			type: [ChangeLogSchema],
 			default: [],
@@ -154,7 +159,7 @@ UserSchema.methods.isCorrectPassword = async function (
 // Convert the 'createdAt' field to MMM DD, YYYY format e.g. Jan 30, 2025
 UserSchema.path("createdAt").get(formatDate)
 UserSchema.path("updatedAt").get(formatDate)
-
+UserSchema.path("birthdate").get(formatDate)
 // SETTERS
 // Set toObject options to exclude _id and password fields automatically
 UserSchema.set("toObject", {

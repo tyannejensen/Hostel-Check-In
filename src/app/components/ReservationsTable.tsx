@@ -17,7 +17,6 @@ interface ReservationTableProps {
 export default function ReservationsTable({ bookings }: ReservationTableProps) {
   const router = useRouter();
   function handleNavigateToReservationById(id: string) {
-    console.log(id);
     router.push(`/dashboard/reservations/${id}`);
   }
 

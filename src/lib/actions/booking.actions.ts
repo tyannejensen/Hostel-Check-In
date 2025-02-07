@@ -35,7 +35,7 @@ export async function getBookings() {
   return bookingsAsObj;
 }
 
-export async function getBookingById(id: string) {
+export async function getBookingById(id: string | string[]) {
   await dbConnect();
 
   const booking = await Booking.findById(id)
@@ -114,9 +114,6 @@ export async function addBookingAndPayment(data: any, userId: string) {
       depositAmount: data.deposit,
     });
     await booking.save({ session });
-    console.log("saving booking");
-
-    console.log("function addBookingAndPayment -> booking", booking);
 
     // Step 3: Get a Paymebt Method to use with the Payment
     const paymentMethod = await PaymentMethod.findOne({
@@ -138,8 +135,6 @@ export async function addBookingAndPayment(data: any, userId: string) {
       paymentMethod: paymentMethod._id,
     });
     await payment.save({ session });
-
-    console.log("function addBookingAndPayment -> payment", payment);
 
     // Step 5: Update Booking with the Payment reference
     booking.payments.push(payment._id);

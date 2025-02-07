@@ -29,30 +29,6 @@ export async function getTenants() {
   }
 }
 
-// Get tenant by ID
-export async function getTenantById(id: string) {
-  try {
-    await dbConnect();
-
-    const tenant = await User.findById(id)
-      .populate("paymentMethods")
-      .populate("bookings");
-
-    if (!tenant)
-      return {
-        error: null,
-        message: "Tenant not found",
-      };
-
-    const tenantObj = tenant?.toObject();
-
-    return tenantObj;
-  } catch (error) {
-    console.error("Unable to get Tenant:", error);
-    return { error: error, message: "Unable to get Tenant" };
-  }
-}
-
 // ----- SET DATA ----- //
 
 // Register a new user

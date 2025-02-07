@@ -37,10 +37,8 @@ export default async function Page() {
   async function handleFormSubmit(values: any) {
     "use server";
 
-    console.log(values);
     if (userId) {
       const result = await addBookingAndPayment(values, userId);
-      // redirect back to reservations page if successful
       redirect("/dashboard/reservations");
     } else {
       console.error("User ID not found.");

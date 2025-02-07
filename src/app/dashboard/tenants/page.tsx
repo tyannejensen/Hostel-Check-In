@@ -22,7 +22,6 @@ export default async function Page() {
   const tenants = await getTenants();
 
   function convertTenantIntoTableData(tenants: any) {
-    console.log(tenants);
     return tenants.reverse().map((tenant: any) => {
       return {
         id: tenant.id,

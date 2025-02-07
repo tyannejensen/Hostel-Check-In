@@ -69,7 +69,6 @@ interface Reservation {
 
 export default function Page() {
   // get book id from url params
-  console.log("booking");
   const { id } = useParams();
 
   const [reservation, setReservation] = useState<Reservation | null>(null);
@@ -80,7 +79,6 @@ export default function Page() {
     const fetchReservation = async () => {
       try {
         const booking: Reservation = await getBookingById(id ?? "");
-        console.log(booking);
         // Mock data for now
         booking.transactionHistory = [
           { date: "2025-01-01", amount: "$100", description: "Deposit" },
@@ -116,7 +114,6 @@ export default function Page() {
       //   reservationId: id,
       // };
       // const booking = await addBookingAndPayments(data, userId);
-      // console.log("Booking and payment added:", booking);
     } catch (error) {
       console.error("Error adding booking and payment:", error);
     }

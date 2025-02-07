@@ -23,17 +23,17 @@ export default async function Page({ params }: any) {
   const tenant = await getTenantById(id);
 
   const formValues = {
-    firstName: "John",
-    lastName: "Doe",
-    email: "etc@gmail.com",
-    phone: "1234567890",
-    address: "123 Main St",
-    city: "Anytown",
-    state: "NY",
-    zip: "12345",
+    firstName: tenant.firstName,
+    lastName: tenant.lastName,
+    email: tenant.email,
+    phone: tenant.phone,
+    addressLineOne: tenant.billingAddress.addressLineOne,
+    addressLineTwo: tenant.billingAddress.addressLineTwo,
+    birthdate: new Date(tenant.birthdate).toISOString().split("T")[0], // yyyy-MM-dd format
+    city: tenant.billingAddress.city,
+    state: tenant.billingAddress.state,
+    zip: tenant.billingAddress.postalCode,
   };
-
-  console.log(tenant);
 
   function formatPhoneNumber(phoneNumber: string): PhoneNumber {
     return {
@@ -47,12 +47,10 @@ export default async function Page({ params }: any) {
   async function handleFormSubmit(values: any) {
     "use server";
 
-    console.log(values);
     // values.phone = formatPhoneNumber(values.phone);
     values.password = "password";
     // Save the tenant to the database
     const response = await saveTenant(values);
-    console.log(response);
     if (response.error) {
       throw new Error(response.message);
     } else {
@@ -66,7 +64,7 @@ export default async function Page({ params }: any) {
       {tenant ? (
         <TenantForm
           title={"UPDATE TENANT"}
-          defaultValues={tenant}
+          defaultValues={formValues}
           handleOnSubmit={handleFormSubmit}
         />
       ) : (

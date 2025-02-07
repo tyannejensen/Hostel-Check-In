@@ -28,7 +28,9 @@ const formSchema = z.object({
   lastName: z.string(),
   email: z.string().email(),
   phone: z.string(),
-  address: z.string(),
+  birthdate: z.string(),
+  addressLineOne: z.string(),
+  addressLineTwo: z.string(),
   city: z.string(),
   state: z.string(),
   zip: z.string(),
@@ -52,7 +54,7 @@ const formSchema = z.object({
 interface TenantForm {
   handleOnSubmit: (values: z.infer<typeof formSchema>) => void;
   title?: string;
-  defaultValues: any;
+  defaultValues?: any;
 }
 
 const TenantForm: React.FC<TenantForm> = ({
@@ -71,7 +73,9 @@ const TenantForm: React.FC<TenantForm> = ({
       lastName: "",
       email: "",
       phone: "",
-      address: "",
+      birthdate: "",
+      addressLineOne: "",
+      addressLineTwo: "",
       city: "",
       state: "",
       zip: "",
@@ -89,7 +93,6 @@ const TenantForm: React.FC<TenantForm> = ({
   //       cvv: "",
   //     };
   //     setPaymentMethodType(value);
-  //     console.log(value);
   //     field.onChange(value);
   //     form.setValue("paymentMethod", paymentMethod);
   //     form.setValue("paymentMethodType", value);
@@ -186,11 +189,50 @@ const TenantForm: React.FC<TenantForm> = ({
                 />
                 <FormField
                   control={form.control}
-                  name="address"
+                  name="birthdate"
                   render={({ field }) => (
                     <FormItem className="b-box">
                       <div className="label-title whitespace-nowrap">
-                        Address
+                        Birthdate
+                      </div>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="addressLineOne"
+                  render={({ field }) => (
+                    <FormItem className="b-box">
+                      <div className="label-title whitespace-nowrap">
+                        Address Line One
+                      </div>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="addressLineTwo"
+                  render={({ field }) => (
+                    <FormItem className="b-box">
+                      <div className="label-title whitespace-nowrap">
+                        Address Line Two
                       </div>
                       <FormControl>
                         <Input

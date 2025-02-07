@@ -266,18 +266,18 @@ async function seedBookingsWithPayments(
 	}
 }
 
-async function seedNotes(admin: IUser, bookings: IBooking[]) {
+async function seedNotes(admin: IUser, users: IUser[]) {
 	// Add all notes and link to the bookings
 	const formatedNotes = await Promise.all(
 		notesData.map(async (note, i) => {
-			const booking = await Booking.findOne({ _id: bookings[i].id })
-			booking.notes.push({
+			const user = await User.findOne({ _id: users[i].id })
+			user.notes.push({
 				...note,
 				createdBy: admin.id,
 			})
-			await booking.save()
-			const bookingObject = await Booking.findOne({
-				_id: booking._id,
+			await user.save()
+			const userObject = await User.findOne({
+				_id: user._id,
 			}).populate({
 				path: "notes",
 				populate: {
@@ -285,7 +285,7 @@ async function seedNotes(admin: IUser, bookings: IBooking[]) {
 					select: "fullname email",
 				},
 			})
-			return bookingObject.notes[0].toObject()
+			return userObject.notes[0].toObject()
 		})
 	)
 	console.table(formatedNotes, ["content", "createdBy", "createdAt"])
@@ -364,7 +364,7 @@ async function seedDatabase() {
 		console.log("Bookings and Payments added successfully!\n")
 
 		// Add all notes and link to the bookings
-		await seedNotes(admin, bookings) // Add all notes
+		await seedNotes(admin, tenants) // Add all notes
 		console.log("Notes added to Bookings successfully!\n")
 
 		// Update Booking status to create a history log
