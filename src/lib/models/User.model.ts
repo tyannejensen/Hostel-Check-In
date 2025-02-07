@@ -193,6 +193,7 @@ UserSchema.path("birthdate").get(formatDate)
 
 // Set the 'fullname" field to the concatenation of the updated 'firstName' field and the current 'lastName' field
 UserSchema.path("firstName").set(function (this: IUser, firstName: string) {
+	if (!this.fullname) return firstName
 	const [_, lastName] = this.fullname.split(" ")
 	this.fullname = firstName + " " + lastName
 	return firstName
@@ -200,17 +201,10 @@ UserSchema.path("firstName").set(function (this: IUser, firstName: string) {
 
 // Set the 'fullname" field to the concatenation of the updated 'lastName' field and the current 'firstName' field
 UserSchema.path("lastName").set(function (this: IUser, lastName: string) {
+	if (!this.fullname) return lastName
 	const [firstName, _] = this.fullname.split(" ")
 	this.fullname = firstName + " " + lastName
 	return lastName
-})
-
-// Set the 'firstName' and 'lastName' fields to the split of the updated 'fullname' field
-UserSchema.path("fullname").set(function (this: IUser, fullname: string) {
-	const [firstName, lastName] = this.fullname.split(" ")
-	this.firstName = firstName
-	this.lastName = lastName
-	return fullname
 })
 
 // Set toObject options to exclude _id and password fields automatically
