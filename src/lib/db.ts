@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server"
 import mongoose from "mongoose"
 
@@ -9,7 +10,15 @@ if (!MONGO_URI) {
 	)
 }
 
-let cached = (global as any).mongoose || { conn: null, promise: null }
+interface MongooseCache {
+	conn: typeof mongoose | null
+	promise: Promise<typeof mongoose> | null
+}
+
+const cached: MongooseCache = (global as any).mongoose || {
+	conn: null,
+	promise: null,
+}
 
 export async function dbConnect() {
 	if (cached.conn) return cached.conn
@@ -19,13 +28,13 @@ export async function dbConnect() {
 			.connect(MONGO_URI, {
 				dbName: "hostel_db",
 			} as mongoose.ConnectOptions)
-			.then((connection) => {
+			.then(async (connection) => {
 				// Force-load all models
-				require("@/models/Booking.model")
-				require("@/models/User.model")
-				require("@/models/Payment.model")
-				require("@/models/PaymentMethod.model")
-				require("@/models/Room.model")
+				await import("@/models/Booking.model")
+				await import("@/models/User.model")
+				await import("@/models/Payment.model")
+				await import("@/models/PaymentMethod.model")
+				await import("@/models/Room.model")
 				return connection
 			})
 	}
